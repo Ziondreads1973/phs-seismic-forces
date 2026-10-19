@@ -60,12 +60,12 @@ test('Art. 87: pantalla global idéntica al contenido enviado a impresión',()=>
   assert.equal(d.saved.printedView,d.nodes.globalReport.innerHTML);
 });
 
-test('TXT: desarrollo completo de factores, sustituciones y fuerzas finales',()=>{
+test('TXT: fórmulas con resultados consecutivos, sin sustituciones numéricas',()=>{
   const d=mount();
   d.nodes.txtButton.events.click();
   assert.equal(d.saved.files.length,1);
   assert.match(d.saved.files[0],/_detallado\.txt$/);
-  for(const section of ['1. ANTECEDENTES','2. PARÁMETROS Y FACTORES DE DISEÑO','3. DESARROLLO DEL CÁLCULO','4. FUERZAS SÍSMICAS FINALES'])
+  for(const section of ['1. ANTECEDENTES','2. CÁLCULO DE FUERZAS SÍSMICAS','3. FUERZAS PARA ANCLAJES','4. RESUMEN DE RESULTADOS'])
     assert.ok(d.saved.payload.includes(section));
   for(const fragment of ['Frecuencia X','1000 kgf','Kh ubicación','Kh,X','Ex =','Ey =','Ez =','Ex,a =','Ey,a =','Ez,a ='])
     assert.ok(d.saved.payload.includes(fragment),fragment);
@@ -126,7 +126,7 @@ test('FS-06-C02: entradas conservan exactamente los decimales introducidos',()=>
       assert.ok(txt.includes(label),'TXT: '+label);
     }
     assert.doesNotMatch(content,/29[.,]99\s*Hz[^]*30[.,]00 Hz/);
-    assert.match(txt,/DESARROLLO DEL CÁLCULO/);
+    assert.match(txt,/CÁLCULO DE FUERZAS SÍSMICAS/);
   }
 });
 
@@ -135,7 +135,7 @@ test('FS-06-C02: factores normativos sin ceros sobrantes, fuerzas con un decimal
  assert.match(c.nodes.globalReport.innerHTML,/Altura H/);
  assert.match(c.nodes.globalReport.innerHTML,/Rp/);
  assert.match(c.nodes.txtPreview.textContent,/ak\/g/);
- assert.match(c.nodes.txtPreview.textContent,/Cp sin limitar/);
+ assert.match(c.nodes.txtPreview.textContent,/Cp =/);
  assert.match(c.nodes.txtPreview.textContent,/Cmin =/);
  const e=mount({norm:'88',w:'1000',vertical:'rigid'});
  assert.match(e.nodes.globalReport.innerHTML,/IE \(Tabla 4\)/);
@@ -154,11 +154,15 @@ test('FS-06-C02: pantalla y TXT contienen el mismo valor de cada fuerza',()=>{
   const d=mount({norm,w:'2000',fx:'25',fy:'30'});
   const preview=d.nodes.globalReport.innerHTML;
   const txt=d.nodes.txtPreview.textContent;
-  for(const line of txt.split('\n').filter(x=>/^E[xyz] \| /.test(x))){
-   const values=line.split('|').slice(1).map(x=>x.trim());
-   for(const value of values)assert.ok(preview.includes(value),norm+': '+line);
+  const finalBlock=txt.split('4. RESUMEN DE RESULTADOS')[1];
+  const rows=finalBlock.split('\n').filter(x=>/^E[xyz]\s+[\d.,]+\s+[\d.,]+/.test(x));
+  assert.equal(rows.length,3,norm);
+  for(const line of rows){
+   const parts=line.trim().split(/\s+/).slice(1);
+   assert.equal(parts.length,2,norm+': '+line);
+   for(const value of parts)assert.ok(preview.includes(value),norm+': '+line);
   }
-  assert.match(txt,/3\. DESARROLLO DEL CÁLCULO/);
+  assert.match(txt,/2\. CÁLCULO DE FUERZAS SÍSMICAS/);
   assert.match(txt,/Ex =/);
   assert.match(txt,/Ey =/);
   assert.match(txt,/Ez =/);
@@ -182,21 +186,21 @@ test('TXT NCh2369: ruta basal y elevada contienen límites, Rp, vertical y ampli
  for(const data of [{loc2369:'ground',duct:'ductile'},{loc2369:'elevated',height:'8.50',zk:'4.25',duct:'nonductile'}]){
    const d=mount({norm:'2369',w:'1000',...data});
    const txt=d.nodes.txtPreview.textContent;
-   for(const fragment of ['Ar/g','ak/g','Cp sin limitar','Cmin','Cmax','C horizontal',
+   for(const fragment of ['Ar/g','ak/g','Cp =','Cmin','Cmax','Ch =',
      'Cv','Kp','Rp','Ex =','Ey =','Ez =','Ex,a =','Ey,a =','Ez,a ='])
      assert.ok(txt.includes(fragment),fragment);
    if(data.loc2369==='elevated')assert.match(txt,/Zk\/H/);
-   else assert.match(txt,/Zk = 0/);
+   else assert.doesNotMatch(txt,/Zk\/H/);
    assert.ok(!d.nodes.globalReport.innerHTML.includes('Cp sin limitar'));
    assert.doesNotMatch(d.nodes.globalReport.innerHTML,/Desarrollo del cálculo/);
  }
 });
 
-test('TXT Art87: factores por eje, ubicación, sustituciones y demanda vertical',()=>{
+test('TXT Art87: factores por eje, ubicación y resultados sin sustituciones',()=>{
  const d=mount({norm:'87',w:'1000',fx:'25',fy:'35',loc87:'floor'});
  const txt=d.nodes.txtPreview.textContent;
  for(const part of ['Kh,X','Kh,Y','Kv ubicación','Coeficiente Cx','Coeficiente Cy',
-    'fX = 25 Hz','fY = 35 Hz','Ex =','Ey =','Ez =',
+    '25 Hz','35 Hz','Cx =','Cy =','Ex =','Ey =','Ez =',
     'Ex,a =','Ey,a =','Ez,a ='])
   assert.ok(txt.includes(part),part);
  const nf=n=>new Intl.NumberFormat(undefined,{minimumFractionDigits:1,maximumFractionDigits:1,useGrouping:false}).format(n);
@@ -213,13 +217,13 @@ test('TXT Art88: desarrollo espectral y ambas hipótesis verticales',()=>{
     'Ex =','Ey =','Ez =','Ex,a =','Ey,a =','Ez,a ='])
     assert.ok(txt.includes(part),part);
   assert.ok(txt.includes(vertical==='rigid'?'V1':'V2'));
-  if(vertical==='rigid')assert.doesNotMatch(txt,/Ez = 0[.,]72/);
-  else assert.match(txt,/Ez = 0[.,]72/);
+  if(vertical==='rigid')assert.doesNotMatch(txt,/Cv = 0[.,]72 ·/);
+  else assert.match(txt,/Cv = 0[.,]72 ·/);
   assert.doesNotMatch(d.nodes.globalReport.innerHTML,/Fb =|Desarrollo del cálculo/);
  }
 });
 
-test('TXT localización decimal aplica también a constantes y sustituciones',()=>{
+test('TXT localización decimal aplica también a fórmulas y resultados',()=>{
  for(const locale of ['es-CL','en-US']){
   const d=mount({norm:'87',w:'1000',fx:'25',fy:'25',loc87:'floor'},locale);
   const txt=d.nodes.txtPreview.textContent;
@@ -230,5 +234,62 @@ test('TXT localización decimal aplica también a constantes y sustituciones',()
   assert.ok(txt.includes('1518'+sep+'8'),locale);
   assert.doesNotMatch(txt,locale==='en-US'?/\b0,60\b/:/\b0\.60\b/);
   assert.ok(!txt.includes('1'+(sep===','?'.':',')+'25 · Ex'));
+  assert.doesNotMatch(txt,/^\s{2,}= /m);
  }
+});
+
+
+test('FS-06-C04: NCh2369 fórmula y resultado inmediatos, sin reemplazo de valores',()=>{
+  for(const p of [{loc2369:'ground',duct:'ductile'},{loc2369:'elevated',duct:'nonductile',height:'6.5',zk:'3.25'}]){
+    const d=mount({norm:'2369',w:'1000',...p});
+    const txt=d.nodes.txtPreview.textContent;
+    for(const expr of [
+      /ak\/g = I · \(Ar\/g\) · S(?: · \(1 \+ 2 · Zk\/H\))?\nak\/g = [0-9.,]+/,
+      /Cp = \(ak\/g\) · Kp \/ Rp\nCp = [0-9.,]+/,
+      /Cmin = 0[.,]7 · I · \(Ar\/g\) · S\nCmin = [0-9.,]+/,
+      /Cmax = 3 · I · \(Ar\/g\) · S\nCmax = [0-9.,]+/,
+      /Ch = mín\(Cmax; máx\(Cmin; Cp\)\)\nCh = [0-9.,]+/,
+      /Cv = kv · I · \(Ar\/g\) · S\nCv = [0-9.,]+/,
+      /Ex = Ch · W\nEx = [0-9.,]+ kgf/,
+      /Ez,a = Ez\nEz,a = [0-9.,]+ kgf/
+    ])assert.match(txt,expr);
+    assert.match(txt,/Condición controlante: (Cp|Cmin|Cmax)/);
+    assert.doesNotMatch(txt,/^\s+= /m);
+    assert.doesNotMatch(d.nodes.globalReport.innerHTML,/Condición controlante|Ch =/);
+  }
+});
+test('FS-06-C04: Art87 y Art88 tienen fórmula y resultado consecutivos',()=>{
+  const cases=[
+    {norm:'87',w:'1000',fx:'25',fy:'35',loc87:'floor'},
+    {norm:'88',w:'1000',vertical:'rigid',loc88:'floor'},
+    {norm:'88',w:'1000',vertical:'flex',loc88:'floor'}
+  ];
+  for(const v of cases){
+    const d=mount(v);
+    const txt=d.nodes.txtPreview.textContent;
+    for(const reg of [/Ex = C[ hx]?\w* · W\nEx = [0-9.,]+ kgf/,
+      /Ey = C[ hy]?\w* · W\nEy = [0-9.,]+ kgf/,
+      /Ez = Cz? · W\nEz = [0-9.,]+ kgf/,
+      /Ex,a = Factor H · Ex\nEx,a = [0-9.,]+ kgf/]){
+      assert.match(txt,reg);
+    }
+    assert.doesNotMatch(txt,/^\s+= /m);
+    assert.doesNotMatch(txt,/^  \d+[.,]\d+ · \d+/m);
+    assert.doesNotMatch(d.nodes.globalReport.innerHTML,/2.1\.|Factor H =|Fb =/);
+  }
+});
+test('FS-06-C04: precisión de coeficientes crece con W y respeta decimal regional',()=>{
+  for(const locale of ['es-CL','en-US']){
+    for(const weight of [100,1000,10000,1000000]){
+      const d=mount({norm:'2369',w:String(weight)},locale);
+      const txt=d.nodes.txtPreview.textContent;
+      const match=txt.match(/^Ch = ([0-9.,]+)$/m);
+      assert.ok(match,'Ch missing');
+      const value=Number(match[1].replace(',','.'));
+      const full=.38808; // Referencia independiente: I=1,2, Ar=0,42, S=1,05, Kp=2,2, Rp=3
+      const forceDelta=Math.abs((value-full)*weight*2.1);
+      assert.ok(forceDelta<=.011,locale+' W='+weight+': error '+forceDelta);
+      assert.doesNotMatch(match[1],locale==='en-US'?/,/:/\./);
+    }
+  }
 });

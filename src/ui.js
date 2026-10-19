@@ -54,130 +54,121 @@ function htmlTable(data,forceMode=false){
 }
 
 /*
- * Reporte TXT auditable: factores y cálculos derivados del mismo resultado
- * del motor que alimenta pantalla/PDF. La sustitución no recalcula la demanda.
+ * TXT auditable: ecuación simbólica seguida del resultado del motor.
+ * Sin sustituciones numéricas ni cálculos paralelos en el reporte.
+ *
+ * Precisión de coeficientes calculados: mínimo cuatro cifras significativas
+ * y suficiente precisión decimal para que el error que introduciría un
+ * coeficiente presentado sea inferior a 0,01 kgf sobre la demanda asociada.
+ * Esta tolerancia es exclusivamente de visualización (no del motor).
  */
-function detailedFactors(r){
+function calculatedCoefficient(value,weight,sensitivity=1){
+ if(value===0)return '0';
+ const magnitude=Math.floor(Math.log10(Math.abs(value)));
+ const minimumDecimals=Math.max(0,3-magnitude);
+ const demand=Math.abs(weight*sensitivity);
+ let decimals=Math.min(15,minimumDecimals);
+ while(decimals<15 && 0.5*Math.pow(10,-decimals)*demand>0.01)decimals++;
+ return new Intl.NumberFormat(undefined,{
+   minimumFractionDigits:0,maximumFractionDigits:decimals,useGrouping:false
+ }).format(value);
+}
+function normativeFactors(r){
  const k=r.factors;
- if(r.method==='NCh2369:2025-cap7')
-  return [
-   ['I',factor(k.I)],['Ar/g',factor(k.Ar_over_g)],['S',factor(k.S)],
-   ['kv',factor(k.kv)],['Kp',factor(k.Kp)],['Rp',factor(k.Rp)],
-   ['ak/g',factor(k.ak_over_g)],['Cp sin limitar',factor(k.Cp)],
-   ['C horizontal mínimo',factor(k.Cmin)],['C horizontal máximo',factor(k.Cmax)],
-   ['C horizontal adoptado',factor(k.structure.X)],
-   ['Cv vertical',factor(k.structure.Z)],
-   ['Factor horizontal anclajes',factor(k.anchor_multiplier.horizontal)],
-   ['Factor vertical anclajes',factor(k.anchor_multiplier.vertical)]
-  ];
- if(r.method==='CNE-Art87')
-  return [
-   ['Kh,X',factor(k.KhX)],['Kh,Y',factor(k.KhY)],['Kv',factor(k.Kv)],
-   ['Kh ubicación',factor(k.location.horizontal)],['Kv ubicación',factor(k.location.vertical)],
-   ['Coeficiente Cx',factor(k.structure.X)],['Coeficiente Cy',factor(k.structure.Y)],
-   ['Coeficiente Cz',factor(k.structure.Z)],
-   ['Factor horizontal anclajes',factor(k.anchor_multiplier.horizontal)],
-   ['Factor vertical anclajes',factor(k.anchor_multiplier.vertical)]
-  ];
+ if(r.method==='NCh2369:2025-cap7')return [
+  ['I',factor(k.I)],['Ar/g',factor(k.Ar_over_g)],['S',factor(k.S)],
+  ['Kp',factor(k.Kp)],['Rp',factor(k.Rp)],['kv',factor(k.kv)]
+ ];
+ if(r.method==='CNE-Art87')return [
+  ['Kh,X',factor(k.KhX)],['Kh,Y',factor(k.KhY)],['Kv',factor(k.Kv)],
+  ['Kh ubicación',factor(k.location.horizontal)],['Kv ubicación',factor(k.location.vertical)],
+  ['Factor anclajes H',factor(k.anchor_multiplier.horizontal)]
+ ];
  return [
   ['IE (Tabla 4)',factor(k.IE)],['R (Tabla 4)',factor(k.R)],
-  ['A0/g',factor(k.A0_g)],['Amortiguamiento xi (%)',factor(k.xi_pct)],
-  ['Fb',factor(k.Fb)],['Sa,máx/g',factor(k.Sa_over_g)],
+  ['A0/g',factor(k.A0_g)],['Amortiguamiento (%)',factor(k.xi_pct)],
   ['Kh ubicación',factor(k.location.horizontal)],['Kv ubicación',factor(k.location.vertical)],
-  ['Coeficiente Cx/Cy',factor(k.structure.X)],['Coeficiente Cz',factor(k.structure.Z)],
-  ['Factor horizontal anclajes',factor(k.anchor_multiplier.horizontal)],
-  ['Factor vertical anclajes',factor(k.anchor_multiplier.vertical)]
+  ['Factor anclajes H',factor(k.anchor_multiplier.horizontal)]
  ];
 }
 function detailedEquations(r){
- const k=r.factors,p=r.inputs,W=inputValue('w'),n=factor,final=force;
- let lines=[];
+ const k=r.factors,p=r.inputs,W=r.weight_kgf,n=factor,final=force;
+ const c=(x,m=1)=>calculatedCoefficient(x,W,m);
+ const calc=[],anchors=[];
+ const add=(arr,formula,result)=>arr.push(formula,result,'');
  if(r.method==='NCh2369:2025-cap7'){
   const elevated=p.location==='elevated';
-  lines.push('Aceleración horizontal en el nivel de apoyo:');
-  if(elevated){
-   lines.push('ak/g = I · (Ar/g) · S · (1 + 2 · Zk/H)');
-   lines.push('     = '+n(k.I)+' · '+n(k.Ar_over_g)+' · '+n(k.S)+' · (1 + 2 · '+inputValue('zk')+'/'+inputValue('height')+')');
-  }else{
-   lines.push('ak/g = I · (Ar/g) · S  [Zk = 0, instalación basal]');
-   lines.push('     = '+n(k.I)+' · '+n(k.Ar_over_g)+' · '+n(k.S));
-  }
-  lines.push('ak/g = '+n(k.ak_over_g),'',
-    'Coeficiente horizontal antes de límites:',
-    'Cp = (ak/g) · Kp / Rp',
-    '   = '+n(k.ak_over_g)+' · '+n(k.Kp)+' / '+n(k.Rp),
-    'Cp = '+n(k.Cp),'',
-    'Límites normativos del coeficiente horizontal:',
-    'Cmin = '+n(.7)+' · I · (Ar/g) · S',
-    '     = '+n(.7)+' · '+n(k.I)+' · '+n(k.Ar_over_g)+' · '+n(k.S),
-    'Cmin = '+n(k.Cmin),
-    'Cmax = 3 · I · (Ar/g) · S',
-    '     = 3 · '+n(k.I)+' · '+n(k.Ar_over_g)+' · '+n(k.S),
-    'Cmax = '+n(k.Cmax),
-    'C horizontal = mín(Cmax; máx(Cmin; Cp))',
-    '             = mín('+n(k.Cmax)+'; máx('+n(k.Cmin)+'; '+n(k.Cp)+'))',
-    'C horizontal = '+n(k.structure.X),'',
-    'Coeficiente vertical (§5.7.1):',
-    'Cv = kv · I · (Ar/g) · S',
-    '   = '+n(k.kv)+' · '+n(k.I)+' · '+n(k.Ar_over_g)+' · '+n(k.S),
-    'Cv = '+n(k.structure.Z),'',
-    'Fuerzas sobre equipo/estructura:',
-    'Ex = C horizontal · Pp = '+n(k.structure.X)+' · '+W+' = '+final(r.structure.Ex),
-    'Ey = C horizontal · Pp = '+n(k.structure.Y)+' · '+W+' = '+final(r.structure.Ey),
-    'Ez = Cv · Pp           = '+n(k.structure.Z)+' · '+W+' = '+final(r.structure.Ez),'',
-    'Fuerzas sísmicas para anclajes:',
-    'Factor H = '+(p.anchor==='ductile'?n(.7)+' · Rp (§7.3.2)':'Rp (§7.3.3)')+' = '+n(k.anchor_multiplier.horizontal),
-    'Ex,a = Ex · Factor H = '+n(r.structure.Ex)+' · '+n(k.anchor_multiplier.horizontal)+' = '+final(r.anchors.Ex),
-    'Ey,a = Ey · Factor H = '+n(r.structure.Ey)+' · '+n(k.anchor_multiplier.horizontal)+' = '+final(r.anchors.Ey),
-    'Ez,a = Ez · 1 = '+final(r.anchors.Ez));
+  calc.push('2.1. Aceleración horizontal');
+  add(calc,elevated?
+   'ak/g = I · (Ar/g) · S · (1 + 2 · Zk/H)':
+   'ak/g = I · (Ar/g) · S',
+   'ak/g = '+c(k.ak_over_g,k.Kp/k.Rp));
+  calc.push('2.2. Coeficiente horizontal');
+  add(calc,'Cp = (ak/g) · Kp / Rp','Cp = '+c(k.Cp));
+  calc.push('2.3. Límites del coeficiente horizontal');
+  add(calc,'Cmin = '+n(.7)+' · I · (Ar/g) · S','Cmin = '+c(k.Cmin));
+  add(calc,'Cmax = 3 · I · (Ar/g) · S','Cmax = '+c(k.Cmax));
+  add(calc,'Ch = mín(Cmax; máx(Cmin; Cp))','Ch = '+c(k.structure.X));
+  const controlling=k.Cp<=k.Cmin?'Cmin':k.Cp>=k.Cmax?'Cmax':'Cp';
+  calc.push('Condición controlante: '+controlling,'');
+  calc.push('2.4. Coeficiente sísmico vertical');
+  add(calc,'Cv = kv · I · (Ar/g) · S','Cv = '+c(k.structure.Z));
+  calc.push('2.5. Fuerzas sísmicas de la estructura');
+  add(calc,'Ex = Ch · W','Ex = '+final(r.structure.Ex));
+  add(calc,'Ey = Ch · W','Ey = '+final(r.structure.Ey));
+  add(calc,'Ez = Cv · W','Ez = '+final(r.structure.Ez));
+  anchors.push('3.1. Amplificación horizontal ('+(p.anchor==='ductile'?'§7.3.2':'§7.3.3')+')');
+  add(anchors,p.anchor==='ductile'?'Factor H = '+n(.7)+' · Rp':'Factor H = Rp',
+   'Factor H = '+n(k.anchor_multiplier.horizontal));
+  add(anchors,'Ex,a = Factor H · Ex','Ex,a = '+final(r.anchors.Ex));
+  add(anchors,'Ey,a = Factor H · Ey','Ey,a = '+final(r.anchors.Ey));
+  anchors.push('3.2. Componente vertical');
+  add(anchors,'Ez,a = Ez','Ez,a = '+final(r.anchors.Ez));
  }else if(r.method==='CNE-Art87'){
-  const L=k.location,IE=n(p.IE);
-  lines.push('Selección de factores por frecuencia:',
-   'Kh,X = '+n(k.KhX)+'  (fX = '+inputValue('fx')+' Hz)',
-   'Kh,Y = '+n(k.KhY)+'  (fY = '+inputValue('fy')+' Hz)',
-   'Kv = '+n(k.Kv)+'; Kh ubicación = '+n(L.horizontal)+'; Kv ubicación = '+n(L.vertical),'',
-   'Fuerzas sobre equipo/estructura:',
-   'Ex = '+n(.6)+' · IE · W · Kh,X · Kh ubicación',
-   '   = '+n(.6)+' · '+IE+' · '+W+' · '+n(k.KhX)+' · '+n(L.horizontal),
-   'Ex = '+final(r.structure.Ex),
-   'Ey = '+n(.6)+' · IE · W · Kh,Y · Kh ubicación',
-   '   = '+n(.6)+' · '+IE+' · '+W+' · '+n(k.KhY)+' · '+n(L.horizontal),
-   'Ey = '+final(r.structure.Ey),
-   'Ez = '+n(.36)+' · IE · W · Kv · Kv ubicación',
-   '   = '+n(.36)+' · '+IE+' · '+W+' · '+n(k.Kv)+' · '+n(L.vertical),
-   'Ez = '+final(r.structure.Ez),'',
-   'Fuerzas sísmicas para anclajes:',
-   'Ex,a = '+n(k.anchor_multiplier.horizontal)+' · Ex = '+n(k.anchor_multiplier.horizontal)+' · '+n(r.structure.Ex)+' = '+final(r.anchors.Ex),
-   'Ey,a = '+n(k.anchor_multiplier.horizontal)+' · Ey = '+n(k.anchor_multiplier.horizontal)+' · '+n(r.structure.Ey)+' = '+final(r.anchors.Ey),
-   'Ez,a = 1 · Ez = '+final(r.anchors.Ez));
+  calc.push('2.1. Factores por frecuencia horizontal');
+  add(calc,'Kh,X = Kh(fX)','Kh,X = '+n(k.KhX));
+  add(calc,'Kh,Y = Kh(fY)','Kh,Y = '+n(k.KhY));
+  calc.push('2.2. Coeficientes de diseño');
+  add(calc,'Cx = '+n(.6)+' · IE · Kh,X · Kh ubicación','Cx = '+c(k.structure.X));
+  add(calc,'Cy = '+n(.6)+' · IE · Kh,Y · Kh ubicación','Cy = '+c(k.structure.Y));
+  add(calc,'Cz = '+n(.36)+' · IE · Kv · Kv ubicación','Cz = '+c(k.structure.Z));
+  calc.push('2.3. Fuerzas sísmicas de la estructura');
+  add(calc,'Ex = Cx · W','Ex = '+final(r.structure.Ex));
+  add(calc,'Ey = Cy · W','Ey = '+final(r.structure.Ey));
+  add(calc,'Ez = Cz · W','Ez = '+final(r.structure.Ez));
+  anchors.push('3.1. Amplificación horizontal');
+  add(anchors,'Factor H = '+n(k.anchor_multiplier.horizontal),'Factor H = '+n(k.anchor_multiplier.horizontal));
+  add(anchors,'Ex,a = Factor H · Ex','Ex,a = '+final(r.anchors.Ex));
+  add(anchors,'Ey,a = Factor H · Ey','Ey,a = '+final(r.anchors.Ey));
+  anchors.push('3.2. Componente vertical');
+  add(anchors,'Ez,a = Ez','Ez,a = '+final(r.anchors.Ez));
  }else{
-  const L=k.location,V=p.vertical;
-  lines.push('Aceleración espectral máxima (xi = '+n(k.xi_pct)+' %, A0/g = '+n(k.A0_g)+'):',
-   'Fb = ('+n(3.21)+' − '+n(.68)+' · ln(xi)) / '+n(2.1156),
-   '   = ('+n(3.21)+' − '+n(.68)+' · ln('+n(k.xi_pct)+')) / '+n(2.1156),
-   'Fb = '+n(k.Fb),
-   'Sa,máx/g = '+n(2.12)+' · (A0/g) · Fb',
-   '         = '+n(2.12)+' · '+n(k.A0_g)+' · '+n(k.Fb),
-   'Sa,máx/g = '+n(k.Sa_over_g),'',
-   'Fuerzas horizontales del equipo:',
-   'Ex = '+n(1.2)+' · IE · (Sa/g) · W · Kh ubicación / R',
-   '   = '+n(1.2)+' · '+n(k.IE)+' · '+n(k.Sa_over_g)+' · '+W+' · '+n(L.horizontal)+' / '+n(k.R),
-   'Ex = '+final(r.structure.Ex),
-   'Ey = '+n(1.2)+' · IE · (Sa/g) · W · Kh ubicación / R',
-   '   = '+n(1.2)+' · '+n(k.IE)+' · '+n(k.Sa_over_g)+' · '+W+' · '+n(L.horizontal)+' / '+n(k.R),
-   'Ey = '+final(r.structure.Ey),'',
-   'Fuerza vertical ('+(V==='rigid'?'V1 — rígido':'V2 — no rígido')+'):');
-  if(V==='rigid')lines.push('Ez = '+n(.36)+' · IE · W · Kv ubicación',
-   '   = '+n(.36)+' · '+n(k.IE)+' · '+W+' · '+n(L.vertical));
-  else lines.push('Ez = '+n(.72)+' · IE · (Sa/g) · W · Kv ubicación / R',
-   '   = '+n(.72)+' · '+n(k.IE)+' · '+n(k.Sa_over_g)+' · '+W+' · '+n(L.vertical)+' / '+n(k.R));
-  lines.push('Ez = '+final(r.structure.Ez),'',
-   'Fuerzas sísmicas para anclajes:',
-   'Ex,a = '+n(k.anchor_multiplier.horizontal)+' · Ex = '+n(k.anchor_multiplier.horizontal)+' · '+n(r.structure.Ex)+' = '+final(r.anchors.Ex),
-   'Ey,a = '+n(k.anchor_multiplier.horizontal)+' · Ey = '+n(k.anchor_multiplier.horizontal)+' · '+n(r.structure.Ey)+' = '+final(r.anchors.Ey),
-   'Ez,a = 1 · Ez = '+final(r.anchors.Ez));
+  const vertical=p.vertical;
+  calc.push('2.1. Aceleración espectral máxima');
+  add(calc,'Fb = ('+n(3.21)+' − '+n(.68)+' · ln(ξ)) / '+n(2.1156),
+   'Fb = '+c(k.Fb,1.2*k.A0_g*k.location.horizontal/k.R));
+  add(calc,'Sa,máx/g = '+n(2.12)+' · (A0/g) · Fb',
+   'Sa,máx/g = '+c(k.Sa_over_g,1.2*k.location.horizontal/k.R));
+  calc.push('2.2. Coeficiente sísmico horizontal');
+  add(calc,'Ch = '+n(1.2)+' · IE · (Sa/g) · Kh ubicación / R',
+   'Ch = '+c(k.structure.X));
+  calc.push('2.3. Coeficiente sísmico vertical ('+(vertical==='rigid'?'V1 — rígido':'V2 — no rígido')+')');
+  add(calc,vertical==='rigid'?
+   'Cv = '+n(.36)+' · IE · Kv ubicación':
+   'Cv = '+n(.72)+' · IE · (Sa/g) · Kv ubicación / R',
+   'Cv = '+c(k.structure.Z));
+  calc.push('2.4. Fuerzas sísmicas de la estructura');
+  add(calc,'Ex = Ch · W','Ex = '+final(r.structure.Ex));
+  add(calc,'Ey = Ch · W','Ey = '+final(r.structure.Ey));
+  add(calc,'Ez = Cv · W','Ez = '+final(r.structure.Ez));
+  anchors.push('3.1. Amplificación horizontal');
+  add(anchors,'Factor H = '+n(k.anchor_multiplier.horizontal),'Factor H = '+n(k.anchor_multiplier.horizontal));
+  add(anchors,'Ex,a = Factor H · Ex','Ex,a = '+final(r.anchors.Ex));
+  add(anchors,'Ey,a = Factor H · Ey','Ey,a = '+final(r.anchors.Ey));
+  anchors.push('3.2. Componente vertical');
+  add(anchors,'Ez,a = Ez','Ez,a = '+final(r.anchors.Ez));
  }
- return lines;
+ return {calc,anchors};
 }
 
 function buildReports(r){
@@ -188,18 +179,26 @@ function buildReports(r){
  const summary='<h2>2. Fuerzas sísmicas finales</h2>'+htmlTable(rows,true);
  const globalHtml=head+'<h2>1. Datos y factores de diseño</h2>'+htmlTable(data)+summary+
   '<p class="report-foot">Magnitudes por dirección. No incluye combinaciones gravitacionales ni verificación resistente de anclajes.</p>';
- const txthead=['PHS | INGENIERÍA ESTRUCTURAL','FUERZAS SÍSMICAS DE DISEÑO',name,'='.repeat(64)];
- const txtpairs=arr=>arr.map(x=>x[0]+' : '+x[1]);
- const txtresult=['ACCIÓN | ESTRUCTURA (kgf) | ANCLAJES (kgf)',
-  ...rows.map(x=>x[0]+' | '+display(x[1],1)+' | '+display(x[2],1))];
- const footer=['','Magnitudes por dirección; sin combinaciones ni verificación resistente.'];
- const textReport=[...txthead,'',
-  '1. ANTECEDENTES',...txtpairs(d.inputs),'',
-  '2. PARÁMETROS Y FACTORES DE DISEÑO',...txtpairs(detailedFactors(r)),'',
-  '3. DESARROLLO DEL CÁLCULO',...detailedEquations(r),'',
-  '4. FUERZAS SÍSMICAS FINALES',...txtresult,...footer,
-  'Los coeficientes calculados se muestran con hasta 12 decimales.',
-  'El motor conserva precisión numérica completa; las fuerzas se presentan a 1 decimal.'
+ const txthead=['PHS | INGENIERÍA ESTRUCTURAL','FUERZAS SÍSMICAS DE DISEÑO',name,'='.repeat(54)];
+ const txtpairs=arr=>arr.map(x=>x[0].padEnd(24,' ')+' : '+x[1]);
+ const txtresult=['                ESTRUCTURA        ANCLAJES',
+  '                  [kgf]            [kgf]',
+  '-'.repeat(54),
+  ...rows.map(x=>x[0].padEnd(15)+display(x[1],1).padStart(13)+display(x[2],1).padStart(17))];
+ const lines=detailedEquations(r);
+ const textReport=[
+  ...txthead,'',
+  '1. ANTECEDENTES','-'.repeat(54),
+  ...txtpairs(d.inputs),'','Parámetros normativos:',
+  ...txtpairs(normativeFactors(r)),'',
+  '2. CÁLCULO DE FUERZAS SÍSMICAS','-'.repeat(54),...lines.calc,
+  '3. FUERZAS PARA ANCLAJES','-'.repeat(54),...lines.anchors,
+  '4. RESUMEN DE RESULTADOS','-'.repeat(54),...txtresult,'-'.repeat(54),'',
+  'OBSERVACIONES',
+  '- Magnitudes positivas por dirección.',
+  '- Sin combinaciones ni verificaciones resistentes.',
+  '- Cálculo interno sin redondeos intermedios.',
+  '='.repeat(54),'PHS | INGENIERÍA ESTRUCTURAL'
  ].join('\n');
  return {globalHtml,textReport};
 }

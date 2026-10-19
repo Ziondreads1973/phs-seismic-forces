@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "0.4",
+  "preliminary": true,
+  "standard": "CNE Anexo Técnico Requisitos Sísmicos enero 2025",
+  "article": "88",
+  "units": {
+    "force": "kgf"
+  },
+  "inputs": {
+    "weight_kgf": 1000,
+    "IE": 1,
+    "R_structure": 1,
+    "R_anchor_reference": 1,
+    "Sa_over_g": 1.3721778749538622,
+    "A0_g": 0.5,
+    "damping_pct": 2,
+    "spectrum_mode": "auto",
+    "location": "ground",
+    "location_factors": {
+      "Kh": 1,
+      "Kv": 1
+    },
+    "floor_verified": false,
+    "vertical_model": "rigid",
+    "anchor_type": "post"
+  },
+  "coefficients": {
+    "structure": {
+      "X": 1.6466134499446345,
+      "Y": 1.6466134499446345,
+      "vertical": 0.36
+    },
+    "anchor_multiplier": {
+      "horizontal": 1.5,
+      "vertical": 1
+    }
+  },
+  "seismic_demands": {
+    "structure": {
+      "Ex": 1646.6134499446346,
+      "Ey": 1646.6134499446346,
+      "Ez_magnitude": 360.0
+    },
+    "anchors": {
+      "Ex": 2469.920174916952,
+      "Ey": 2469.920174916952,
+      "Ez_magnitude": 360.0
+    }
+  },
+  "notes": [
+    "Ejemplo generado conforme al código JS, solo ilustrativo"
+  ],
+  "limitations": [
+    "No incluye combinaciones ni gravitacionales",
+    "No calcula reacciones individuales de anclajes",
+    "Verificar Título XXII y XXX",
+    "Herramienta preliminar; falta verificación de casos normativos"
+  ]
+}

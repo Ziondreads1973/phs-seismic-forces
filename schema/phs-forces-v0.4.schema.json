@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://phs.local/schemas/phs-forces-v0.4.schema.json",
+  "title": "PHS Fuerzas Sísmicas v0.5 - contrato de exportación 0.4",
+  "description": "Validación estructural del exportador observado. NO certifica conformidad normativa.",
+  "type": "object",
+  "required": ["schemaVersion", "preliminary", "standard", "article", "units", "inputs", "coefficients", "seismic_demands", "notes", "limitations"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {"const":"0.4"},
+    "preliminary": {"const":true},
+    "standard": {"enum":["NCh2369:2025","CNE Anexo Técnico Requisitos Sísmicos enero 2025"]},
+    "article": {"enum":["7.2-7.3","87","88"]},
+    "units": {"type":"object","required":["force"],"properties":{"force":{"const":"kgf"}},"additionalProperties":false},
+    "inputs": {"type":"object","required":["weight_kgf"],"properties":{"weight_kgf":{"type":"number","exclusiveMinimum":0}},"additionalProperties":true},
+    "coefficients": {
+      "type":"object","required":["structure","anchor_multiplier"],"additionalProperties":false,
+      "properties": {
+        "structure":{"type":"object","required":["X","Y","vertical"],"properties":{"X":{"type":"number","minimum":0},"Y":{"type":"number","minimum":0},"vertical":{"type":"number","minimum":0}},"additionalProperties":false},
+        "anchor_multiplier":{"type":"object","required":["horizontal","vertical"],"properties":{"horizontal":{"type":"number","exclusiveMinimum":0},"vertical":{"const":1}},"additionalProperties":false}
+      }
+    },
+    "seismic_demands": {
+      "type":"object","required":["structure","anchors"],"additionalProperties":false,
+      "properties": {
+        "structure":{"$ref":"#/$defs/demands"},
+        "anchors":{"$ref":"#/$defs/demands"}
+      }
+    },
+    "notes":{"type":"array","items":{"type":"string"}},
+    "limitations":{"type":"array","items":{"type":"string"}}
+  },
+  "$defs":{
+    "demands":{"type":"object","required":["Ex","Ey","Ez_magnitude"],"properties":{"Ex":{"type":"number","minimum":0},"Ey":{"type":"number","minimum":0},"Ez_magnitude":{"type":"number","minimum":0}},"additionalProperties":false}
+  },
+  "allOf":[
+    {"if":{"properties":{"article":{"const":"7.2-7.3"}}},"then":{"properties":{"standard":{"const":"NCh2369:2025"},"inputs":{"required":["category","seismic_zone","soil","Rp","height_m","level_m","anchor_route"]}}}},
+    {"if":{"properties":{"article":{"const":"87"}}},"then":{"properties":{"standard":{"const":"CNE Anexo Técnico Requisitos Sísmicos enero 2025"},"inputs":{"required":["IE","frequency_Hz","vertical_frequency_check","location","location_factors","floor_verified","anchor_type"]}}}},
+    {"if":{"properties":{"article":{"const":"88"}}},"then":{"properties":{"standard":{"const":"CNE Anexo Técnico Requisitos Sísmicos enero 2025"},"inputs":{"required":["IE","R_structure","R_anchor_reference","Sa_over_g","A0_g","damping_pct","spectrum_mode","location","location_factors","floor_verified","vertical_model","anchor_type"]}}}}
+  ]
+}

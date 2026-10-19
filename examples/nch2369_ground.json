@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "0.4",
+  "preliminary": true,
+  "standard": "NCh2369:2025",
+  "article": "7.2-7.3",
+  "units": {
+    "force": "kgf"
+  },
+  "inputs": {
+    "weight_kgf": 1000,
+    "category": "III",
+    "seismic_zone": "2",
+    "soil": "C",
+    "Rp": 1.5,
+    "height_m": 2.2,
+    "level_m": 0,
+    "anchor_route": "duct"
+  },
+  "coefficients": {
+    "structure": {
+      "X": 0.7761600000000001,
+      "Y": 0.7761600000000001,
+      "vertical": 0.63504
+    },
+    "anchor_multiplier": {
+      "horizontal": 1.0499999999999998,
+      "vertical": 1
+    }
+  },
+  "seismic_demands": {
+    "structure": {
+      "Ex": 776.1600000000001,
+      "Ey": 776.1600000000001,
+      "Ez_magnitude": 635.0400000000001
+    },
+    "anchors": {
+      "Ex": 814.968,
+      "Ey": 814.968,
+      "Ez_magnitude": 635.0400000000001
+    }
+  },
+  "notes": [
+    "Ejemplo generado conforme al código JS, solo ilustrativo"
+  ],
+  "limitations": [
+    "No incluye combinaciones ni gravitacionales",
+    "No calcula reacciones individuales de anclajes",
+    "Verificar Título XXII y XXX",
+    "Herramienta preliminar; falta verificación de casos normativos"
+  ]
+}

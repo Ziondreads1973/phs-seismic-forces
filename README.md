@@ -1,49 +1,58 @@
 # PHS | Fuerzas sísmicas de diseño
 
-Aplicación **independiente** para calcular fuerzas sísmicas de equipos y sus anclajes. Versión **0.6.0 funcional preliminar** (basada en v0.5). No implementa diseño resistente de anclajes y **no modifica** `phs-anchor-design`.
+Aplicación independiente para calcular **fuerzas sísmicas globales de equipos/estructuras y demandas para anclajes**, de acuerdo con los procedimientos simplificados definidos en el proyecto.
 
-## Iniciar
+## Estado
 
-Abrir `index.html` en un navegador moderno. No requiere servidor, instalación ni internet. El archivo fuente recibido se conserva sin modificaciones en `reference/phs_fuerzas_sismicas_v0_5.html`.
+**Versión candidata funcional (integración FS-01 a FS-05 en main).** El HTML implementa el alcance acordado; para liberar una versión 1.0.0 estable quedan por ejecutar las pruebas locales completas con Node y una inspección visual de los PDF A4 generados por navegador.
 
-## Procedimientos implementados
+Los 48 criterios aprobados se encuentran en [docs/ESPECIFICACION_APROBADA_V1.md](docs/ESPECIFICACION_APROBADA_V1.md). Ese documento prevalece sobre la documentación histórica v0.5.
 
-- NCh2369:2025, capítulo 7 (ruta simplificada implementada en la versión de origen).
-- Anexo Técnico CNE, artículo 87, procedimiento estático asociado al artículo 38.
-- Anexo Técnico CNE, artículo 88, procedimiento asociado al artículo 39.
+## Uso
 
-Resultados: fuerzas sísmicas de estructura y fuerzas sísmicas para anclajes, por dirección X/Y/Z, con exportaciones PDF (impresión del navegador), TXT y JSON.
+Abrir **`index.html`** directamente en un navegador moderno. No requiere instalar paquetes, ejecutar servidores ni disponer de internet.
 
-**Importante:** la aplicación señala que sus resultados son preliminares. Se deben auditar las disposiciones normativas antes de su uso como demanda de diseño definitiva.
+Permite calcular:
+- **NCh2369:2025 capítulo 7:** método simplificado sin análisis de la estructura principal, clasificación automática de `Rp`, fuerzas horizontales y verticales y amplificación de anclajes. No incluye §5.8.
+- **Anexo Técnico CNE artículo 87:** banco de baterías estacionarias sobre soporte, método Art. 38, IE=1 por defecto editable, frecuencias horizontales y factores propios de anclajes.
+- **Anexo Técnico CNE artículo 88:** celdas metálicas autosoportadas, método Art. 39, IE=1 y R=1 para la celda, A0=0,50g, amortiguamiento 2 %, modelos verticales V1/V2 y ubicación.
+- Instalación basal, sala modular con apoyo basal equivalente y ubicaciones adicionales expresamente consideradas por cada procedimiento.
 
-## Documentación y validación
+Los resultados son magnitudes por dirección `Ex`, `Ey` y `Ez`, separadas para estructura/equipo y anclajes. **No son reacciones individuales por perno, combinaciones de carga ni verificaciones resistentes.**
 
-- `docs/GUIA_COMPLETA.md`: descripción técnica exhaustiva del **JSON existente v0.4**, inputs, coeficientes y ecuaciones de cálculo.
-- `schema/phs-forces-v0.4.schema.json`: esquema del JSON que exporta el HTML.
-- `examples/*.json`: casos ilustrativos coherentes con las ecuaciones del código original (no constituyen certificación normativa).
-- `tests/validate_export.py`: comprobación local de coherencia de los archivos JSON, sin dependencias externas.
+## Reportes
+
+Se exportan **únicamente PDF y TXT**. Cada formato permite seleccionar su nivel de forma independiente:
+- **Global:** entradas principales y resumen Ex/Ey/Ez para estructura y anclajes.
+- **Detallado:** antecedentes, factores, ecuaciones principales con valores y resumen final.
+
+El PDF utiliza la función de impresión del navegador con página A4. El TXT se descarga en UTF-8. No hay salida JSON, Excel ni integración con PHS Anchor Design.
+
+## Arquitectura
+
+- `src/motor.js`: motor de cálculo puro con tres procedimientos.
+- `src/ui.js`: interfaz, validaciones de presentación y reportes.
+- `src/template.html`: diseño de pantalla y reporte.
+- `scripts/build.cjs`: genera `index.html` autónomo, incrustando los dos módulos.
+- `tests/motor.test.cjs`: pruebas de referencia, frecuencia límite y entradas inválidas.
+- `tests/ui.test.cjs`: pruebas de comportamiento HTML y reportes simulados.
+- `tests/smoke_dom.cjs`: verificación básica del HTML entregable.
+- `reference/` y documentación `schema/`, `examples/`, `docs/GUIA_COMPLETA.md`: **histórico de v0.5**. No forman parte del producto actual ni habilitan salida JSON.
+
+## Comandos locales (Node.js, sin dependencias externas)
 
 ```powershell
-python tests/validate_export.py examples/nch2369_ground.json examples/art87_ground.json examples/art88_ground.json
+node scripts/build.cjs
+node --test tests/*.test.cjs
+node tests/smoke_dom.cjs
+Start-Process (Resolve-Path ".\index.html")
 ```
 
-## Límites de responsabilidad
+Las pruebas numéricas automatizadas verifican los resultados de referencia acordados. La inspección de paginación y aspecto del PDF mediante el navegador es un control adicional **necesario para cerrar la versión estable**.
 
-Este repositorio **solo calcula cargas**. Los campos `seismic_demands.anchors` expresan acciones sísmicas globales con la amplificación propia del método seleccionado; **no** son esfuerzos por perno, combinaciones LRFD ni reacciones por apoyo. No se calculan geometrías de fijación, resistencias del hormigón ni verificaciones de conexiones. Cualquier uso del JSON por software externo es opcional y no forma parte de este desarrollo.
+## Restricciones
 
-## Política de desarrollo
-
-- Aplicación autónoma HTML/CSS/JavaScript.
-- Mantener la trazabilidad normativa, sin ocultar hipótesis ni redondear internamente.
-- Pruebas y auditorías locales.
-- **No crear ni ejecutar GitHub Actions ni flujos CI/CD** sin autorización expresa.
-
-## Cambios v0.6.0 (FS-01)
-
-- Se bloquea la ruta automática `justified` de NCh2369: el cumplimiento de §8.5 no puede verificarse mediante un selector.
-- Se mantienen advertencias preliminares en los resultados.
-- Se rechazan salidas no finitas antes de permitir exportaciones.
-- Se conserva el contrato JSON v0.4.
-- Pruebas locales del motor: 8 escenarios ejecutados, además de 3 ejemplos JSON validados.
-
-**Estado:** primera versión funcional preliminar, no aprobada para diseño normativo hasta completar la auditoría de las tres rutas.
+- No crear, habilitar ni ejecutar GitHub Actions, pipelines CI/CD ni automatizaciones de pago.
+- No modificar `phs-anchor-design`.
+- Pruebas locales; no se bloquean cálculos por existencia de auditorías normativas pendientes.
+- No utilizar resultados numéricamente inválidos ni extrapolar procedimientos fuera del alcance expresamente acordado.

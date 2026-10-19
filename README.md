@@ -24,11 +24,12 @@ Los resultados son magnitudes por dirección `Ex`, `Ey` y `Ez`, separadas para e
 
 **Formato numérico:** la coma o el punto decimal se toma automáticamente de la configuración regional del navegador/sistema mediante `Intl.NumberFormat`, siempre con `useGrouping: false` (sin separador de miles). El formato se aplica uniformemente a pantalla, PDF, TXT, factores y ecuaciones; los cálculos internos conservan precisión completa.
 
-Se exportan **únicamente PDF y TXT**. Cada formato permite seleccionar su nivel de forma independiente:
-- **Global:** entradas principales y resumen Ex/Ey/Ez para estructura y anclajes.
-- **Detallado:** antecedentes, factores, ecuaciones principales con valores y resumen final.
+Se exportan **únicamente PDF global y TXT detallado**, sin selectores de nivel:
+- **Pantalla y PDF global:** un mismo bloque de resultados con antecedentes, factores principales y fuerzas Ex/Ey/Ez para estructura y anclajes. El PDF imprime ese bloque directamente en A4.
+- **TXT detallado:** antecedentes completos, factores, ecuaciones principales con valores y resultados. Se descarga en UTF-8.
+- **Artículo 88:** Tabla 4 de IE/R visible y completa como referencia de consulta, con la fila del equipo eléctrico destacada. No modifica automáticamente el R del equipo calculado.
 
-El PDF utiliza la función de impresión del navegador con página A4. El TXT se descarga en UTF-8. No hay salida JSON, Excel ni integración con PHS Anchor Design.
+No hay salida JSON, Excel ni integración con PHS Anchor Design.
 
 ## Arquitectura
 

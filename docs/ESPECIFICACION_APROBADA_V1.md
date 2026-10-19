@@ -117,3 +117,16 @@
 - Fuerzas finales: **un decimal fijo en kgf**, independientemente de la precisión del dato de entrada. Sin agrupación de miles en ningún valor presentado.
 - Los algoritmos del motor y su precisión interna no se alteran. Los reportes no incluyen validaciones resistentes ni combinaciones LRFD/ASD.
 - Salida TXT con sufijo `_resultados.txt` (reemplaza sufijo histórico `_detallado.txt`).
+
+### FS-06-C03 — Rectificación explícita del TXT (aprobado por usuario)
+
+**Esta decisión posterior PREVALECE sobre FS-06-C02 únicamente en lo referido al TXT.** La simplificación de FS-06-C02 para la **pantalla y el PDF global** se conserva.
+
+- PDF: entradas y resultados resumidos, factores esenciales; sin ecuaciones ni intermedios. Se imprime el mismo bloque visible en pantalla.
+- **TXT: reporte auditable detallado**, recuperando datos ingresados, todos los factores de cálculo pertinentes, expresiones normativas del motor, sustitución numérica, límites/coeficientes cuando aplican y fuerzas independientes de estructura/equipo y anclajes, para NCh2369:2025 capítulo 7, artículo 87 y artículo 88 (V1/V2).
+- NCh2369: cálculo de `ak/g`, `Cp`, límites mínimo/máximo, coeficiente horizontal adoptado, coeficiente vertical, fuerzas y amplificación de anclajes.
+- Art. 87: `Kh,X`, `Kh,Y` en función de las frecuencias, coeficientes de ubicación y fuerzas horizontal/vertical y de anclajes.
+- Art. 88: `Fb`, `Sa,máx/g`, ubicación, fuerzas horizontal/vertical V1 o V2 y amplificación de anclajes.
+- Valores calculados se muestran con hasta 12 decimales y las fuerzas finales a 1 decimal, con separador decimal regional y sin separador de miles. Las expresiones se evalúan en el **motor sin redondear intermedios**. En el TXT, los coeficientes impresos son una representación redondeada; el valor final corresponde siempre al resultado del motor, no a recalcular desde la cadena.
+- No crear un motor paralelo de reportes ni modificar métodos normativos; los factores y fuerzas provienen del objeto de resultados del motor. El TXT usa `*_detallado.txt`.
+- No se incluyen verificaciones resistentes de anclajes, combinaciones LRFD/ASD ni el ámbito excluido de §5.8 o artículo 89.

@@ -37,13 +37,13 @@ function mount(changes={},locale){
   return {nodes,saved,set,localNumbers};
 }
 
-test('Contrato: PDF global único, TXT detallado único, sin niveles ni JSON',()=>{
+test('Contrato: PDF y TXT de entradas y fuerzas sin selectores ni JSON',()=>{
   assert.equal(scripts.length,2);
   for(const old of ['pdfLevel','txtLevel','printHost','pdfPreview','saveJson'])
     assert.doesNotMatch(html,new RegExp('id="'+old+'"'));
   assert.match(html,/id="globalReport"/);
   assert.match(html,/Guardar PDF global/);
-  assert.match(html,/Descargar TXT detallado/);
+  assert.match(html,/Descargar TXT</);
   assert.match(html,/@media print[\s\S]*?main\{display:block!important/);
 });
 
@@ -52,7 +52,7 @@ test('Art. 87: pantalla global idéntica al contenido enviado a impresión',()=>
   assert.equal(d.nodes.pdfButton.disabled,false);
   const f=new Intl.NumberFormat(undefined,{minimumFractionDigits:1,maximumFractionDigits:1,useGrouping:false}).format(1012.5);
   assert.ok(d.nodes.globalReport.innerHTML.includes(f));
-  assert.match(d.nodes.globalReport.innerHTML,/Antecedentes y factores principales/);
+  assert.match(d.nodes.globalReport.innerHTML,/Datos y factores de diseño/);
   assert.match(d.nodes.globalReport.innerHTML,/Fuerzas sísmicas finales/);
   assert.doesNotMatch(d.nodes.globalReport.innerHTML,/Ecuaciones y resultados principales/);
   d.nodes.pdfButton.events.click();
@@ -60,15 +60,16 @@ test('Art. 87: pantalla global idéntica al contenido enviado a impresión',()=>
   assert.equal(d.saved.printedView,d.nodes.globalReport.innerHTML);
 });
 
-test('TXT: siempre detallado con parámetros, ecuaciones y resultados',()=>{
+test('TXT: únicamente datos de entrada, factores esenciales y fuerzas finales',()=>{
   const d=mount();
   d.nodes.txtButton.events.click();
   assert.equal(d.saved.files.length,1);
-  assert.match(d.saved.files[0],/_detallado\.txt$/);
-  for(const section of ['1. ANTECEDENTES','2. PARÁMETROS Y FACTORES','3. ECUACIONES PRINCIPALES','4. RESULTADOS'])
+  assert.match(d.saved.files[0],/_resultados\.txt$/);
+  for(const section of ['1. DATOS Y FACTORES DE DISEÑO','2. FUERZAS SÍSMICAS FINALES'])
     assert.ok(d.saved.payload.includes(section));
   assert.match(d.saved.payload,/Frecuencia X/);
-  assert.match(d.saved.payload,/Ex =/);
+  assert.match(d.saved.payload,/1000 kgf/);
+  assert.doesNotMatch(d.saved.payload,/ECUACIONES|Ex =|Kh ubicación|Kh,X/);
 });
 
 test('Art. 88: tabla IE/R a la vista y fila del equipo destacada',()=>{
@@ -79,8 +80,8 @@ test('Art. 88: tabla IE/R a la vista y fila del equipo destacada',()=>{
   assert.doesNotMatch(html,/<details><summary>Ver Tabla 4/);
   assert.match(d.nodes.globalReport.innerHTML,/IE \(Tabla 4\)/);
   assert.match(d.nodes.globalReport.innerHTML,/R \(Tabla 4\)/);
-  assert.match(d.nodes.globalReport.innerHTML,/Sa,máx\/g/);
-  assert.match(d.nodes.txtPreview.textContent,/Fb =/);
+  assert.match(d.nodes.globalReport.innerHTML,/A0\/g/);
+  assert.doesNotMatch(d.nodes.txtPreview.textContent,/Fb =|Sa,máx\/g/);
 });
 
 test('NCh2369 basal y elevada: resultados y bloqueo de entradas inválidas',()=>{
@@ -114,4 +115,45 @@ test('Formato local: coma o punto decimal, sin separador de miles, en ambas sali
     assert.equal(d.nodes.pdfButton.disabled,false);
     assert.equal(d.nodes.txtButton.disabled,false);
   }
+});
+
+test('FS-06-C02: entradas conservan exactamente los decimales introducidos',()=>{
+  for(const [locale,decimal] of [['es-CL',','],['en-US','.']]){
+    const d=mount({norm:'87',w:'1000.125',ie:'1.20',fx:'29.99',fy:'30'},locale);
+    const content=d.nodes.globalReport.innerHTML,txt=d.nodes.txtPreview.textContent;
+    for(const label of ['1000'+decimal+'125 kgf','1'+decimal+'20','29'+decimal+'99 Hz','30 Hz']){
+      assert.ok(content.includes(label),'Pantalla: '+label);
+      assert.ok(txt.includes(label),'TXT: '+label);
+    }
+    assert.doesNotMatch(content,/29[.,]99\s*Hz[^]*30[.,]00 Hz/);
+    assert.doesNotMatch(txt,/ECUACIONES|3. ECUACIONES/);
+  }
+});
+
+test('FS-06-C02: factores normativos sin ceros sobrantes, fuerzas con un decimal fijo',()=>{
+ const c=mount({norm:'2369',w:'1000',loc2369:'elevated',height:'4.25',zk:'2.50'});
+ assert.match(c.nodes.globalReport.innerHTML,/Altura H/);
+ assert.match(c.nodes.globalReport.innerHTML,/Rp/);
+ assert.doesNotMatch(c.nodes.txtPreview.textContent,/ak\/g|Cp|ECUACIONES/);
+ const e=mount({norm:'88',w:'1000',vertical:'rigid'});
+ assert.match(e.nodes.globalReport.innerHTML,/IE \(Tabla 4\)/);
+ assert.match(e.nodes.globalReport.innerHTML,/R \(Tabla 4\)/);
+ assert.match(e.nodes.globalReport.innerHTML,/A0\/g/);
+ assert.doesNotMatch(e.nodes.txtPreview.textContent,/Sa,máx\/g|Fb =|Ex =/);
+ const val=new Intl.NumberFormat(undefined,{minimumFractionDigits:1,maximumFractionDigits:1,useGrouping:false}).format(360);
+ assert.ok(e.nodes.globalReport.innerHTML.includes(val));
+ assert.ok(e.nodes.txtPreview.textContent.includes(val));
+});
+
+test('FS-06-C02: pantalla y TXT contienen el mismo valor de cada fuerza',()=>{
+ for(const norm of ['2369','87','88']){
+  const d=mount({norm,w:'2000',fx:'25',fy:'30'});
+  const preview=d.nodes.globalReport.innerHTML;
+  const txt=d.nodes.txtPreview.textContent;
+  for(const line of txt.split('\n').filter(x=>/^E[xyz] \| /.test(x))){
+   const values=line.split('|').slice(1).map(x=>x.trim());
+   for(const value of values)assert.ok(preview.includes(value),norm+': '+line);
+  }
+  assert.doesNotMatch(txt,/ECUACIONES|Ex =|Ey =|Ez =/);
+ }
 });

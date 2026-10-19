@@ -106,3 +106,14 @@
 - **TXT: solo detallado**, con antecedentes, coeficientes, ecuaciones principales y fuerzas finales; eliminar su selector de detalle.
 - Mantener formato decimal de la configuración regional, sin agrupación de miles, para tablas y reportes. No cambiar precisión interna del motor.
 - No expandir la aplicación a diseño resistente ni alterar los tres motores de cálculo por este cambio de interfaz.
+
+### FS-06-C02 — Simplificación posterior aprobada
+
+**Este criterio es posterior y prevalece sobre la descripción anterior de FS-06 (incluida la exigencia de ecuaciones o intermediarios en TXT), sobre FS-04 y sobre las partes contradictorias de este documento.**
+
+- Pantalla, PDF global y TXT entregarán **únicamente datos de entrada, factores automáticos esenciales y fuerzas finales para equipo y anclajes**. Se eliminan de los reportes todas las ecuaciones y operaciones intermedias; el TXT continúa en formato textual estructurado.
+- Entradas numéricas: mantener la precisión escrita por el usuario sin agregar ceros (e.g. 25 Hz, 29,99 Hz, 2,50 m si se ingresó con dos decimales). El separador decimal se localiza según navegador/sistema.
+- Factores tabulados o normativos esenciales: precisión pertinente al valor, sin ceros innecesarios. La Tabla 4 visible es informativa y también evita ceros añadidos.
+- Fuerzas finales: **un decimal fijo en kgf**, independientemente de la precisión del dato de entrada. Sin agrupación de miles en ningún valor presentado.
+- Los algoritmos del motor y su precisión interna no se alteran. Los reportes no incluyen validaciones resistentes ni combinaciones LRFD/ASD.
+- Salida TXT con sufijo `_resultados.txt` (reemplaza sufijo histórico `_detallado.txt`).

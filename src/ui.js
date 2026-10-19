@@ -4,7 +4,7 @@
 const $=id=>document.getElementById(id);
 const motor=globalThis.PHSSeismicMotor;
 let active=null,reports=null;
-const display=(n,d=1)=>Number(n).toLocaleString('es-CL',{minimumFractionDigits:d,maximumFractionDigits:d,useGrouping:false});
+const display=(n,d=1)=>new Intl.NumberFormat(undefined,{minimumFractionDigits:d,maximumFractionDigits:d,useGrouping:false}).format(n);
 const num=id=>$(id).value.trim()===''?NaN:Number($(id).value);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const force=n=>display(n,1)+' kgf';
@@ -35,11 +35,11 @@ function lineData(r){
   a.push(['IE',eq(p.IE)],['Frecuencia X',display(p.fx,2)+' Hz'],['Frecuencia Y',display(p.fy,2)+' Hz'],['Ubicación',place(p.location)]);
   f.push(['Kh,X',eq(k.KhX)],['Kh,Y',eq(k.KhY)],['Kv',eq(k.Kv)],['Kh ubicación',eq(k.location.horizontal)],
     ['Kv ubicación',eq(k.location.vertical)],['Amplificación anclajes H',eq(k.anchor_multiplier.horizontal)]);
-  e.push('Ex = 0,60 · IE · W · Kh,X · Kh,ubicación = '+force(r.structure.Ex),
-  'Ey = 0,60 · IE · W · Kh,Y · Kh,ubicación = '+force(r.structure.Ey),
-  'Ez = 0,36 · IE · W · Kv,ubicación = '+force(r.structure.Ez),
-  'Ex,a = 1,25 · Ex = '+force(r.anchors.Ex),
-  'Ey,a = 1,25 · Ey = '+force(r.anchors.Ey));
+  e.push('Ex = '+display(0.60,2)+' · IE · W · Kh,X · Kh,ubicación = '+force(r.structure.Ex),
+  'Ey = '+display(0.60,2)+' · IE · W · Kh,Y · Kh,ubicación = '+force(r.structure.Ey),
+  'Ez = '+display(0.36,2)+' · IE · W · Kv,ubicación = '+force(r.structure.Ez),
+  'Ex,a = '+display(1.25,2)+' · Ex = '+force(r.anchors.Ex),
+  'Ey,a = '+display(1.25,2)+' · Ey = '+force(r.anchors.Ey));
  }else{
   const p=r.inputs,k=r.factors;
   a.push(['Clasificación','Celda metálica autosoportada'],['Ubicación',place(p.location)],
@@ -47,11 +47,11 @@ function lineData(r){
   f.push(['IE (Tabla 4)',eq(k.IE)],['R (Tabla 4)',eq(k.R)],['A0/g',eq(k.A0_g)],['Amortiguamiento',display(k.xi_pct,1)+' %'],
   ['Fb',eq(k.Fb)],['Sa,máx/g',eq(k.Sa_over_g)],['Kh ubicación',eq(k.location.horizontal)],
   ['Kv ubicación',eq(k.location.vertical)],['Amplificación anclajes H',eq(k.anchor_multiplier.horizontal)]);
-  e.push('Fb = (3,21 − 0,68 · ln(2)) / 2,1156 = '+eq(k.Fb),
-   'Sa,máx/g = 2,12 · A0/g · Fb = '+eq(k.Sa_over_g),
-   'Ex = Ey = 1,20 · IE · (Sa/g) · W · Kh / R = '+force(r.structure.Ex),
-   (p.vertical==='rigid'?'Ez (V1) = 0,36 · IE · W · Kv':'Ez (V2) = 0,72 · IE · (Sa/g) · W · Kv / R')+' = '+force(r.structure.Ez),
-   'Ex,a = Ey,a = 1,50 · Ex = '+force(r.anchors.Ex));
+  e.push('Fb = ('+display(3.21,2)+' − '+display(0.68,2)+' · ln(2)) / '+display(2.1156,4)+' = '+eq(k.Fb),
+   'Sa,máx/g = '+display(2.12,2)+' · A0/g · Fb = '+eq(k.Sa_over_g),
+   'Ex = Ey = '+display(1.20,2)+' · IE · (Sa/g) · W · Kh / R = '+force(r.structure.Ex),
+   (p.vertical==='rigid'?'Ez (V1) = '+display(0.36,2)+' · IE · W · Kv':'Ez (V2) = '+display(0.72,2)+' · IE · (Sa/g) · W · Kv / R')+' = '+force(r.structure.Ez),
+   'Ex,a = Ey,a = '+display(1.50,2)+' · Ex = '+force(r.anchors.Ex));
  }
  e.push('Ez,a = Ez = '+force(r.anchors.Ez));
  return {inputs:a,factors:f,equations:e};
@@ -92,6 +92,12 @@ function read(){
  }
  if(standard==='87')return motor.calculate87({weight_kgf:W,IE:num('ie'),fx:num('fx'),fy:num('fy'),location:$('loc87').value});
  return motor.calculate88({weight_kgf:W,vertical:$('vertical').value,location:$('loc88').value});
+}
+function localizeStaticNumbers(){
+ document.querySelectorAll('[data-local-number]').forEach(el=>{
+   if(el.dataset&&Object.prototype.hasOwnProperty.call(el.dataset,'localNumber'))
+     el.textContent=display(Number(el.dataset.localNumber),Number(el.dataset.decimals||0));
+ });
 }
 function updateVisibility(){
  const n=$('norm').value;
@@ -140,5 +146,6 @@ document.querySelectorAll('input,select').forEach(el=>{
  if(['pdfLevel','txtLevel'].includes(el.id))return;
  el.addEventListener('input',render);el.addEventListener('change',render);
 });
+localizeStaticNumbers();
 render();
 })();

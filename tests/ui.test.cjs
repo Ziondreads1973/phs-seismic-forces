@@ -157,3 +157,15 @@ test('FS-06-C02: pantalla y TXT contienen el mismo valor de cada fuerza',()=>{
   assert.doesNotMatch(txt,/ECUACIONES|Ex =|Ey =|Ez =/);
  }
 });
+
+test('FS-06-C02: Tabla 4 sin ceros añadidos en referencias, coma y punto decimal',()=>{
+ for(const [locale,decimal] of [['es-CL',','],['en-US','.']]){
+  const d=mount({norm:'88'},locale);
+  const numbers=d.localNumbers.map(x=>x.textContent);
+  assert.ok(numbers.includes('1'));
+  assert.ok(numbers.includes('1'+decimal+'5'));
+  assert.ok(numbers.includes('0'+decimal+'5'));
+  assert.ok(!numbers.includes('1'+decimal+'00'));
+  assert.ok(!numbers.includes('1'+decimal+'50'));
+ }
+});

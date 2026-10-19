@@ -95,3 +95,14 @@
 `docs/GUIA_COMPLETA.md`, `schema/`, `examples/` y `tests/validate_export.py` describen **la exportación JSON de la versión 0.5**. Se conservan como material histórico de referencia, pero **no especifican la versión objetivo**. No activarlos ni mostrarlos en UI.
 
 **Precedencia documental:** prevalecen las decisiones más recientes del usuario sobre cualquier criterio anterior contradictorio. Este documento resume decisiones del diálogo; no reemplaza la comprobación de aplicabilidad normativa del ingeniero.
+
+## FS-06 — Presentación de factores y reportes (aprobado posteriormente)
+
+**Esta decisión reemplaza cualquier opción de formato global/detallado de FS-03/FS-04 y las opciones inicialmente descritas en este documento.**
+
+- Para el artículo 88, mostrar la **Tabla 4 completa de `IE` y `R`** en el panel de antecedentes, no detrás de un desplegable, con la fila aplicable al equipo eléctrico destacada. Tabla de **referencia**, no selector que afecte el cálculo.
+- Visualizar los **resultados globales directamente en pantalla**, como un único bloque con antecedentes y factores esenciales y tabla Ex/Ey/Ez para equipo y anclajes. Debe ser **exactamente el mismo contenido que se imprime en PDF**.
+- **PDF: solo global**, generado de ese bloque mediante impresión A4; eliminar su selector de detalle y la vista previa duplicada.
+- **TXT: solo detallado**, con antecedentes, coeficientes, ecuaciones principales y fuerzas finales; eliminar su selector de detalle.
+- Mantener formato decimal de la configuración regional, sin agrupación de miles, para tablas y reportes. No cambiar precisión interna del motor.
+- No expandir la aplicación a diseño resistente ni alterar los tres motores de cálculo por este cambio de interfaz.

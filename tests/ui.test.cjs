@@ -269,7 +269,7 @@ test('FS-06-C04: Art87 y Art88 tienen fórmula y resultado consecutivos',()=>{
     const txt=d.nodes.txtPreview.textContent;
     for(const reg of [/Ex = C[ hx]?\w* · W\nEx = [0-9.,]+ kgf/,
       /Ey = C[ hy]?\w* · W\nEy = [0-9.,]+ kgf/,
-      /Ez = Cz? · W\nEz = [0-9.,]+ kgf/,
+      /Ez = C[ vz] · W\nEz = [0-9.,]+ kgf/,
       /Ex,a = Factor H · Ex\nEx,a = [0-9.,]+ kgf/]){
       assert.match(txt,reg);
     }

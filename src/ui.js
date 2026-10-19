@@ -58,8 +58,8 @@ function htmlTable(data,forceMode=false){
  * Sin sustituciones numéricas ni cálculos paralelos en el reporte.
  *
  * Precisión de coeficientes calculados: mínimo cuatro cifras significativas
- * y suficiente precisión decimal para que el error que introduciría un
- * coeficiente presentado sea inferior a 0,01 kgf sobre la demanda asociada.
+ * y precisión decimal cuya cota de redondeo representa como máximo
+ * 0,01 kgf en la demanda asociada (hasta el límite de 15 decimales).
  * Esta tolerancia es exclusivamente de visualización (no del motor).
  */
 function calculatedCoefficient(value,weight,sensitivity=1){
@@ -102,17 +102,17 @@ function detailedEquations(r){
   add(calc,elevated?
    'ak/g = I · (Ar/g) · S · (1 + 2 · Zk/H)':
    'ak/g = I · (Ar/g) · S',
-   'ak/g = '+c(k.ak_over_g,k.Kp/k.Rp));
+   'ak/g = '+c(k.ak_over_g,k.Kp/k.Rp*k.anchor_multiplier.horizontal));
   calc.push('2.2. Coeficiente horizontal');
-  add(calc,'Cp = (ak/g) · Kp / Rp','Cp = '+c(k.Cp));
+  add(calc,'Cp = (ak/g) · Kp / Rp','Cp = '+c(k.Cp,k.anchor_multiplier.horizontal));
   calc.push('2.3. Límites del coeficiente horizontal');
   add(calc,'Cmin = '+n(.7)+' · I · (Ar/g) · S','Cmin = '+c(k.Cmin));
   add(calc,'Cmax = 3 · I · (Ar/g) · S','Cmax = '+c(k.Cmax));
-  add(calc,'Ch = mín(Cmax; máx(Cmin; Cp))','Ch = '+c(k.structure.X));
+  add(calc,'Ch = mín(Cmax; máx(Cmin; Cp))','Ch = '+c(k.structure.X,k.anchor_multiplier.horizontal));
   const controlling=k.Cp<=k.Cmin?'Cmin':k.Cp>=k.Cmax?'Cmax':'Cp';
   calc.push('Condición controlante: '+controlling,'');
   calc.push('2.4. Coeficiente sísmico vertical');
-  add(calc,'Cv = kv · I · (Ar/g) · S','Cv = '+c(k.structure.Z));
+  add(calc,'Cv = kv · I · (Ar/g) · S','Cv = '+c(k.structure.Z,k.anchor_multiplier.vertical));
   calc.push('2.5. Fuerzas sísmicas de la estructura');
   add(calc,'Ex = Ch · W','Ex = '+final(r.structure.Ex));
   add(calc,'Ey = Ch · W','Ey = '+final(r.structure.Ey));
@@ -137,7 +137,7 @@ function detailedEquations(r){
   add(calc,'Ey = Cy · W','Ey = '+final(r.structure.Ey));
   add(calc,'Ez = Cz · W','Ez = '+final(r.structure.Ez));
   anchors.push('3.1. Amplificación horizontal');
-  add(anchors,'Factor H = '+n(k.anchor_multiplier.horizontal),'Factor H = '+n(k.anchor_multiplier.horizontal));
+  anchors.push('Factor H = '+n(k.anchor_multiplier.horizontal),'');
   add(anchors,'Ex,a = Factor H · Ex','Ex,a = '+final(r.anchors.Ex));
   add(anchors,'Ey,a = Factor H · Ey','Ey,a = '+final(r.anchors.Ey));
   anchors.push('3.2. Componente vertical');
@@ -146,9 +146,9 @@ function detailedEquations(r){
   const vertical=p.vertical;
   calc.push('2.1. Aceleración espectral máxima');
   add(calc,'Fb = ('+n(3.21)+' − '+n(.68)+' · ln(ξ)) / '+n(2.1156),
-   'Fb = '+c(k.Fb,1.2*k.A0_g*k.location.horizontal/k.R));
+   'Fb = '+c(k.Fb,2.12*1.2*k.A0_g*k.location.horizontal*k.anchor_multiplier.horizontal/k.R));
   add(calc,'Sa,máx/g = '+n(2.12)+' · (A0/g) · Fb',
-   'Sa,máx/g = '+c(k.Sa_over_g,1.2*k.location.horizontal/k.R));
+   'Sa,máx/g = '+c(k.Sa_over_g,1.2*k.location.horizontal*k.anchor_multiplier.horizontal/k.R));
   calc.push('2.2. Coeficiente sísmico horizontal');
   add(calc,'Ch = '+n(1.2)+' · IE · (Sa/g) · Kh ubicación / R',
    'Ch = '+c(k.structure.X));
@@ -162,7 +162,7 @@ function detailedEquations(r){
   add(calc,'Ey = Ch · W','Ey = '+final(r.structure.Ey));
   add(calc,'Ez = Cv · W','Ez = '+final(r.structure.Ez));
   anchors.push('3.1. Amplificación horizontal');
-  add(anchors,'Factor H = '+n(k.anchor_multiplier.horizontal),'Factor H = '+n(k.anchor_multiplier.horizontal));
+  anchors.push('Factor H = '+n(k.anchor_multiplier.horizontal),'');
   add(anchors,'Ex,a = Factor H · Ex','Ex,a = '+final(r.anchors.Ex));
   add(anchors,'Ey,a = Factor H · Ey','Ey,a = '+final(r.anchors.Ey));
   anchors.push('3.2. Componente vertical');

@@ -1,172 +1,403 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PHS | Fuerzas sísmicas de diseño</title><style>
-:root{font-family:Inter,Segoe UI,Arial,sans-serif;color:#1d2d40;background:#f3f6fb}*{box-sizing:border-box}body{margin:0}header{background:#123456;color:white;padding:18px 24px}header h1{font-size:20px;margin:0 0 4px}header small{color:#c5d7e8}main{max-width:1360px;margin:22px auto;padding:0 18px;display:grid;grid-template-columns:390px 1fr;gap:17px}.card{background:white;border:1px solid #d8e0e9;border-radius:12px;padding:18px;margin-bottom:16px;box-shadow:0 4px 16px #102b4510}h2{font-size:15px;margin:0 0 15px;color:#173d64}h3{font-size:12px;margin:16px 0 8px;color:#476179;text-transform:uppercase;letter-spacing:.045em}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field{margin:0 0 11px}label{display:block;font-size:12px;font-weight:650;margin-bottom:5px;color:#334b61}input,select{width:100%;border:1px solid #c5d2dd;background:#fff;color:#1c3248;border-radius:7px;padding:10px;font-size:13px}input:focus,select:focus{outline:2px solid #b2d0f4}.help,.sub{color:#64768a;font-size:11px;line-height:1.5}.notice{background:#f0f6fc;border-left:3px solid #397cbd;padding:11px 12px;border-radius:5px;font-size:12px;line-height:1.6;margin:12px 0}.warning{background:#fff7e6;border-left-color:#a8790a}.bad{background:#fff0ed;border-left-color:#c03426}.good{background:#eaf8ef;border-left-color:#28845e}.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.kpi{border:1px solid #d6e4ee;border-radius:9px;padding:13px;background:#f6faff}.kpi strong{display:block;font-size:20px;color:#164c7a;margin:5px 0}.kpi span{font-size:11px;color:#52667c}table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:10px 8px;border-bottom:1px solid #e5ebf0;text-align:right}th:first-child,td:first-child{text-align:left}th{background:#edf3f8;color:#39546f}pre{white-space:pre-wrap;font-family:Consolas,monospace;font-size:11px;background:#f5f8fb;border:1px solid #e0e8ee;padding:15px;border-radius:8px;line-height:1.65;max-height:520px;overflow:auto}button{cursor:pointer;border:0;border-radius:7px;padding:10px 13px;background:#1e609c;color:white;font-weight:700}button.secondary{background:#e9eff6;color:#284c6d}button:disabled{opacity:.5;cursor:not-allowed}.buttons{display:flex;gap:8px;flex-wrap:wrap}.muted{color:#718093}.hidden{display:none}.foot{font-size:11px;color:#667a90;line-height:1.6}@media(max-width:950px){main{display:block}.kpis{grid-template-columns:repeat(2,1fr)}}
- .tabs{display:flex;gap:8px;margin-bottom:12px}.tabs button{background:#e9eff6;color:#284c6d}.tabs button.active{background:#1e609c;color:white}.reference td,.reference th{text-align:left;white-space:normal}.reference td:last-child{text-align:center}.minor{font-size:11px;color:#586f87}
-
-.preview-report{background:white;border:1px solid #d5dfe9;padding:29px 35px;margin-top:14px;color:#1c2f46;font-size:12px;line-height:1.55}
-.preview-report .phs-kicker{font-size:10px;letter-spacing:0.04em;color:#62758a;font-weight:700}
-.preview-report h1{font-size:19px;color:#142e4d;margin:7px 0 3px}
-.preview-report .phs-sub{font-size:12px;color:#546b83}
-.preview-report h2{font-size:14px;color:#142e4d;margin:24px 0 10px;break-after:avoid}
-.preview-report p{margin:8px 0 12px}.preview-report hr{border:0;border-top:1px solid #b5c4d4;margin:16px 0}
-.preview-report table{width:100%;border-collapse:collapse;font-size:11.5px;table-layout:auto}
-.preview-report th{background:#f0f4f8;text-align:left}.preview-report td,.preview-report th{padding:7px 9px;border-bottom:1px solid #d9e1e8}
-.preview-report td:last-child{text-align:right;white-space:nowrap}.preview-report .phs-equation{background:#f3f6fa;text-align:center;padding:12px;margin:12px 0;font:13px/1.7 Georgia,serif}
-.preview-report .phs-note{font-size:11px;color:#53687e}.preview-report .phs-footer{font-size:10px;color:#718397;margin-top:22px;border-top:1px solid #d9e1e8;padding-top:9px}
-.preview-report .phs-summary{font-weight:700;background:#f8fafc}.preview-report section{break-inside:avoid-page}
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PHS | Fuerzas Sísmicas</title>
+<style>
+:root{font-family:Inter,Segoe UI,Arial,sans-serif;color:#243449;background:#f3f6fb;font-size:14px}
+*{box-sizing:border-box}body{margin:0}header{background:#133c63;color:white;padding:19px 28px}
+header h1{font-size:21px;margin:0 0 4px}header small{color:#c8def1}
+main{max-width:1400px;margin:21px auto;padding:0 18px;display:grid;grid-template-columns:minmax(300px,390px) minmax(0,1fr);gap:18px}
+.card{background:#fff;border:1px solid #d7e2ed;border-radius:11px;padding:18px;margin-bottom:16px;box-shadow:0 3px 13px #132f450a}
+h2{font-size:16px;color:#174263;margin:0 0 14px}h3{font-size:12px;color:#416581;text-transform:uppercase;letter-spacing:.035em;margin:19px 0 10px}
+label{display:block;font-size:12px;font-weight:650;margin-bottom:5px}
+.field{margin-bottom:12px}.field small{display:block;color:#60758a;font-size:11px;line-height:1.5;margin-top:4px}
+input,select{display:block;width:100%;border:1px solid #bbcad7;border-radius:7px;padding:10px;font:inherit;background:#fff;color:#203951}
+input:focus,select:focus{outline:2px solid #9ec9ed}
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.muted{color:#64778a;font-size:12px;line-height:1.55}
+.rule{height:1px;background:#e4ebf2;margin:17px 0}
+.status{padding:11px 14px;border-radius:6px;margin-bottom:15px;font-size:12px;line-height:1.5}
+.status.valid{background:#eaf5ed;color:#285f42}.status.invalid{background:#f4f6f8;color:#576b7e}
+table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:10px 8px;border-bottom:1px solid #dde5ed;text-align:right}th:first-child,td:first-child{text-align:left}th{background:#edf3f8;color:#2b4a65}
+.pairs td:first-child{color:#425d74}.pairs td:last-child{font-weight:600}
+button{border:0;border-radius:7px;padding:11px 15px;background:#2169a7;color:white;font:inherit;font-weight:700;cursor:pointer}
+button:hover:not(:disabled){background:#175684}button:disabled{background:#a4b5c3;cursor:not-allowed}
+button.secondary{background:#e8eff7;color:#214d74}.button-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.button-row button{flex:1;min-width:125px}.report{border:1px solid #d4e0e9;padding:24px 28px;background:#fff;margin-top:12px;line-height:1.55}
+.report h1{font-size:18px;margin:5px 0 0;color:#173d63}.report h2{font-size:14px;margin:22px 0 10px}
+.report-kicker{font-size:10px;letter-spacing:.08em;font-weight:700;color:#5d7488}.report hr{border:0;border-top:1px solid #b8c9d9;margin:16px 0}
+.report .equation{padding:8px 12px;margin:5px 0;background:#f4f7fa;font:12px/1.6 Consolas,monospace;overflow-wrap:anywhere}
+.report-foot{font-size:11px;color:#52667a;border-top:1px solid #dbe5ed;padding-top:12px;margin-top:22px}
+pre{font:11px/1.65 Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;background:#f4f7fb;padding:15px;border-radius:8px;border:1px solid #e0e8ef;max-height:340px;overflow:auto}
+.reference th,.reference td{text-align:left;white-space:normal}
+.reference td:nth-child(2),.reference td:nth-child(3){text-align:right}
+details summary{font-size:12px;font-weight:650;color:#24577f;cursor:pointer}details{margin-top:14px}
+#printHost{display:none}
+[hidden]{display:none!important}
+@media(max-width:900px){main{display:block}.cols{grid-template-columns:1fr 1fr}}
 @page{size:A4;margin:16mm 18mm}
-@media print{body{background:white!important}body>*:not(main){display:none!important}main,main article,main article .card{display:block!important;margin:0!important;padding:0!important;border:0!important;box-shadow:none!important;max-width:none!important}main aside,main article>section:not(#printHost){display:none!important}#printHost{display:block!important}#previewReport{border:0!important;margin:0!important;padding:0!important}.preview-report h1{font-size:17px}.preview-report h2{font-size:13px}}
-</style></head><body><header><h1>PHS | Fuerzas sísmicas de equipos y anclajes</h1><small>NCh2369:2025 Cap. 7 · Anexo Técnico CNE enero 2025 Arts. 87 y 88 · Versión 0.6.0 funcional preliminar</small></header><main><aside><section class="card"><h2>1. Procedimiento de cálculo</h2><div class="field"><label>Normativa</label><select id="norm"><option value="2369">NCh2369:2025 — Capítulo 7</option><option value="87">NTSyCS — Artículo 87 (baterías estacionarias)</option><option value="88">NTSyCS — Artículo 88 (celdas autosoportadas)</option></select></div><div class="field"><label>Peso sísmico del equipo, W o Pp [kgf]</label><input id="w" type="number" min="0" step="any" placeholder="Ingresar peso total"></div><div id="block2369"><h3>Parámetros NCh2369</h3><div class="row"><div class="field"><label>Categoría de importancia</label><select id="cat"><option value="I">I</option><option value="II">II</option><option value="III" selected>III</option><option value="IV">IV</option></select></div><div class="field"><label>Zona sísmica</label><select id="zone"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option></select></div></div><div class="row"><div class="field"><label>Tipo de suelo</label><select id="soil"><option>A</option><option>B</option><option selected>C</option><option>D</option><option>E</option></select></div><div class="field"><label>Factor de modificación de respuesta, Rp</label><select id="rp"><option value="1.5">1.5</option><option value="3">3.0</option></select></div></div><div class="row"><div class="field"><label>Altura total de la estructura, H [m]</label><input id="height" type="number" step="any" min="0" placeholder="H"></div><div class="field"><label>Altura del punto de apoyo, Zk [m]</label><input id="zk" type="number" step="any" min="0" placeholder="Zk"></div></div><div class="field"><label>Criterio de anclajes</label><select id="duct"><option value="duct">§7.3.2 Dúctil; sin cumplir §8.5 (0.7·Rp)</option><option value="brittle">§7.3.3 No dúctil (Rp)</option></select></div><div class="notice warning"><b>Alcance NCh2369 §7.2.2:</b> ruta sin análisis del edificio, ecuación (20), con aceleración por altura §7.2.3. No cubre las ecuaciones (16) o (17). El cálculo vertical requiere contrastarse con §5.7. La selección dúctil/no dúctil no justifica por sí sola §8.2 ni §8.5.</div></div><div id="blockCNE" class="hidden"><h3>Clasificación y factores normativos</h3>
-<div class="notice">Para equipos eléctricos en general, la Tabla 4 establece <b>I<sub>E</sub> = 1.00</b>. Los factores R no son universales: dependen del elemento a diseñar. Art. 87 utiliza Art. 38, sin R ni S<sub>a</sub>.</div>
-<div class="row"><div class="field"><label>Factor de importancia del equipo, I<sub>E</sub></label><input id="ie" type="number" min="0" step="any" value="1"></div><div class="field"><label>Tipo de anclaje (R)</label><select id="anchorType"><option value="post">Postinstalado para equipo: R=1</option><option value="embedded">Preinstalado: R=2</option><option value="post109">Postinstalado en soporte Art. 109: R=2</option><option value="single">Único punto de transferencia: R=1</option></select></div></div>
-<div id="block87"><h3>Art. 87 — método estático Art. 38</h3><div class="row"><div class="field"><label>Frecuencia horizontal en X, f<sub>X</sub> [Hz]</label><input id="fx" type="number" min="0" step="any" placeholder="Ej. 32"></div><div class="field"><label>Frecuencia horizontal en Y, f<sub>Y</sub> [Hz]</label><input id="fy" type="number" min="0" step="any" placeholder="Ej. 28"></div></div>
-<div class="notice warning">El Art. 87 exige frecuencia equivalente ≥ 20 Hz en cualquier dirección, incluida Z (Art. 122). Este módulo utiliza fX y fY para seleccionar la amplificación horizontal; no verifica la rigidez vertical. Esa comprobación queda fuera del alcance del cálculo de fuerzas.</div></div></div>
-<div id="block88" class="hidden"><h3>Art. 88 — método Art. 39</h3><div class="row"><div class="field"><label>Factor de modificación de respuesta, R</label><input id="r" type="number" min="0" step="any" value="1"></div><div class="field"><label>Aceleración sísmica basal, A₀ [g]</label><input id="a0" type="number" value="0.5" min="0" step="any"></div></div><div class="row"><div class="field"><label>Amortiguamiento, ξ [%]</label><input id="xi" type="number" min="0" max="20" step="any" value="2"></div><div class="field"><label>Obtención de aceleración espectral</label><select id="saMode"><option value="auto">Automático: Sa máxima Art. 19</option><option value="manual">Manual (espectro validado)</option></select></div></div><div id="manualSa" class="hidden field"><label>Aceleración espectral máxima, Sₐ/g</label><input id="sa" type="number" min="0" step="any" placeholder="Ordenada espectral"></div><div class="help">Art. 88: utilizar Sa máxima para ξ=2%, salvo justificación normativa específica. El cálculo automático corresponde al espectro del Art. 19 en su intervalo de máxima aceleración (0.9–10 Hz). No requiere periodo fundamental.</div><div class="notice" id="saSummary">Sa: pendiente</div></div>
-<h3>Condición de ubicación — casos habituales</h3>
-<div class="field"><label>Ubicación real del equipo</label><select id="loc"><option value="ground">Losa o fundación a nivel de terreno</option><option value="floor">Piso superior de edificio/sala de hasta 3 pisos — Art. 83</option><option value="special">Otra condición (parrón, estructura alta, piso técnico, edificio &gt;3 pisos…)</option></select></div>
-<div id="locationSummary" class="notice">A nivel basal: Kh adicional = 1.00; Kv adicional = 1.00 (si no existen otras amplificaciones aplicables).</div>
-<div class="field hidden" id="floorConfirmation"><label style="display:flex;gap:8px;align-items:flex-start"><input id="floorVerified" type="checkbox" style="width:auto;margin-top:2px">Confirmo que es un piso superior real de edificio o sala de hasta tres pisos, no únicamente un zócalo, bastidor elevado o piso técnico.</label></div>
-<div class="help">Factores de ubicación adicionales a los propios del Art. 87 o 88. Art. 83: Kh = 1.50 y Kv = 1.40. Los casos fuera de estas condiciones no se calculan automáticamente. No aplica este selector al motor NCh2369, que mantiene su propio tratamiento de altura.</div>
-<div class="field" id="vertical88"><label>Comportamiento vertical del equipo (Art. 39)</label><select id="vertical"><option value="rigid">Rígido vertical (V1)</option><option value="flex">No rígido vertical (V2, Sa máxima conservadora)</option></select></div>
-<div class="notice warning">Para ambas rutas debe comprobarse el Título XXII, el Título XXX y las reglas de combinación. La clasificación no se deduce solamente de la palabra «gabinete»; confirmar que Art. 87 u 88 sea aplicable.</div></div></section></aside><article><section class="card"><h2>2. Resultados — estructura y anclajes</h2><div id="status" class="notice warning">Ingresa el peso y los parámetros aplicables.</div><div class="kpis"><div class="kpi"><span>Estructura · Ex / Ey</span><strong id="structH">—</strong><span>kgf, por dirección</span></div><div class="kpi"><span>Estructura · Ez</span><strong id="structV">—</strong><span>kgf, magnitud</span></div><div class="kpi"><span>Anclajes · Ex / Ey</span><strong id="anchorH">—</strong><span>kgf, por dirección</span></div><div class="kpi"><span>Anclajes · Ez</span><strong id="anchorV">—</strong><span>kgf, magnitud</span></div></div><h3>Separación de factores</h3><div style="overflow:auto"><table><thead><tr><th>Acción</th><th>Coef. estructura</th><th>Factor adicional anclajes</th><th>Coef. anclajes</th></tr></thead><tbody id="detail"><tr><td colspan="4" style="text-align:center">Sin resultados</td></tr></tbody></table></div><div id="notes" class="notice"></div></section><section class="card"><div class="tabs"><button class="active" id="calcTab" type="button">Resultados</button><button id="refTab" type="button">Tabla Iₑ y R · Art. 21</button></div><div id="reference" class="hidden"><h2>Tabla 4 — factores de importancia y respuesta</h2><div class="help">Extracto orientativo del Anexo Técnico CNE enero 2025, Tabla 4, páginas 31–33. Siempre prevalece la clasificación y las excepciones del texto completo.</div><div style="overflow:auto"><table class="reference"><thead><tr><th>Elemento</th><th>Iₑ</th><th>R</th></tr></thead><tbody>
-<tr><td>Equipo eléctrico general y componentes fijados directamente</td><td>1</td><td>1</td></tr><tr><td>Soporte dúctil sin redundancia</td><td>Iₑ del equipo</td><td>1.5</td></tr><tr><td>Soporte dúctil con redundancia</td><td>Iₑ del equipo</td><td>≤3</td></tr><tr><td>Reticulado de acero con rigidez global Art. 122</td><td>Iₑ del equipo</td><td>3</td></tr><tr><td>Reticulado sin rigidez global Art. 122</td><td>Iₑ del equipo</td><td>≤2</td></tr><tr><td>Soporte horizontal en voladizo con ≥3 apoyos</td><td>Iₑ del equipo</td><td>2</td></tr><tr><td>Marcos de acero</td><td>Iₑ del equipo</td><td>3</td></tr><tr><td>Marcos de hormigón armado</td><td>Iₑ del equipo</td><td>2</td></tr><tr><td>Soportes tubulares</td><td>Iₑ del equipo</td><td>1.5</td></tr><tr><td>Otros soportes de equipos</td><td>Iₑ del equipo</td><td>A definir</td></tr><tr><td>Anclajes preinstalados</td><td>Iₑ del equipo</td><td>2</td></tr><tr><td>Anclajes postinstalados en soporte Art. 109</td><td>Iₑ del equipo</td><td>2</td></tr><tr><td>Anclajes postinstalados para equipo / otros soportes</td><td>Iₑ del equipo</td><td>1</td></tr><tr><td>Soldadura a placa embebida / único punto de transferencia</td><td>Iₑ del equipo</td><td>1</td></tr><tr><td>Otros elementos de sistemas de anclaje, Título XXX</td><td>Iₑ del equipo</td><td>2</td></tr><tr><td>Fundación de hormigón superficial</td><td>Iₑ del equipo</td><td>3</td></tr><tr><td>Sistema estructural rígido</td><td>Iₑ del equipo</td><td>1</td></tr></tbody></table></div><p class="help">Nota: valores máximos «≤R» requieren selección justificada, no se asignan automáticamente. Anclajes de equipo pueden requerir otra ruta según artículo y elemento.</p></div></section><section class="card"><h2>3. Reporte y exportación</h2><div class="buttons"><button id="savePdf">Guardar como PDF</button><button id="saveTxt">Descargar TXT</button><button id="saveJson" class="secondary">Exportar JSON</button><button id="copy" class="secondary">Copiar reporte</button></div><p class="help">El JSON distingue las solicitaciones de estructura y de anclajes y deja constancia de los factores utilizados. Las cargas son demandas por dirección, no combinaciones de carga ni reacciones individuales de pernos.</p><div id="previewReport" class="preview-report"><p>Complete los datos para generar el reporte.</p></div><details><summary>Ver contenido del TXT</summary><pre id="report">Sin cálculo válido.</pre></details></section><section class="card"><h2>Alcance y limitaciones</h2><p class="foot">Herramienta de cálculo preliminar con trazabilidad de hipótesis. No sustituye la lectura de las normas vigentes, la revisión de combinaciones de carga, los requisitos del Título XXX ni el diseño estructural y de las conexiones. No representa un certificado de cumplimiento.</p></section><section id="printHost" class="card" style="display:none"><div id="printMirror"></div></section></article></main><script>
-
+@media print{
+ body{background:white}header,main{display:none!important}
+ #printHost{display:block!important;margin:0!important;padding:0!important}
+ #printHost h1{font-size:17px}#printHost h2{font-size:13px}
+ #printHost .equation,#printHost table{break-inside:avoid}
+ #printHost h2{break-after:avoid}#printHost tr{break-inside:avoid}
+}
+</style></head><body>
+<header><h1>PHS | Fuerzas sísmicas de equipos y anclajes</h1><small>NCh2369:2025 capítulo 7 · Anexo Técnico CNE, artículos 87 y 88 · Aplicación offline</small></header>
+<main>
+<aside>
+<section class="card">
+<h2>1. Procedimiento y antecedentes</h2>
+<div class="field"><label for="norm">Normativa</label><select id="norm">
+<option value="2369">NCh2369:2025 · Capítulo 7</option>
+<option value="87">Anexo Técnico · Artículo 87</option>
+<option value="88">Anexo Técnico · Artículo 88</option></select></div>
+<div class="field"><label for="w">Peso sísmico total W / Pp [kgf]</label><input id="w" type="number" min="0" step="any" placeholder="Ingresar peso sísmico"></div>
+<section id="block2369">
+<h3>NCh2369 — Clasificaciones</h3>
+<div class="cols">
+<div class="field"><label for="cat">Categoría importancia</label><select id="cat"><option value="I">I</option><option value="II">II</option><option value="III" selected>III</option><option value="IV">IV</option></select></div>
+<div class="field"><label for="zone">Zona sísmica</label><select id="zone"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option></select></div></div>
+<div class="field"><label for="soil">Tipo de suelo</label><select id="soil"><option>A</option><option>B</option><option selected>C</option><option>D</option><option>E</option></select></div>
+<div class="field"><label for="equipment">Clasificación del equipo / elemento secundario</label><select id="equipment">
+<option value="electrical-mechanical">Equipo eléctrico o mecánico</option>
+<option value="secondary-ductile">Elemento secundario con componentes dúctiles</option>
+<option value="secondary-nonductile">Elemento secundario con componentes no dúctiles</option>
+<option value="other-specified">Otro equipo no especificado</option>
+</select></div>
+<div class="field"><label for="duct">Clasificación del sistema de anclaje</label><select id="duct">
+<option value="ductile">Dúctil — ruta §7.3.2</option><option value="nonductile">No dúctil — ruta §7.3.3</option>
+</select></div>
+<h3>Ubicación y altura</h3>
+<div class="field"><label for="loc2369">Condición de instalación</label><select id="loc2369">
+<option value="ground">Nivel de terreno / losa basal</option>
+<option value="modular">Sala modular con apoyo basal equivalente</option>
+<option value="elevated">Estructura elevada</option></select></div>
+<div id="heightGroup" hidden>
+<div class="cols"><div class="field"><label for="height">Altura H [m]</label><input id="height" type="number" step="any" min="0" placeholder="H"></div>
+<div class="field"><label for="zk">Altura nivel Zk [m]</label><input id="zk" type="number" step="any" min="0" placeholder="Zk"></div></div>
+</div>
+</section>
+<section id="block87" hidden>
+<h3>Art. 87 — Bancos de baterías sobre soporte</h3>
+<div class="field"><label for="ie">Factor importancia IE (editable)</label><input id="ie" type="number" min="0" step="any" value="1"></div>
+<div class="cols"><div class="field"><label for="fx">Frecuencia horizontal fX [Hz]</label><input id="fx" type="number" min="0" step="any" placeholder="fX"></div>
+<div class="field"><label for="fy">Frecuencia horizontal fY [Hz]</label><input id="fy" type="number" min="0" step="any" placeholder="fY"></div></div>
+<p class="muted">Frecuencias horizontales mínimas 20 Hz. Kh se calcula independientemente en X e Y.</p>
+<div class="field"><label for="loc87">Condición de instalación</label><select id="loc87">
+<option value="ground">Losa/fundación a nivel basal</option>
+<option value="modular">Sala modular con apoyo basal equivalente</option>
+<option value="floor">Piso superior real, edificio hasta tres pisos</option></select></div>
+</section>
+<section id="block88" hidden>
+<h3>Art. 88 — Celda metálica autosoportada</h3>
+<p class="muted">Clasificación del equipo: IE = 1,00 y R = 1,00 (Tabla 4). A0 = 0,50g y amortiguamiento = 2 %. La aceleración espectral máxima es automática.</p>
+<div class="field"><label for="vertical">Comportamiento vertical</label><select id="vertical">
+<option value="rigid">V1 — Rígido verticalmente</option>
+<option value="flex">V2 — No rígido verticalmente</option></select></div>
+<div class="field"><label for="loc88">Condición de instalación</label><select id="loc88">
+<option value="ground">Losa/fundación basal</option>
+<option value="modular">Sala modular con apoyo basal equivalente</option>
+<option value="floor">Piso superior real, edificio hasta tres pisos</option></select></div>
+<details><summary>Ver Tabla 4 — referencia de clasificación</summary>
+<p class="muted">Los factores de soportes y anclajes no reemplazan el R de la celda autosoportada.</p>
+<table class="reference"><thead><tr><th>Elemento</th><th>IE</th><th>R</th></tr></thead><tbody>
+<tr><td>Equipo eléctrico general</td><td>1,00</td><td>1,00</td></tr>
+<tr><td>Soporte dúctil sin redundancia</td><td>Del equipo</td><td>1,50</td></tr>
+<tr><td>Soporte dúctil con redundancia</td><td>Del equipo</td><td>≤3,00</td></tr>
+<tr><td>Reticulado de acero con rigidez global Art. 122</td><td>Del equipo</td><td>3,00</td></tr>
+<tr><td>Reticulado sin rigidez global Art. 122</td><td>Del equipo</td><td>≤2,00</td></tr>
+<tr><td>Soporte horizontal en voladizo con ≥3 apoyos</td><td>Del equipo</td><td>2,00</td></tr>
+<tr><td>Marcos de acero</td><td>Del equipo</td><td>3,00</td></tr>
+<tr><td>Marcos de hormigón armado</td><td>Del equipo</td><td>2,00</td></tr>
+<tr><td>Soportes tubulares</td><td>Del equipo</td><td>1,50</td></tr>
+<tr><td>Otros soportes de equipos</td><td>Del equipo</td><td>Por definir</td></tr>
+<tr><td>Anclaje preinstalado</td><td>Del equipo</td><td>2,00</td></tr>
+<tr><td>Anclaje postinstalado en soporte Art. 109</td><td>Del equipo</td><td>2,00</td></tr>
+<tr><td>Anclaje postinstalado para equipo</td><td>Del equipo</td><td>1,00</td></tr>
+<tr><td>Soldadura a placa embebida / único punto transferencia</td><td>Del equipo</td><td>1,00</td></tr>
+<tr><td>Otros elementos sistemas de anclaje (Título XXX)</td><td>Del equipo</td><td>2,00</td></tr>
+<tr><td>Fundación superficial de hormigón</td><td>Del equipo</td><td>3,00</td></tr>
+<tr><td>Sistema estructural rígido</td><td>Del equipo</td><td>1,00</td></tr>
+</tbody></table></details>
+</section>
+</section>
+</aside>
+<article>
+<section class="card"><h2>2. Resultados de cálculo</h2><div id="status" class="status invalid">Complete los parámetros.</div>
+<p class="muted" id="methodDetail">—</p><div id="forces"><p>Sin resultados.</p></div>
+<p class="muted">Acciones sísmicas como magnitudes por dirección. No incluyen combinaciones gravitacionales, reacciones individuales ni verificaciones resistentes de anclajes.</p>
+</section>
+<section class="card"><h2>3. Reportes PDF y TXT</h2>
+<div class="cols">
+<div class="field"><label for="pdfLevel">Nivel del PDF</label><select id="pdfLevel"><option value="global">Global</option><option value="detallado">Detallado</option></select></div>
+<div class="field"><label for="txtLevel">Nivel del TXT</label><select id="txtLevel"><option value="global">Global</option><option value="detallado" selected>Detallado</option></select></div>
+</div>
+<div class="button-row"><button id="pdfButton" disabled>Guardar como PDF</button><button id="txtButton" class="secondary" disabled>Descargar TXT</button></div>
+<p class="muted">El PDF se guarda mediante impresión del navegador en tamaño A4. El TXT se descarga como archivo UTF-8. Cada formato permite seleccionar su propio nivel.</p>
+<h3>Vista previa del PDF seleccionado</h3><div class="report" id="pdfPreview">Sin resultados disponibles.</div>
+<details><summary>Vista previa del TXT seleccionado</summary><pre id="txtPreview">Sin resultados disponibles.</pre></details>
+</section>
+</article>
+</main>
+<div id="printHost"></div>
+<script>
+/* PHS Fuerzas Sísmicas — motor numérico (criterios FS-01..FS-05)
+ * Funciones puras. Los resultados representan magnitudes por dirección, no combinaciones.
+ * Reportes y UI deberán leer siempre este mismo resultado.
+ */
+(function(root,factory){
+  const api=factory();
+  if(typeof module==='object'&&module.exports)module.exports=api;
+  else root.PHSSeismicMotor=api;
+})(typeof globalThis!=='undefined'?globalThis:this,function(){
+  'use strict';
+  const IMPORTANCE={I:0.8,II:1,III:1.2,IV:1.2};
+  const AR={'1':0.28,'2':0.42,'3':0.56};
+  const SOIL={A:0.9,B:1,C:1.05,D:1,E:1};
+  const KV={A:1.2,B:1.2,C:1.2,D:1.1,E:1};
+  const Kp=2.2;
+  function finite(value,label,positive=false){
+    if(typeof value!=='number'||!Number.isFinite(value)||(positive?value<=0:value<0))
+      throw new RangeError(label+': valor numérico inválido');
+    return value;
+  }
+  function oneOf(v,allowed,label){
+    if(!allowed.includes(v))throw new RangeError(label+': clasificación fuera de alcance');
+    return v;
+  }
+  function complete(r){
+    for(const group of [r.structure,r.anchors]){
+      for(const key of ['Ex','Ey','Ez'])finite(group[key],key);
+    }
+    return r;
+  }
+  function locFactors(location){
+    oneOf(location,['ground','modular','floor'],'ubicación');
+    return {horizontal:location==='floor'?1.5:1,vertical:location==='floor'?1.4:1};
+  }
+  function classifyRp(equipment,anchor){
+    oneOf(equipment,['electrical-mechanical','secondary-ductile','secondary-nonductile','other-specified'],'equipo');
+    oneOf(anchor,['ductile','nonductile'],'anclajes');
+    if(equipment==='electrical-mechanical')return anchor==='ductile'?3:1.5;
+    if(equipment==='secondary-ductile')return 3;
+    return 1.5;
+  }
+  function calculate2369(d){
+    const W=finite(d.weight_kgf,'peso sísmico',true);
+    const category=oneOf(d.category,Object.keys(IMPORTANCE),'categoría de importancia');
+    const zone=oneOf(String(d.zone),Object.keys(AR),'zona sísmica');
+    const soil=oneOf(d.soil,Object.keys(SOIL),'tipo de suelo');
+    const equipment=oneOf(d.equipment,['electrical-mechanical','secondary-ductile','secondary-nonductile','other-specified'],'clasificación');
+    const anchor=oneOf(d.anchor,['ductile','nonductile'],'tipo de anclaje');
+    const location=oneOf(d.location,['ground','modular','elevated'],'ubicación');
+    let H=null,Zk=0;
+    if(location==='elevated'){
+      H=finite(d.height_m,'altura H',true);
+      Zk=finite(d.level_m,'altura Zk',true);
+      if(Zk>H)throw new RangeError('Zk no puede superar H');
+    }
+    const I=IMPORTANCE[category],Ar=AR[zone],S=SOIL[soil],kv=KV[soil];
+    const Rp=classifyRp(equipment,anchor);
+    const base=I*Ar*S;
+    const ak=base*(1+(location==='elevated'?2*Zk/H:0));
+    const Cp=ak*Kp/Rp;
+    const Cx=Math.min(3*base,Math.max(0.7*base,Cp));
+    const Cv=kv*base;
+    const multiplier=anchor==='ductile'?0.7*Rp:Rp;
+    const horizontal=Cx*W,vertical=Cv*W;
+    return complete({
+      method:'NCh2369:2025-cap7',weight_kgf:W,
+      inputs:{category,zone,soil,equipment,anchor,location,height_m:H,level_m:Zk},
+      factors:{I,Ar_over_g:Ar,S,kv,Kp,Rp,ak_over_g:ak,Cp,Cmin:0.7*base,Cmax:3*base,
+        structure:{X:Cx,Y:Cx,Z:Cv},anchor_multiplier:{horizontal:multiplier,vertical:1}},
+      structure:{Ex:horizontal,Ey:horizontal,Ez:vertical},
+      anchors:{Ex:horizontal*multiplier,Ey:horizontal*multiplier,Ez:vertical}
+    });
+  }
+  function kh(f,label){
+    finite(f,label,true);
+    if(f<20)throw new RangeError(label+': frecuencia inferior a 20 Hz');
+    return f<30?1.35:1;
+  }
+  function calculate87(d){
+    const W=finite(d.weight_kgf,'peso sísmico',true);
+    const IE=finite(d.IE,'IE',true);
+    const fx=finite(d.fx,'fX',true),fy=finite(d.fy,'fY',true);
+    const KhX=kh(fx,'fX'),KhY=kh(fy,'fY');
+    const location=oneOf(d.location,['ground','modular','floor'],'ubicación');
+    const loc=locFactors(location);
+    const Cx=.60*IE*KhX*loc.horizontal, Cy=.60*IE*KhY*loc.horizontal, Cv=.36*IE*loc.vertical;
+    const s={Ex:Cx*W,Ey:Cy*W,Ez:Cv*W};
+    return complete({method:'CNE-Art87',weight_kgf:W,
+      inputs:{IE,fx,fy,location},
+      factors:{KhX,KhY,Kv:1,location:loc,structure:{X:Cx,Y:Cy,Z:Cv},
+        anchor_multiplier:{horizontal:1.25,vertical:1}},
+      structure:s,anchors:{Ex:s.Ex*1.25,Ey:s.Ey*1.25,Ez:s.Ez}});
+  }
+  function calculate88(d){
+    const W=finite(d.weight_kgf,'peso sísmico',true);
+    const vertical=oneOf(d.vertical,['rigid','flex'],'modelo vertical');
+    const location=oneOf(d.location,['ground','modular','floor'],'ubicación');
+    const loc=locFactors(location);
+    const IE=1,R=1,A0=.5,xi=2;
+    const Fb=(3.21-.68*Math.log(xi))/2.1156;
+    const Sa=2.12*A0*Fb;
+    const Cx=1.2*IE*Sa/R*loc.horizontal;
+    const Cv=(vertical==='rigid'?.36*IE:.72*IE*Sa/R)*loc.vertical;
+    const s={Ex:Cx*W,Ey:Cx*W,Ez:Cv*W};
+    return complete({method:'CNE-Art88',weight_kgf:W,
+      inputs:{location,vertical,classification:'electrical-cell'},
+      factors:{IE,R,A0_g:A0,xi_pct:xi,Fb,Sa_over_g:Sa,location:loc,
+        structure:{X:Cx,Y:Cx,Z:Cv},anchor_multiplier:{horizontal:1.5,vertical:1}},
+      structure:s,anchors:{Ex:s.Ex*1.5,Ey:s.Ey*1.5,Ez:s.Ez}});
+  }
+  return Object.freeze({calculate2369,calculate87,calculate88,classifyRp,locFactors});
+}); 
+</script>
+<script>
+/* PHS Fuerzas Sísmicas — UI y reportes, sin dependencias externas */
+(function(){
 'use strict';
-const $=id=>document.getElementById(id),num=id=>Number($(id).value),required=id=>$(id).value.trim()!==''&&Number.isFinite(num(id));let last=null;
-const fmt=(v,d=3)=>Number.isFinite(v)?Number(v).toLocaleString('es-CL',{minimumFractionDigits:d,maximumFractionDigits:d,useGrouping:false}):'—';
-// La precisión de visualización no modifica los valores completos utilizados en el motor ni en JSON.
-const dec={fuerza:1,coef:3,factor:2,espectro:3,frecuencia:2,geometria:2};
-const I={I:.8,II:1,III:1.2,IV:1.2},Ar={1:.28,2:.42,3:.56},S={A:.9,B:1,C:1.05,D:1,E:1},Kv={A:1.2,B:1.2,C:1.2,D:1.1,E:1};
-const anchorR={post:1,embedded:2,post109:2,single:1};
-function saMaximum(a0,xi){const fb=(3.21-.68*Math.log(xi))/2.1156;return {fb,sa:2.12*a0*fb};}
-function show(){const n=$('norm').value;$('block2369').classList.toggle('hidden',n!=='2369');$('blockCNE').classList.toggle('hidden',n==='2369');$('block87').classList.toggle('hidden',n!=='87');$('block88').classList.toggle('hidden',n!=='88');$('vertical88').classList.toggle('hidden',n!=='88');$('manualSa').classList.toggle('hidden',$('saMode').value!=='manual');updateLocation();calculate()}
-function updateLocation(){
- const loc=$('loc').value;
- $('floorConfirmation').classList.toggle('hidden',loc!=='floor');
- const explanations={
-  ground:'Nivel basal / terreno: Kh adicional = 1.00 y Kv adicional = 1.00, siempre que no corresponda otra amplificación por la estructura de apoyo.',
-  floor:'Art. 83: piso superior de edificio/sala hasta 3 pisos: Kh adicional = 1.50; Kv adicional = 1.40. Estos factores se multiplican por los factores propios del equipo y de sus anclajes.',
-  special:'Caso especial: no se asignan factores por defecto; revisar Art. 80–83, Art. 90 o las disposiciones correspondientes antes de calcular.'
- };
- $('locationSummary').textContent=explanations[loc];
- $('locationSummary').className='notice'+(loc==='special'?' warning':'');
-}
-function fail(m){last=null;$('status').className='notice warning';$('status').textContent=m;['structH','structV','anchorH','anchorV'].forEach(id=>$(id).textContent='—');$('detail').innerHTML='<tr><td colspan="4" style="text-align:center">Sin resultados</td></tr>';$('report').textContent='Sin cálculo válido.';$('previewReport').innerHTML='<p>Complete los datos para generar el reporte.</p>'; $('notes').textContent='La herramienta no genera fuerzas definitivas sin verificar las condiciones necesarias.'}
-function calculate(){const n=$('norm').value;if(!required('w')||num('w')<=0){fail('Introduce un peso sísmico mayor que cero.');return}let w=num('w'),hx,hy,v,ax,ay,av,chX,chY,cv,anchMult,locH=1,locV=1,desc=[],inputs={weight_kgf:w},status='';
-if(n==='2369'){
- if(!['duct','brittle'].includes($('duct').value)){fail('Ruta de anclaje sin justificación verificable: seleccione una ruta admitida.');return}
- if(!required('height')||!required('zk')||num('height')<=0||num('zk')<0||num('zk')>num('height')){fail('NCh2369: comprueba H > 0 y 0 ≤ Zk ≤ H.');return}
- const ie=I[$('cat').value],ar=Ar[$('zone').value],s=S[$('soil').value],rp=num('rp'),acc=ie*ar*s*(1+2*num('zk')/num('height')),cp=acc*2.2/rp;
- chX=chY=Math.min(3*ie*ar*s,Math.max(.7*ie*ar*s,cp));cv=Kv[$('soil').value]*ie*ar*s;anchMult=$('duct').value==='brittle'?rp:$('duct').value==='duct'?.7*rp:NaN;
- hx=hy=chX*w;v=cv*w;ax=ay=hx*anchMult;av=v;
- desc=[`I=${ie}; Ar/g=${ar}; S=${s}; Rp=${rp}; Kp=2.2`,`ak/g=${fmt(acc,4)}; Cp=${fmt(cp,4)}`,`C horizontal estructura=${fmt(chX,dec.coef)}; C vertical=${fmt(cv,dec.coef)}`,`Multiplicador horizontal para anclajes=${fmt(anchMult,dec.factor)}; vertical=1.0`];
- inputs={...inputs,category:$('cat').value,seismic_zone:$('zone').value,soil:$('soil').value,Rp:rp,height_m:num('height'),level_m:num('zk'),anchor_route:$('duct').value};status='NCh2369: cálculo preliminar ecuación (20). Pendiente contraste de la fuerza vertical con §5.7 y selección de ductilidad.';
-}else{
- if(!required('ie')||num('ie')<=0){fail('Ingrese I_E > 0.');return}
- if($('loc').value==='special'){fail('Ubicación fuera de los casos habituales: revisar las condiciones de instalación y los factores normativos específicos.');return}
- if($('loc').value==='floor'&&!$('floorVerified').checked){fail('Confirma que el equipo está en un piso superior real de edificio o sala de hasta tres pisos antes de aplicar Art. 83.');return}
- if($('loc').value==='floor'){locH=1.5;locV=1.4}
- const ie=num('ie'), ra=anchorR[$('anchorType').value];
- if(n==='87'){
-  if(!required('fx')||!required('fy')||num('fx')<=0||num('fy')<=0){fail('Art. 87: ingresa frecuencias equivalentes fX y fY.');return}
-  if(num('fx')<20||num('fy')<20){fail('Art. 87: frecuencia horizontal inferior a 20 Hz. No cumple requisito mínimo.');return}
-  const khx=num('fx')<30?1.35:1,khy=num('fy')<30?1.35:1;
-  chX=.6*ie*khx*locH;chY=.6*ie*khy*locH;cv=.36*ie*locV;anchMult=1.25;
-  hx=chX*w;hy=chY*w;v=cv*w;ax=hx*anchMult;ay=hy*anchMult;av=v;
-  desc=[`Art. 87 → método estático Art. 38: H=0.60·I_E·W·Kh; V=0.36·I_E·W·Kv`,`KhX=${khx}; KhY=${khy}; Kv=1.0`,`Multiplicador horizontal adicional de anclajes=1.25; vertical=1.0`,`Factores adicionales por ubicación Kh=${locH}; Kv=${locV} (Art. ${$('loc').value==='floor'?'83':'80–83: no aplicable por altura'})`,`La frecuencia vertical no se solicita ni verifica; requisito general f≥20 Hz en cualquier dirección debe comprobarse fuera de esta app`,`Tabla 4: R para anclajes ${ra} (informativo; método estático Art. 38 no incorpora R).`];
-  inputs={...inputs,IE:ie,frequency_Hz:{X:num('fx'),Y:num('fy')},vertical_frequency_check:"fuera_de_alcance",location:$('loc').value,location_factors:{Kh:locH,Kv:locV},floor_verified:$('loc').value==='floor'&&$('floorVerified').checked,anchor_type:$('anchorType').value};
-  status='Art. 87: cálculo estático Art. 38; Sa y R no intervienen en esta fórmula. Verificar Título XXX y las condiciones de altura.';
+const $=id=>document.getElementById(id);
+const motor=globalThis.PHSSeismicMotor;
+let active=null,reports=null;
+const display=(n,d=1)=>Number(n).toLocaleString('es-CL',{minimumFractionDigits:d,maximumFractionDigits:d,useGrouping:false});
+const num=id=>$(id).value.trim()===''?NaN:Number($(id).value);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const force=n=>display(n,1)+' kgf';
+const caption=(r)=>r.method==='NCh2369:2025-cap7'?'NCh2369:2025 · Capítulo 7':r.method==='CNE-Art87'?'Anexo Técnico CNE · Artículo 87':'Anexo Técnico CNE · Artículo 88';
+const place=s=>({'ground':'Nivel basal / terreno','modular':'Sala modular con apoyo basal equivalente','elevated':'Estructura elevada','floor':'Piso superior de edificio hasta 3 pisos'})[s]||s;
+const eq=n=>display(n,3);
+function lineData(r){
+ const a=[['Peso sísmico',force(r.weight_kgf)]],f=[],e=[];
+ if(r.method==='NCh2369:2025-cap7'){
+  const p=r.inputs,k=r.factors;
+  a.push(['Categoría',p.category],['Zona sísmica',String(p.zone)],['Suelo',p.soil],
+   ['Clasificación equipo',({'electrical-mechanical':'Equipo eléctrico/mecánico','secondary-ductile':'Elemento secundario con componentes dúctiles','secondary-nonductile':'Elemento secundario no dúctil','other-specified':'Otro no especificado'})[p.equipment]],
+   ['Sistema de anclaje',p.anchor==='ductile'?'Dúctil (§7.3.2)':'No dúctil (§7.3.3)'],
+   ['Ubicación',place(p.location)]);
+  if(p.location==='elevated')a.push(['Altura H',display(p.height_m,2)+' m'],['Nivel Zk',display(p.level_m,2)+' m']);
+  f.push(['I',eq(k.I)],['Ar/g',eq(k.Ar_over_g)],['S',eq(k.S)],['kv',eq(k.kv)],['Kp',eq(k.Kp)],['Rp',eq(k.Rp)],
+   ['ak/g',eq(k.ak_over_g)],['Cp',eq(k.Cp)],['Límite mín.',eq(k.Cmin)],['Límite máx.',eq(k.Cmax)],
+   ['Coef. horizontal adoptado',eq(k.structure.X)],['Coef. vertical',eq(k.structure.Z)],
+   ['Amplificación anclajes H',eq(k.anchor_multiplier.horizontal)]);
+  e.push('ak/g = I · Ar/g · S · (1 + 2 Zk/H) = '+eq(k.ak_over_g),
+   'Cp = (ak/g) · Kp / Rp = '+eq(k.Cp),
+   'C horizontal = mín('+eq(k.Cmax)+'; máx('+eq(k.Cmin)+'; '+eq(k.Cp)+')) = '+eq(k.structure.X),
+   'Ex = Ey = C horizontal · Pp = '+force(r.structure.Ex),
+   'Ez = kv · I · Ar/g · S · Pp = '+force(r.structure.Ez),
+   'Ex,a = Ey,a = Ex · '+eq(k.anchor_multiplier.horizontal)+' = '+force(r.anchors.Ex));
+ }else if(r.method==='CNE-Art87'){
+  const p=r.inputs,k=r.factors;
+  a.push(['IE',eq(p.IE)],['Frecuencia X',display(p.fx,2)+' Hz'],['Frecuencia Y',display(p.fy,2)+' Hz'],['Ubicación',place(p.location)]);
+  f.push(['Kh,X',eq(k.KhX)],['Kh,Y',eq(k.KhY)],['Kv',eq(k.Kv)],['Kh ubicación',eq(k.location.horizontal)],
+    ['Kv ubicación',eq(k.location.vertical)],['Amplificación anclajes H',eq(k.anchor_multiplier.horizontal)]);
+  e.push('Ex = 0,60 · IE · W · Kh,X · Kh,ubicación = '+force(r.structure.Ex),
+  'Ey = 0,60 · IE · W · Kh,Y · Kh,ubicación = '+force(r.structure.Ey),
+  'Ez = 0,36 · IE · W · Kv,ubicación = '+force(r.structure.Ez),
+  'Ex,a = 1,25 · Ex = '+force(r.anchors.Ex),
+  'Ey,a = 1,25 · Ey = '+force(r.anchors.Ey));
  }else{
-  if(!required('r')||num('r')<=0||!required('a0')||num('a0')<=0||!required('xi')||num('xi')<=0||num('xi')>20){fail('Art. 88: requiere R>0, A0>0 y 0<ξ≤20%.');return}
-  let r=num('r'),a0=num('a0'),xi=num('xi'),sp=saMaximum(a0,xi),sa=$('saMode').value==='auto'?sp.sa:num('sa');
-  if($('saMode').value==='manual'&&(!required('sa')||sa<=0)){fail('Espectro manual: ingrese Sa,máx/g positivo.');return}
-  $('saSummary').textContent=`Espectro Art. 19: Fb=${fmt(sp.fb,4)}; A=${fmt(sp.sa,4)} g; Sa,máx/g utilizado=${fmt(sa,4)} (${ $('saMode').value==='auto'?'automático':'manual'}).`;
-  chX=chY=1.2*ie*sa/r*locH;cv=($('vertical').value==='rigid'?.36*ie:1.2*.6*ie*sa/r)*locV;
-  anchMult=1.5;hx=hy=chX*w;v=cv*w;ax=ay=hx*anchMult;av=v;
-  desc=[`Art. 88 → Art. 39: H=1.2·I_E·(Sa/g)/R·W·Kh`,`Art. 19: A=2.12·A0·Fb, Fb=(3.21-0.68·ln(ξ))/2.1156`,`A0=${a0} g; ξ=${xi}%; Sa,máx/g=${fmt(sa,4)}`,`R equipo/estructura=${r}; R anclaje Tabla 4=${ra} (clasificación informativa)`,`Vertical ${$('vertical').value==='rigid'?'V1=0.36·I_E·W·Kv':'V2=1.2·0.6·I_E·(Sa/g)/R·W·Kv'}`,`Kh estructura=1; Kh adicional anclajes=1.5; Kv adicional=1`,`Factores adicionales por ubicación Kh=${locH}; Kv=${locV} (Art. ${$('loc').value==='floor'?'83':'80–83: no aplicable por altura'})`];
-  inputs={...inputs,IE:ie,R_structure:r,R_anchor_reference:ra,Sa_over_g:sa,A0_g:a0,damping_pct:xi,spectrum_mode:$('saMode').value,location:$('loc').value,location_factors:{Kh:locH,Kv:locV},floor_verified:$('loc').value==='floor'&&$('floorVerified').checked,vertical_model:$('vertical').value,anchor_type:$('anchorType').value};
-  status='Art. 88: Sa máxima calculada según Art. 19 (o ingresada manualmente). Confirmar clasificación y condiciones de Títulos XXII/XXX.';
+  const p=r.inputs,k=r.factors;
+  a.push(['Clasificación','Celda metálica autosoportada'],['Ubicación',place(p.location)],
+   ['Modelo vertical',p.vertical==='rigid'?'V1 — Rígido':'V2 — No rígido']);
+  f.push(['IE (Tabla 4)',eq(k.IE)],['R (Tabla 4)',eq(k.R)],['A0/g',eq(k.A0_g)],['Amortiguamiento',display(k.xi_pct,1)+' %'],
+  ['Fb',eq(k.Fb)],['Sa,máx/g',eq(k.Sa_over_g)],['Kh ubicación',eq(k.location.horizontal)],
+  ['Kv ubicación',eq(k.location.vertical)],['Amplificación anclajes H',eq(k.anchor_multiplier.horizontal)]);
+  e.push('Fb = (3,21 − 0,68 · ln(2)) / 2,1156 = '+eq(k.Fb),
+   'Sa,máx/g = 2,12 · A0/g · Fb = '+eq(k.Sa_over_g),
+   'Ex = Ey = 1,20 · IE · (Sa/g) · W · Kh / R = '+force(r.structure.Ex),
+   (p.vertical==='rigid'?'Ez (V1) = 0,36 · IE · W · Kv':'Ez (V2) = 0,72 · IE · (Sa/g) · W · Kv / R')+' = '+force(r.structure.Ez),
+   'Ex,a = Ey,a = 1,50 · Ex = '+force(r.anchors.Ex));
+ }
+ e.push('Ez,a = Ez = '+force(r.anchors.Ez));
+ return {inputs:a,factors:f,equations:e};
+}
+function rowsForces(r){
+ return [['Ex',r.structure.Ex,r.anchors.Ex],['Ey',r.structure.Ey,r.anchors.Ey],['Ez',r.structure.Ez,r.anchors.Ez]];
+}
+function htmlTable(data,forceMode=false){
+ if(forceMode)return '<table><thead><tr><th>Acción</th><th>Estructura (kgf)</th><th>Anclajes (kgf)</th></tr></thead><tbody>'+
+ data.map(x=>'<tr><td>'+esc(x[0])+'</td><td>'+display(x[1],1)+'</td><td>'+display(x[2],1)+'</td></tr>').join('')+'</tbody></table>';
+ return '<table class="pairs"><tbody>'+data.map(x=>'<tr><td>'+esc(x[0])+'</td><td>'+esc(x[1])+'</td></tr>').join('')+'</tbody></table>';
+}
+function buildReports(r){
+ const d=lineData(r),rows=rowsForces(r),name=caption(r);
+ const head='<div class="report-kicker">PHS | INGENIERÍA ESTRUCTURAL</div><h1>FUERZAS SÍSMICAS DE DISEÑO</h1><p>'+esc(name)+'</p><hr>';
+ const summary='<h2>Resumen de fuerzas de diseño</h2>'+htmlTable(rows,true);
+ const base=head+'<h2>Antecedentes principales</h2>'+htmlTable(d.inputs.filter((x,i)=>i===0||x[0]==='Ubicación'||x[0]==='Clasificación equipo'||x[0]==='Clasificación'||x[0]==='Modelo vertical'))+summary;
+ const detail=head+'<h2>1. Antecedentes</h2>'+htmlTable(d.inputs)+
+  '<h2>2. Parámetros y factores</h2>'+htmlTable(d.factors)+
+  '<h2>3. Ecuaciones y resultados principales</h2>'+
+  d.equations.map(x=>'<div class="equation">'+esc(x)+'</div>').join('')+
+  '<h2>4. Resumen de fuerzas de diseño</h2>'+htmlTable(rows,true);
+ const footer='<p class="report-foot">Acciones sísmicas como magnitudes por dirección. No incluye combinaciones gravitacionales ni diseño resistente de anclajes.</p>';
+ const txthead=['PHS | INGENIERÍA ESTRUCTURAL','FUERZAS SÍSMICAS DE DISEÑO',name,'='.repeat(64)];
+ const txtpairs=(arr)=>arr.map(x=>x[0]+' : '+x[1]);
+ const txtresult=['ACCIÓN | ESTRUCTURA (kgf) | ANCLAJES (kgf)',...rows.map(x=>x[0]+' | '+display(x[1],1)+' | '+display(x[2],1))];
+ const txtfoot=['','Magnitudes sísmicas por dirección; no incluye combinaciones ni verificación resistente.'];
+ const globalTxt=[...txthead,'','ANTECEDENTES PRINCIPALES',...txtpairs(d.inputs.filter((x,i)=>i===0||x[0]==='Ubicación'||x[0]==='Clasificación equipo'||x[0]==='Clasificación'||x[0]==='Modelo vertical')),'','RESULTADOS',...txtresult,...txtfoot].join('\n');
+ const detailTxt=[...txthead,'','1. ANTECEDENTES',...txtpairs(d.inputs),'','2. PARÁMETROS Y FACTORES',...txtpairs(d.factors),'','3. ECUACIONES PRINCIPALES',...d.equations,'','4. RESULTADOS',...txtresult,...txtfoot].join('\n');
+ return {globalHtml:base+footer,detailHtml:detail+footer,globalTxt,detailTxt};
+}
+function read(){
+ const standard=$('norm').value;
+ const W=num('w');
+ if(standard==='2369'){
+   return motor.calculate2369({weight_kgf:W,category:$('cat').value,zone:$('zone').value,soil:$('soil').value,
+     equipment:$('equipment').value,anchor:$('duct').value,location:$('loc2369').value,height_m:num('height'),level_m:num('zk')});
+ }
+ if(standard==='87')return motor.calculate87({weight_kgf:W,IE:num('ie'),fx:num('fx'),fy:num('fy'),location:$('loc87').value});
+ return motor.calculate88({weight_kgf:W,vertical:$('vertical').value,location:$('loc88').value});
+}
+function updateVisibility(){
+ const n=$('norm').value;
+ for(const v of ['2369','87','88'])$('block'+v).hidden=n!==v;
+ $('heightGroup').hidden=$('loc2369').value!=='elevated';
+}
+function refreshReports(){
+ if(!reports)return;
+ const pdf=$('pdfLevel').value==='global'?reports.globalHtml:reports.detailHtml;
+ const txt=$('txtLevel').value==='global'?reports.globalTxt:reports.detailTxt;
+ $('pdfPreview').innerHTML=pdf;$('txtPreview').textContent=txt;$('printHost').innerHTML=pdf;
+}
+function render(){
+ updateVisibility();
+ try{
+   const r=read();active=r;reports=buildReports(r);
+   $('status').textContent='Cálculo actualizado';$('status').className='status valid';
+   $('forces').innerHTML=htmlTable(rowsForces(r),true);
+   $('methodDetail').textContent=caption(r);
+   $('pdfButton').disabled=false;$('txtButton').disabled=false;
+   refreshReports();
+ }catch(e){
+   active=null;reports=null;$('status').textContent=e.message;$('status').className='status invalid';
+   $('forces').innerHTML='<p class="empty">Ingresa los datos necesarios para calcular.</p>';
+   $('methodDetail').textContent='—';
+   $('pdfPreview').innerHTML='<p>Sin resultados disponibles.</p>';
+   $('txtPreview').textContent='Sin resultados disponibles.';
+   $('printHost').innerHTML='';
+   $('pdfButton').disabled=true;$('txtButton').disabled=true;
  }
 }
-$('status').textContent=status;$('status').className='notice warning';
-$('structH').textContent=fmt(Math.max(hx,hy),dec.fuerza);$('structV').textContent=fmt(v,dec.fuerza);$('anchorH').textContent=fmt(Math.max(ax,ay),dec.fuerza);$('anchorV').textContent=fmt(av,dec.fuerza);
-$('detail').innerHTML=`<tr><td>Horizontal X</td><td>${fmt(chX,dec.coef)}</td><td>${fmt(anchMult,dec.factor)}</td><td>${fmt(ax/w,dec.coef)}</td></tr><tr><td>Horizontal Y</td><td>${fmt(chY,dec.coef)}</td><td>${fmt(anchMult,dec.factor)}</td><td>${fmt(ay/w,dec.coef)}</td></tr><tr><td>Vertical Z</td><td>${fmt(cv,dec.coef)}</td><td>1,00</td><td>${fmt(av/w,dec.coef)}</td></tr>`;
-$('notes').textContent='Los resultados representan magnitudes sísmicas por dirección y no incluyen combinaciones gravitacionales, esfuerzos sobre cada perno ni validación de anclajes al hormigón.';
-if(![hx,hy,v,ax,ay,av,chX,chY,cv,anchMult].every(Number.isFinite)){fail('Error: las entradas producen resultados no finitos. Revise valores y unidades.');return}
- last={schemaVersion:'0.4',preliminary:true,standard:n==='2369'?'NCh2369:2025':'CNE Anexo Técnico Requisitos Sísmicos enero 2025',article:n==='2369'?'7.2-7.3':n,units:{force:'kgf'},inputs,coefficients:{structure:{X:chX,Y:chY,vertical:cv},anchor_multiplier:{horizontal:anchMult,vertical:1}},seismic_demands:{structure:{Ex:hx,Ey:hy,Ez_magnitude:v},anchors:{Ex:ax,Ey:ay,Ez_magnitude:av}},notes:desc,limitations:['No incluye combinaciones ni gravitacionales','No calcula reacciones individuales de anclajes','Verificar Título XXII y XXX','Herramienta preliminar; falta verificación de casos normativos']};
-const tituloNorma=n==='2369'?'NCh2369:2025 · Capítulo 7':n==='87'?'NTSyCS · Anexo Técnico · Artículo 87':'NTSyCS · Anexo Técnico · Artículo 88';
-const modelo=[];
-const entrada=(nombre,valor)=>modelo.push([nombre,valor]);
-entrada('Peso sísmico, '+(n==='2369'?'Pp':'W'),fmt(w,dec.fuerza)+' kgf');
-if(n==='2369'){
- entrada('Categoría de importancia',$('cat').value);
- entrada('Factor de importancia, I',fmt(I[$('cat').value],2));
- entrada('Zona sísmica',$('zone').value);
- entrada('Aceleración efectiva, Ar/g',fmt(Ar[$('zone').value],3));
- entrada('Tipo de suelo',$('soil').value);
- entrada('Factor de suelo, S',fmt(S[$('soil').value],2));
- entrada('Altura de la estructura, H',fmt(num('height'),2)+' m');
- entrada('Cota del punto de apoyo, Zk',fmt(num('zk'),2)+' m');
- entrada('Factor de amplificación, Kp','2,20');
- entrada('Factor de modificación de respuesta, Rp',fmt(num('rp'),2));
-}else{
- entrada('Factor de importancia, IE',fmt(num('ie'),2));
- if(n==='87'){
-   entrada('Frecuencia horizontal X, fx',fmt(num('fx'),2)+' Hz');
-   entrada('Frecuencia horizontal Y, fy',fmt(num('fy'),2)+' Hz');
- }else{
-   entrada('Factor de modificación de respuesta, R',fmt(num('r'),2));
-   entrada('Aceleración basal, A0',fmt(num('a0'),2)+' g');
-   entrada('Razón de amortiguamiento, ξ',fmt(num('xi'),2)+' %');
-   entrada('Aceleración espectral máxima, Sa/g',fmt(inputs.Sa_over_g,3));
- }
- entrada('Condición de instalación',$('loc').value==='floor'?'Piso superior de edificio de hasta tres pisos':'A nivel de terreno');
- entrada('Amplificación horizontal por ubicación',fmt(locH,2));
- entrada('Amplificación vertical por ubicación',fmt(locV,2));
- if(n==='88')entrada('Comportamiento vertical',$('vertical').value==='rigid'?'Rígido':'No rígido');
+function saveTxt(){
+ if(!active||!reports)return;
+ const level=$('txtLevel').value;
+ const name='PHS_'+active.method.replace(/[^a-z0-9]+/gi,'_')+'_'+level+'.txt';
+ const file=new Blob([level==='global'?reports.globalTxt:reports.detailTxt],{type:'text/plain;charset=utf-8'});
+ const url=URL.createObjectURL(file),link=document.createElement('a');
+ link.href=url;link.download=name;document.body.appendChild(link);link.click();link.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
-const secciones=[];
-const seccion=(nombre,descripcion,ecuaciones,filas)=>secciones.push({nombre,descripcion,ecuaciones,filas});
-if(n==='2369'){
- const ie=I[$('cat').value],ar=Ar[$('zone').value],s=S[$('soil').value],rp=num('rp'),acc=ie*ar*s*(1+2*num('zk')/num('height')),cp=acc*2.2/rp;
- seccion('2. Fuerzas sísmicas para la estructura','Determinación de la fuerza horizontal conforme al capítulo 7, considerando los límites normativos.',['Fp = (ak/g) · (Kp/Rp) · Pp','Fp,min ≤ Fp ≤ Fp,max','Fv = kv · I · (Ar/g) · S · Pp'],[
- ['Fuerza horizontal calculada',fmt(cp*w,1)+' kgf'],['Fuerza horizontal mínima',fmt(.7*ie*ar*s*w,1)+' kgf'],['Fuerza horizontal máxima',fmt(3*ie*ar*s*w,1)+' kgf'],['Fuerza horizontal adoptada, Fp',fmt(hx,1)+' kgf'],['Fuerza sísmica vertical, Fv',fmt(v,1)+' kgf']]);
- seccion('3. Fuerzas sísmicas para los anclajes','Amplificación horizontal conforme al criterio de anclajes seleccionado. La fuerza vertical permanece sin amplificación adicional de §7.3.',[($('duct').value==='brittle'?'αa = Rp':$('duct').value==='duct'?'αa = 0,7 · Rp':'αa = 1,00')+' = '+fmt(anchMult,2)],[['Criterio de anclajes',$('duct').selectedOptions[0].textContent]]);
-}else if(n==='87'){
- const khx=num('fx')<30?1.35:1,khy=num('fy')<30?1.35:1;
- seccion('2. Fuerzas sísmicas para la estructura','Método estático del artículo 38 con los factores horizontales del artículo 87.',['H = 0,60 · IE · W · Kh','V = 0,36 · IE · W · Kv'],[
- ['Factor horizontal X, Kh,X',fmt(khx,2)],['Factor horizontal Y, Kh,Y',fmt(khy,2)],['Factor vertical, Kv','1,00'],['Fuerza horizontal X, Ex',fmt(hx,1)+' kgf'],['Fuerza horizontal Y, Ey',fmt(hy,1)+' kgf'],['Fuerza vertical, Ez',fmt(v,1)+' kgf']]);
- seccion('3. Fuerzas sísmicas para los anclajes','El artículo 87 establece una amplificación adicional para el diseño de los anclajes.',['Eh,anc = 1,25 · Eh','Ev,anc = 1,00 · Ev'],[['Factor horizontal adicional','1,25'],['Factor vertical adicional','1,00']]);
-}else{
- const sp=saMaximum(num('a0'),num('xi'));
- seccion('2. Determinación de la aceleración espectral','Se adopta el máximo del espectro del artículo 19 para el amortiguamiento indicado, conforme al artículo 88.',['A = 2,12 · A0 · Fb','Fb = (3,21 − 0,68 · ln(ξ)) / 2,1156'],[['Factor espectral, Fb',fmt(sp.fb,3)],['Aceleración espectral máxima adoptada, Sa/g',fmt(inputs.Sa_over_g,3)]]);
- seccion('3. Fuerzas sísmicas para la estructura','Método del artículo 39; se adopta el comportamiento vertical seleccionado.',['H = 1,20 · IE · (Sa/g) · W · Kh / R',$('vertical').value==='rigid'?'V1 = 0,36 · IE · W · Kv':'V2 = 0,72 · IE · (Sa/g) · W · Kv / R'],[['Fuerza horizontal X, Ex',fmt(hx,1)+' kgf'],['Fuerza horizontal Y, Ey',fmt(hy,1)+' kgf'],['Fuerza vertical, Ez',fmt(v,1)+' kgf']]);
- seccion('4. Fuerzas sísmicas para los anclajes','Amplificación horizontal del artículo 88. La demanda vertical no recibe esta amplificación.',['Eh,anc = 1,50 · Eh','Ev,anc = 1,00 · Ev'],[['Factor horizontal adicional','1,50'],['Factor vertical adicional','1,00']]);
-}
-const tituloResumen=(n==='88'?'5.': '4.')+' Resumen de solicitaciones de diseño';
-const tituloObservaciones=(n==='88'?'6.':'5.')+' Observaciones';
-const resumen=[['Ex',hx,ax],['Ey',hy,ay],['Ez',v,av]];
-const observaciones=['Las acciones sísmicas se presentan por dirección, sin combinaciones gravitacionales ni distribución de esfuerzos entre anclajes.','La resistencia de las conexiones al hormigón no se verifica en este módulo.'];
-if(n==='87')observaciones.push('La exigencia de frecuencia mínima de 20 Hz en cualquier dirección, incluida Z, debe verificarse independientemente. Esta aplicación solo usa fx y fy.');
-if(n==='88')observaciones.push('La clasificación de rigidez vertical y las condiciones de aplicación de los artículos 19, 39 y 88 deben justificarse.');
-if(n!=='2369')observaciones.push('Revisar condiciones particulares de instalación y requisitos del Título XXX.');
-const escHtml=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const tabla=filas=>'<table><tbody>'+filas.map(([l,r])=>'<tr><td>'+escHtml(l)+'</td><td>'+escHtml(r)+'</td></tr>').join('')+'</tbody></table>';
-let html='<div class="phs-kicker">PHS | INGENIERÍA ESTRUCTURAL</div><h1>DETERMINACIÓN DE FUERZAS SÍSMICAS</h1><div class="phs-sub">'+escHtml(tituloNorma)+'</div><hr><section><h2>1. Antecedentes de cálculo</h2><p>Se consideran los siguientes parámetros para determinar las solicitaciones sísmicas de diseño.</p>'+tabla(modelo)+'</section>';
-for(const sec of secciones){html+='<section><h2>'+escHtml(sec.nombre)+'</h2><p>'+escHtml(sec.descripcion)+'</p><div class="phs-equation">'+sec.ecuaciones.map(escHtml).join('<div style="height:8px"></div>')+'</div>'+tabla(sec.filas)+'</section>'}
-html+='<section><h2>'+escHtml(tituloResumen)+'</h2><table><thead><tr><th>Acción</th><th>Estructura (kgf)</th><th>Anclajes (kgf)</th></tr></thead><tbody>'+resumen.map(([l,s,a])=>'<tr><td>'+l+'</td><td style="text-align:right">'+fmt(s,1)+'</td><td style="text-align:right">'+fmt(a,1)+'</td></tr>').join('')+'</tbody></table></section>';
-html+='<section><h2>'+escHtml(tituloObservaciones)+'</h2>'+observaciones.map(o=>'<p class="phs-note">• '+escHtml(o)+'</p>').join('')+'</section><div class="phs-footer">PHS | INGENIERÍA ESTRUCTURAL · Reporte preliminar para revisión técnica</div>';
-$('previewReport').innerHTML=html;
-const txt=['PHS | INGENIERÍA ESTRUCTURAL','DETERMINACIÓN DE FUERZAS SÍSMICAS',tituloNorma,'================================================','', '1. ANTECEDENTES DE CÁLCULO','------------------------------------------------',...modelo.map(([l,r])=>l+' : '+r),''];
-for(const sec of secciones){txt.push(sec.nombre.toUpperCase(),'------------------------------------------------',sec.descripcion,...sec.ecuaciones,...sec.filas.map(([l,r])=>l+' : '+r),'')}
-txt.push(tituloResumen.toUpperCase(),'------------------------------------------------','Acción | Estructura (kgf) | Anclajes (kgf)',...resumen.map(([l,s,a])=>l+' | '+fmt(s,1)+' | '+fmt(a,1)),'',tituloObservaciones.toUpperCase(),'------------------------------------------------',...observaciones.map(x=>'• '+x),'','Cálculos internos sin redondeo intermedio. Documento preliminar.');
-$('report').textContent=txt.join('\n');
-}
-function download(content,name,type){const b=new Blob([content],{type}),url=URL.createObjectURL(b),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
-$('savePdf').onclick=()=>{if(!last)return;$('printMirror').innerHTML=$('previewReport').outerHTML;window.print();};
-$('saveTxt').onclick=()=>{if(last)download($('report').textContent,'PHS_fuerzas_sismicas.txt','text/plain;charset=utf-8')};
-$('saveJson').onclick=()=>{if(last)download(JSON.stringify(last,null,2),'PHS_fuerzas_sismicas.json','application/json')};
-$('copy').onclick=()=>{if(last)navigator.clipboard.writeText($('report').textContent).catch(()=>alert('No se pudo copiar.'))};
-$('refTab').onclick=()=>{$('reference').classList.remove('hidden');$('refTab').classList.add('active');$('calcTab').classList.remove('active')};
-$('calcTab').onclick=()=>{$('reference').classList.add('hidden');$('calcTab').classList.add('active');$('refTab').classList.remove('active')};
-document.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',el.id==='norm'||el.id==='saMode'?show:()=>{if(el.id==='loc')updateLocation();calculate()}));show();
-</script></body></html>
+$('pdfButton').addEventListener('click',()=>{if(active)window.print()});
+$('txtButton').addEventListener('click',saveTxt);
+$('pdfLevel').addEventListener('change',refreshReports);
+$('txtLevel').addEventListener('change',refreshReports);
+document.querySelectorAll('input,select').forEach(el=>{
+ if(['pdfLevel','txtLevel'].includes(el.id))return;
+ el.addEventListener('input',render);el.addEventListener('change',render);
+});
+render();
+})();
+</script>
+</body></html>

@@ -22,6 +22,8 @@ Los resultados son magnitudes por dirección `Ex`, `Ey` y `Ez`, separadas para e
 
 ## Reportes
 
+**Formato numérico:** la coma o el punto decimal se toma automáticamente de la configuración regional del navegador/sistema mediante `Intl.NumberFormat`, siempre con `useGrouping: false` (sin separador de miles). El formato se aplica uniformemente a pantalla, PDF, TXT, factores y ecuaciones; los cálculos internos conservan precisión completa.
+
 Se exportan **únicamente PDF y TXT**. Cada formato permite seleccionar su nivel de forma independiente:
 - **Global:** entradas principales y resumen Ex/Ey/Ez para estructura y anclajes.
 - **Detallado:** antecedentes, factores, ecuaciones principales con valores y resumen final.

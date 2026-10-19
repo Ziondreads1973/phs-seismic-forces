@@ -199,7 +199,7 @@ test('TXT NCh2369: ruta basal y elevada contienen límites, Rp, vertical y ampli
 test('TXT Art87: factores por eje, ubicación y resultados sin sustituciones',()=>{
  const d=mount({norm:'87',w:'1000',fx:'25',fy:'35',loc87:'floor'});
  const txt=d.nodes.txtPreview.textContent;
- for(const part of ['Kh,X','Kh,Y','Kv ubicación','Coeficiente Cx','Coeficiente Cy',
+ for(const part of ['Kh,X','Kh,Y','Kv ubicación','Cx =','Cy =',
     '25 Hz','35 Hz','Cx =','Cy =','Ex =','Ey =','Ez =',
     'Ex,a =','Ey,a =','Ez,a ='])
   assert.ok(txt.includes(part),part);

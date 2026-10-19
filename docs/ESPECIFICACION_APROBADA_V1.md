@@ -144,3 +144,14 @@
 - Separador decimal según configuración regional del navegador, sin agrupación de miles.
 - Estructura del TXT: `1. ANTECEDENTES`, `2. CÁLCULO DE FUERZAS SÍSMICAS`, `3. FUERZAS PARA ANCLAJES`, `4. RESUMEN DE RESULTADOS`.
 - Conservar el motor independiente sin ninguna modificación y mantener el PDF global existente.
+
+### FS-06-C05 — Redondeo simplificado del TXT (último criterio aprobado)
+
+**Prevalece sobre la precisión adaptativa de FS-06-C04**, únicamente en la presentación de los coeficientes calculados del TXT.
+
+- Coeficientes/resultados intermedios calculados: **máximo 3 decimales**; redondeo decimal convencional del formateador regional (`Intl.NumberFormat`) y sin ceros decimales innecesarios. Ejemplo del caso basal NCh2369: `ak/g=0,529`, `Cp=0,388`, `Cmin=0,37`, `Cmax=1,588`, `Ch=0,388` en región de coma decimal.
+- El límite de 3 decimales no se aplica a los **inputs introducidos por el usuario** (se conservan tal como se ingresaron) ni a los **factores normativos tabulados** (se muestran con su precisión normativa, sin ceros añadidos).
+- Las **fuerzas finales** se muestran a 1 decimal fijo en kgf.
+- Este es un límite de presentación, **no de precisión de cálculo**. El motor conserva todos sus valores internos y los reportes no recalculan fuerzas con coeficientes redondeados. Se acepta que al multiplicar manualmente un coeficiente visible por W se obtenga una fuerza ligeramente distinta de la fuerza final presentada.
+- Separador decimal según configuración regional del navegador, sin separador de miles.
+- Se mantiene el esquema fórmula simbólica seguida inmediatamente por su resultado; sin sustituciones numéricas. El PDF y el resumen en pantalla no cambian.

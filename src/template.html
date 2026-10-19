@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PHS | Fuerzas Sísmicas</title>
+<style>
+:root{font-family:Inter,Segoe UI,Arial,sans-serif;color:#243449;background:#f3f6fb;font-size:14px}
+*{box-sizing:border-box}body{margin:0}header{background:#133c63;color:white;padding:19px 28px}
+header h1{font-size:21px;margin:0 0 4px}header small{color:#c8def1}
+main{max-width:1400px;margin:21px auto;padding:0 18px;display:grid;grid-template-columns:minmax(300px,390px) minmax(0,1fr);gap:18px}
+.card{background:#fff;border:1px solid #d7e2ed;border-radius:11px;padding:18px;margin-bottom:16px;box-shadow:0 3px 13px #132f450a}
+h2{font-size:16px;color:#174263;margin:0 0 14px}h3{font-size:12px;color:#416581;text-transform:uppercase;letter-spacing:.035em;margin:19px 0 10px}
+label{display:block;font-size:12px;font-weight:650;margin-bottom:5px}
+.field{margin-bottom:12px}.field small{display:block;color:#60758a;font-size:11px;line-height:1.5;margin-top:4px}
+input,select{display:block;width:100%;border:1px solid #bbcad7;border-radius:7px;padding:10px;font:inherit;background:#fff;color:#203951}
+input:focus,select:focus{outline:2px solid #9ec9ed}
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.muted{color:#64778a;font-size:12px;line-height:1.55}
+.rule{height:1px;background:#e4ebf2;margin:17px 0}
+.status{padding:11px 14px;border-radius:6px;margin-bottom:15px;font-size:12px;line-height:1.5}
+.status.valid{background:#eaf5ed;color:#285f42}.status.invalid{background:#f4f6f8;color:#576b7e}
+table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:10px 8px;border-bottom:1px solid #dde5ed;text-align:right}th:first-child,td:first-child{text-align:left}th{background:#edf3f8;color:#2b4a65}
+.pairs td:first-child{color:#425d74}.pairs td:last-child{font-weight:600}
+button{border:0;border-radius:7px;padding:11px 15px;background:#2169a7;color:white;font:inherit;font-weight:700;cursor:pointer}
+button:hover:not(:disabled){background:#175684}button:disabled{background:#a4b5c3;cursor:not-allowed}
+button.secondary{background:#e8eff7;color:#214d74}.button-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.button-row button{flex:1;min-width:125px}.report{border:1px solid #d4e0e9;padding:24px 28px;background:#fff;margin-top:12px;line-height:1.55}
+.report h1{font-size:18px;margin:5px 0 0;color:#173d63}.report h2{font-size:14px;margin:22px 0 10px}
+.report-kicker{font-size:10px;letter-spacing:.08em;font-weight:700;color:#5d7488}.report hr{border:0;border-top:1px solid #b8c9d9;margin:16px 0}
+.report .equation{padding:8px 12px;margin:5px 0;background:#f4f7fa;font:12px/1.6 Consolas,monospace;overflow-wrap:anywhere}
+.report-foot{font-size:11px;color:#52667a;border-top:1px solid #dbe5ed;padding-top:12px;margin-top:22px}
+pre{font:11px/1.65 Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;background:#f4f7fb;padding:15px;border-radius:8px;border:1px solid #e0e8ef;max-height:340px;overflow:auto}
+.reference th,.reference td{text-align:left;white-space:normal}
+.reference td:nth-child(2),.reference td:nth-child(3){text-align:right}
+details summary{font-size:12px;font-weight:650;color:#24577f;cursor:pointer}details{margin-top:14px}
+#printHost{display:none}
+[hidden]{display:none!important}
+@media(max-width:900px){main{display:block}.cols{grid-template-columns:1fr 1fr}}
+@page{size:A4;margin:16mm 18mm}
+@media print{
+ body{background:white}header,main{display:none!important}
+ #printHost{display:block!important;margin:0!important;padding:0!important}
+ #printHost h1{font-size:17px}#printHost h2{font-size:13px}
+ #printHost .equation,#printHost table{break-inside:avoid}
+ #printHost h2{break-after:avoid}#printHost tr{break-inside:avoid}
+}
+</style></head><body>
+<header><h1>PHS | Fuerzas sísmicas de equipos y anclajes</h1><small>NCh2369:2025 capítulo 7 · Anexo Técnico CNE, artículos 87 y 88 · Aplicación offline</small></header>
+<main>
+<aside>
+<section class="card">
+<h2>1. Procedimiento y antecedentes</h2>
+<div class="field"><label for="norm">Normativa</label><select id="norm">
+<option value="2369">NCh2369:2025 · Capítulo 7</option>
+<option value="87">Anexo Técnico · Artículo 87</option>
+<option value="88">Anexo Técnico · Artículo 88</option></select></div>
+<div class="field"><label for="w">Peso sísmico total W / Pp [kgf]</label><input id="w" type="number" min="0" step="any" placeholder="Ingresar peso sísmico"></div>
+<section id="block2369">
+<h3>NCh2369 — Clasificaciones</h3>
+<div class="cols">
+<div class="field"><label for="cat">Categoría importancia</label><select id="cat"><option value="I">I</option><option value="II">II</option><option value="III" selected>III</option><option value="IV">IV</option></select></div>
+<div class="field"><label for="zone">Zona sísmica</label><select id="zone"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option></select></div></div>
+<div class="field"><label for="soil">Tipo de suelo</label><select id="soil"><option>A</option><option>B</option><option selected>C</option><option>D</option><option>E</option></select></div>
+<div class="field"><label for="equipment">Clasificación del equipo / elemento secundario</label><select id="equipment">
+<option value="electrical-mechanical">Equipo eléctrico o mecánico</option>
+<option value="secondary-ductile">Elemento secundario con componentes dúctiles</option>
+<option value="secondary-nonductile">Elemento secundario con componentes no dúctiles</option>
+<option value="other-specified">Otro equipo no especificado</option>
+</select></div>
+<div class="field"><label for="duct">Clasificación del sistema de anclaje</label><select id="duct">
+<option value="ductile">Dúctil — ruta §7.3.2</option><option value="nonductile">No dúctil — ruta §7.3.3</option>
+</select></div>
+<h3>Ubicación y altura</h3>
+<div class="field"><label for="loc2369">Condición de instalación</label><select id="loc2369">
+<option value="ground">Nivel de terreno / losa basal</option>
+<option value="modular">Sala modular con apoyo basal equivalente</option>
+<option value="elevated">Estructura elevada</option></select></div>
+<div id="heightGroup" hidden>
+<div class="cols"><div class="field"><label for="height">Altura H [m]</label><input id="height" type="number" step="any" min="0" placeholder="H"></div>
+<div class="field"><label for="zk">Altura nivel Zk [m]</label><input id="zk" type="number" step="any" min="0" placeholder="Zk"></div></div>
+</div>
+</section>
+<section id="block87" hidden>
+<h3>Art. 87 — Bancos de baterías sobre soporte</h3>
+<div class="field"><label for="ie">Factor importancia IE (editable)</label><input id="ie" type="number" min="0" step="any" value="1"></div>
+<div class="cols"><div class="field"><label for="fx">Frecuencia horizontal fX [Hz]</label><input id="fx" type="number" min="0" step="any" placeholder="fX"></div>
+<div class="field"><label for="fy">Frecuencia horizontal fY [Hz]</label><input id="fy" type="number" min="0" step="any" placeholder="fY"></div></div>
+<p class="muted">Frecuencias horizontales mínimas 20 Hz. Kh se calcula independientemente en X e Y.</p>
+<div class="field"><label for="loc87">Condición de instalación</label><select id="loc87">
+<option value="ground">Losa/fundación a nivel basal</option>
+<option value="modular">Sala modular con apoyo basal equivalente</option>
+<option value="floor">Piso superior real, edificio hasta tres pisos</option></select></div>
+</section>
+<section id="block88" hidden>
+<h3>Art. 88 — Celda metálica autosoportada</h3>
+<p class="muted">Clasificación del equipo: IE = 1,00 y R = 1,00 (Tabla 4). A0 = 0,50g y amortiguamiento = 2 %. La aceleración espectral máxima es automática.</p>
+<div class="field"><label for="vertical">Comportamiento vertical</label><select id="vertical">
+<option value="rigid">V1 — Rígido verticalmente</option>
+<option value="flex">V2 — No rígido verticalmente</option></select></div>
+<div class="field"><label for="loc88">Condición de instalación</label><select id="loc88">
+<option value="ground">Losa/fundación basal</option>
+<option value="modular">Sala modular con apoyo basal equivalente</option>
+<option value="floor">Piso superior real, edificio hasta tres pisos</option></select></div>
+<details><summary>Ver Tabla 4 — referencia de clasificación</summary>
+<p class="muted">Los factores de soportes y anclajes no reemplazan el R de la celda autosoportada.</p>
+<table class="reference"><thead><tr><th>Elemento</th><th>IE</th><th>R</th></tr></thead><tbody>
+<tr><td>Equipo eléctrico general</td><td>1,00</td><td>1,00</td></tr>
+<tr><td>Soporte dúctil sin redundancia</td><td>Del equipo</td><td>1,50</td></tr>
+<tr><td>Soporte dúctil con redundancia</td><td>Del equipo</td><td>≤3,00</td></tr>
+<tr><td>Reticulado de acero con rigidez global Art. 122</td><td>Del equipo</td><td>3,00</td></tr>
+<tr><td>Reticulado sin rigidez global Art. 122</td><td>Del equipo</td><td>≤2,00</td></tr>
+<tr><td>Soporte horizontal en voladizo con ≥3 apoyos</td><td>Del equipo</td><td>2,00</td></tr>
+<tr><td>Marcos de acero</td><td>Del equipo</td><td>3,00</td></tr>
+<tr><td>Marcos de hormigón armado</td><td>Del equipo</td><td>2,00</td></tr>
+<tr><td>Soportes tubulares</td><td>Del equipo</td><td>1,50</td></tr>
+<tr><td>Otros soportes de equipos</td><td>Del equipo</td><td>Por definir</td></tr>
+<tr><td>Anclaje preinstalado</td><td>Del equipo</td><td>2,00</td></tr>
+<tr><td>Anclaje postinstalado en soporte Art. 109</td><td>Del equipo</td><td>2,00</td></tr>
+<tr><td>Anclaje postinstalado para equipo</td><td>Del equipo</td><td>1,00</td></tr>
+<tr><td>Soldadura a placa embebida / único punto transferencia</td><td>Del equipo</td><td>1,00</td></tr>
+<tr><td>Otros elementos sistemas de anclaje (Título XXX)</td><td>Del equipo</td><td>2,00</td></tr>
+<tr><td>Fundación superficial de hormigón</td><td>Del equipo</td><td>3,00</td></tr>
+<tr><td>Sistema estructural rígido</td><td>Del equipo</td><td>1,00</td></tr>
+</tbody></table></details>
+</section>
+</section>
+</aside>
+<article>
+<section class="card"><h2>2. Resultados de cálculo</h2><div id="status" class="status invalid">Complete los parámetros.</div>
+<p class="muted" id="methodDetail">—</p><div id="forces"><p>Sin resultados.</p></div>
+<p class="muted">Acciones sísmicas como magnitudes por dirección. No incluyen combinaciones gravitacionales, reacciones individuales ni verificaciones resistentes de anclajes.</p>
+</section>
+<section class="card"><h2>3. Reportes PDF y TXT</h2>
+<div class="cols">
+<div class="field"><label for="pdfLevel">Nivel del PDF</label><select id="pdfLevel"><option value="global">Global</option><option value="detallado">Detallado</option></select></div>
+<div class="field"><label for="txtLevel">Nivel del TXT</label><select id="txtLevel"><option value="global">Global</option><option value="detallado" selected>Detallado</option></select></div>
+</div>
+<div class="button-row"><button id="pdfButton" disabled>Guardar como PDF</button><button id="txtButton" class="secondary" disabled>Descargar TXT</button></div>
+<p class="muted">El PDF se guarda mediante impresión del navegador en tamaño A4. El TXT se descarga como archivo UTF-8. Cada formato permite seleccionar su propio nivel.</p>
+<h3>Vista previa del PDF seleccionado</h3><div class="report" id="pdfPreview">Sin resultados disponibles.</div>
+<details><summary>Vista previa del TXT seleccionado</summary><pre id="txtPreview">Sin resultados disponibles.</pre></details>
+</section>
+</article>
+</main>
+<div id="printHost"></div>
+<script>
+/*__PHS_MOTOR__*/ 
+</script>
+<script>
+/*__PHS_UI__*/
+</script>
+</body></html>

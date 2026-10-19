@@ -130,3 +130,17 @@
 - Valores calculados se muestran con hasta 12 decimales y las fuerzas finales a 1 decimal, con separador decimal regional y sin separador de miles. Las expresiones se evalúan en el **motor sin redondear intermedios**. En el TXT, los coeficientes impresos son una representación redondeada; el valor final corresponde siempre al resultado del motor, no a recalcular desde la cadena.
 - No crear un motor paralelo de reportes ni modificar métodos normativos; los factores y fuerzas provienen del objeto de resultados del motor. El TXT usa `*_detallado.txt`.
 - No se incluyen verificaciones resistentes de anclajes, combinaciones LRFD/ASD ni el ámbito excluido de §5.8 o artículo 89.
+
+### FS-06-C04 — Maqueta TXT aprobada: ecuación y resultado, sin sustitución
+
+**Esta especificación es posterior y sustituye las partes contradictorias de FS-06-C02 y FS-06-C03 relativas al TXT.** El PDF y la pantalla global no cambian.
+
+- El TXT mostrará los **inputs reales**, la clasificación y los factores normativos adoptados, con los decimales ingresados por el usuario.
+- Cada fórmula principal o intermedia se presenta **seguida inmediatamente por la línea de su resultado**, con el mismo identificador (`ak/g = I · (Ar/g) · S`, salto de línea, `ak/g = 0,5292`). **No hay líneas de sustitución numérica** ni recálculo con valores previamente redondeados.
+- NCh2369: mostrar `ak/g`, `Cp`, `Cmin`, `Cmax`, `Ch`, condición controlante, `Cv`, fuerzas de equipo y amplificación de anclajes; usar rama basal o elevada según inputs y ruta dúctil/no dúctil elegida.
+- Art. 87: mostrar factores direccionales por frecuencia, coeficientes horizontales y vertical, fuerzas de estructura, demanda de anclajes.
+- Art. 88: mostrar `Fb`, `Sa,máx/g`, `Ch`, `Cv` (V1 o V2), fuerzas de estructura y anclajes.
+- Dígitos significativos: coeficientes tabulados sin ceros añadidos; coeficientes calculados con al menos cuatro cifras significativas y precisión decimal adaptada para que la cota aproximada de error de representación sobre el peso/amplificación del caso sea como máximo 0,01 kgf (hasta 15 decimales). Esto es una **política de presentación**, no una tolerancia de cálculo. Las fuerzas finales mantienen un decimal fijo en kgf.
+- Separador decimal según configuración regional del navegador, sin agrupación de miles.
+- Estructura del TXT: `1. ANTECEDENTES`, `2. CÁLCULO DE FUERZAS SÍSMICAS`, `3. FUERZAS PARA ANCLAJES`, `4. RESUMEN DE RESULTADOS`.
+- Conservar el motor independiente sin ninguna modificación y mantener el PDF global existente.

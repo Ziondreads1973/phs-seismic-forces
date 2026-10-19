@@ -106,8 +106,8 @@ function detailedEquations(r){
   calc.push('2.2. Coeficiente horizontal');
   add(calc,'Cp = (ak/g) · Kp / Rp','Cp = '+c(k.Cp,k.anchor_multiplier.horizontal));
   calc.push('2.3. Límites del coeficiente horizontal');
-  add(calc,'Cmin = '+n(.7)+' · I · (Ar/g) · S','Cmin = '+c(k.Cmin));
-  add(calc,'Cmax = 3 · I · (Ar/g) · S','Cmax = '+c(k.Cmax));
+  add(calc,'Cmin = '+n(.7)+' · I · (Ar/g) · S','Cmin = '+c(k.Cmin,k.anchor_multiplier.horizontal));
+  add(calc,'Cmax = 3 · I · (Ar/g) · S','Cmax = '+c(k.Cmax,k.anchor_multiplier.horizontal));
   add(calc,'Ch = mín(Cmax; máx(Cmin; Cp))','Ch = '+c(k.structure.X,k.anchor_multiplier.horizontal));
   const controlling=k.Cp<=k.Cmin?'Cmin':k.Cp>=k.Cmax?'Cmax':'Cp';
   calc.push('Condición controlante: '+controlling,'');
@@ -129,8 +129,8 @@ function detailedEquations(r){
   add(calc,'Kh,X = Kh(fX)','Kh,X = '+n(k.KhX));
   add(calc,'Kh,Y = Kh(fY)','Kh,Y = '+n(k.KhY));
   calc.push('2.2. Coeficientes de diseño');
-  add(calc,'Cx = '+n(.6)+' · IE · Kh,X · Kh ubicación','Cx = '+c(k.structure.X));
-  add(calc,'Cy = '+n(.6)+' · IE · Kh,Y · Kh ubicación','Cy = '+c(k.structure.Y));
+  add(calc,'Cx = '+n(.6)+' · IE · Kh,X · Kh ubicación','Cx = '+c(k.structure.X,k.anchor_multiplier.horizontal));
+  add(calc,'Cy = '+n(.6)+' · IE · Kh,Y · Kh ubicación','Cy = '+c(k.structure.Y,k.anchor_multiplier.horizontal));
   add(calc,'Cz = '+n(.36)+' · IE · Kv · Kv ubicación','Cz = '+c(k.structure.Z));
   calc.push('2.3. Fuerzas sísmicas de la estructura');
   add(calc,'Ex = Cx · W','Ex = '+final(r.structure.Ex));
@@ -151,7 +151,7 @@ function detailedEquations(r){
    'Sa,máx/g = '+c(k.Sa_over_g,1.2*k.location.horizontal*k.anchor_multiplier.horizontal/k.R));
   calc.push('2.2. Coeficiente sísmico horizontal');
   add(calc,'Ch = '+n(1.2)+' · IE · (Sa/g) · Kh ubicación / R',
-   'Ch = '+c(k.structure.X));
+   'Ch = '+c(k.structure.X,k.anchor_multiplier.horizontal));
   calc.push('2.3. Coeficiente sísmico vertical ('+(vertical==='rigid'?'V1 — rígido':'V2 — no rígido')+')');
   add(calc,vertical==='rigid'?
    'Cv = '+n(.36)+' · IE · Kv ubicación':

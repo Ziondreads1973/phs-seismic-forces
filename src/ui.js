@@ -67,21 +67,18 @@ function htmlTable(data,forceMode=false){
 function buildReports(r){
  const d=lineData(r),rows=rowsForces(r),name=caption(r);
  const head='<div class="report-kicker">PHS | INGENIERÍA ESTRUCTURAL</div><h1>FUERZAS SÍSMICAS DE DISEÑO</h1><p>'+esc(name)+'</p><hr>';
- const summary='<h2>Resumen de fuerzas de diseño</h2>'+htmlTable(rows,true);
- const base=head+'<h2>Antecedentes principales</h2>'+htmlTable(d.inputs.filter((x,i)=>i===0||x[0]==='Ubicación'||x[0]==='Clasificación equipo'||x[0]==='Clasificación'||x[0]==='Modelo vertical'))+summary;
- const detail=head+'<h2>1. Antecedentes</h2>'+htmlTable(d.inputs)+
-  '<h2>2. Parámetros y factores</h2>'+htmlTable(d.factors)+
-  '<h2>3. Ecuaciones y resultados principales</h2>'+
-  d.equations.map(x=>'<div class="equation">'+esc(x)+'</div>').join('')+
-  '<h2>4. Resumen de fuerzas de diseño</h2>'+htmlTable(rows,true);
- const footer='<p class="report-foot">Acciones sísmicas como magnitudes por dirección. No incluye combinaciones gravitacionales ni diseño resistente de anclajes.</p>';
+ const summary='<h2>2. Fuerzas sísmicas finales</h2>'+htmlTable(rows,true);
+ const essential=d.inputs.filter((x,i)=>i===0||['Ubicación','Clasificación equipo','Clasificación','Modelo vertical','Categoría','Zona sísmica','Suelo','Sistema de anclaje','Frecuencia X','Frecuencia Y'].includes(x[0]));
+ const wanted=r.method==='NCh2369:2025-cap7'?['I','Rp']:r.method==='CNE-Art87'?['Kh,X','Kh,Y']:['IE (Tabla 4)','R (Tabla 4)','A0/g','Sa,máx/g'];
+ const factors=d.factors.filter(x=>wanted.includes(x[0]));
+ const globalHtml=head+'<h2>1. Antecedentes y factores principales</h2>'+htmlTable([...essential,...factors])+summary+
+ '<p class="report-foot">Acciones sísmicas como magnitudes por dirección. No incluye combinaciones gravitacionales ni diseño resistente de anclajes.</p>';
  const txthead=['PHS | INGENIERÍA ESTRUCTURAL','FUERZAS SÍSMICAS DE DISEÑO',name,'='.repeat(64)];
  const txtpairs=(arr)=>arr.map(x=>x[0]+' : '+x[1]);
  const txtresult=['ACCIÓN | ESTRUCTURA (kgf) | ANCLAJES (kgf)',...rows.map(x=>x[0]+' | '+display(x[1],1)+' | '+display(x[2],1))];
  const txtfoot=['','Magnitudes sísmicas por dirección; no incluye combinaciones ni verificación resistente.'];
- const globalTxt=[...txthead,'','ANTECEDENTES PRINCIPALES',...txtpairs(d.inputs.filter((x,i)=>i===0||x[0]==='Ubicación'||x[0]==='Clasificación equipo'||x[0]==='Clasificación'||x[0]==='Modelo vertical')),'','RESULTADOS',...txtresult,...txtfoot].join('\n');
  const detailTxt=[...txthead,'','1. ANTECEDENTES',...txtpairs(d.inputs),'','2. PARÁMETROS Y FACTORES',...txtpairs(d.factors),'','3. ECUACIONES PRINCIPALES',...d.equations,'','4. RESULTADOS',...txtresult,...txtfoot].join('\n');
- return {globalHtml:base+footer,detailHtml:detail+footer,globalTxt,detailTxt};
+ return {globalHtml,detailTxt};
 }
 function read(){
  const standard=$('norm').value;
@@ -106,44 +103,34 @@ function updateVisibility(){
 }
 function refreshReports(){
  if(!reports)return;
- const pdf=$('pdfLevel').value==='global'?reports.globalHtml:reports.detailHtml;
- const txt=$('txtLevel').value==='global'?reports.globalTxt:reports.detailTxt;
- $('pdfPreview').innerHTML=pdf;$('txtPreview').textContent=txt;$('printHost').innerHTML=pdf;
+ $('globalReport').innerHTML=reports.globalHtml;
+ $('txtPreview').textContent=reports.detailTxt;
 }
 function render(){
  updateVisibility();
  try{
    const r=read();active=r;reports=buildReports(r);
    $('status').textContent='Cálculo actualizado';$('status').className='status valid';
-   $('forces').innerHTML=htmlTable(rowsForces(r),true);
-   $('methodDetail').textContent=caption(r);
    $('pdfButton').disabled=false;$('txtButton').disabled=false;
    refreshReports();
  }catch(e){
    active=null;reports=null;$('status').textContent=e.message;$('status').className='status invalid';
-   $('forces').innerHTML='<p class="empty">Ingresa los datos necesarios para calcular.</p>';
-   $('methodDetail').textContent='—';
-   $('pdfPreview').innerHTML='<p>Sin resultados disponibles.</p>';
+   $('globalReport').innerHTML='<p class="empty">Ingresa los datos necesarios para calcular.</p>';
    $('txtPreview').textContent='Sin resultados disponibles.';
-   $('printHost').innerHTML='';
    $('pdfButton').disabled=true;$('txtButton').disabled=true;
  }
 }
 function saveTxt(){
  if(!active||!reports)return;
- const level=$('txtLevel').value;
- const name='PHS_'+active.method.replace(/[^a-z0-9]+/gi,'_')+'_'+level+'.txt';
- const file=new Blob([level==='global'?reports.globalTxt:reports.detailTxt],{type:'text/plain;charset=utf-8'});
+ const name='PHS_'+active.method.replace(/[^a-z0-9]+/gi,'_')+'_detallado.txt';
+ const file=new Blob([reports.detailTxt],{type:'text/plain;charset=utf-8'});
  const url=URL.createObjectURL(file),link=document.createElement('a');
  link.href=url;link.download=name;document.body.appendChild(link);link.click();link.remove();
  setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 $('pdfButton').addEventListener('click',()=>{if(active)window.print()});
 $('txtButton').addEventListener('click',saveTxt);
-$('pdfLevel').addEventListener('change',refreshReports);
-$('txtLevel').addEventListener('change',refreshReports);
 document.querySelectorAll('input,select').forEach(el=>{
- if(['pdfLevel','txtLevel'].includes(el.id))return;
  el.addEventListener('input',render);el.addEventListener('change',render);
 });
 localizeStaticNumbers();

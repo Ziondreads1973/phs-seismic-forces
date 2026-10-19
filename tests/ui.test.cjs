@@ -14,7 +14,7 @@ function mount(changes={},locale){
  const document={getElementById:element,querySelectorAll(){return ids.map(element)},
   body:{appendChild(){}},createElement(){return {href:'',download:'',click(){saved.files.push(this.download)},remove(){}}}};
  const numberFormatter=Intl.NumberFormat;
- const localeIntl={NumberFormat:(ignored,options)=>new numberFormatter(locale,options)};
+ const localeIntl={NumberFormat:function(ignored,options){return new numberFormatter(locale,options)}};
  const context=vm.createContext({document,window:{print(){saved.printed++}},URL:{createObjectURL(){return'blob://test'},revokeObjectURL(){}},
  Blob:global.Blob,setTimeout(){},console,Intl:localeIntl});
  for(const script of scripts)vm.runInContext(script,context,{timeout:3000});

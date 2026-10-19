@@ -1,6 +1,6 @@
 # PHS | Fuerzas sísmicas de diseño
 
-Aplicación **independiente** para calcular fuerzas sísmicas de equipos y sus anclajes. Versión de origen **0.5 preliminar**. No implementa diseño resistente de anclajes y **no modifica** `phs-anchor-design`.
+Aplicación **independiente** para calcular fuerzas sísmicas de equipos y sus anclajes. Versión **0.6.0 funcional preliminar** (basada en v0.5). No implementa diseño resistente de anclajes y **no modifica** `phs-anchor-design`.
 
 ## Iniciar
 
@@ -37,3 +37,13 @@ Este repositorio **solo calcula cargas**. Los campos `seismic_demands.anchors` e
 - Mantener la trazabilidad normativa, sin ocultar hipótesis ni redondear internamente.
 - Pruebas y auditorías locales.
 - **No crear ni ejecutar GitHub Actions ni flujos CI/CD** sin autorización expresa.
+
+## Cambios v0.6.0 (FS-01)
+
+- Se bloquea la ruta automática `justified` de NCh2369: el cumplimiento de §8.5 no puede verificarse mediante un selector.
+- Se mantienen advertencias preliminares en los resultados.
+- Se rechazan salidas no finitas antes de permitir exportaciones.
+- Se conserva el contrato JSON v0.4.
+- Pruebas locales del motor: 8 escenarios ejecutados, además de 3 ejemplos JSON validados.
+
+**Estado:** primera versión funcional preliminar, no aprobada para diseño normativo hasta completar la auditoría de las tres rutas.

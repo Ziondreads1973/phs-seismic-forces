@@ -30,16 +30,24 @@ pre{font:11px/1.65 Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywher
 .reference th,.reference td{text-align:left;white-space:normal}
 .reference td:nth-child(2),.reference td:nth-child(3){text-align:right}
 details summary{font-size:12px;font-weight:650;color:#24577f;cursor:pointer}details{margin-top:14px}
-#printHost{display:none}
+.reference-block{margin-top:18px;padding:12px;border:1px solid #d5e1eb;border-radius:8px;background:#f9fbfd}
+.reference-block h3{margin:0 0 8px}.reference-block table{margin-top:10px}
+.reference-block tr.applied td{background:#e9f2fb;font-weight:700;color:#153f62}
+#globalReport{margin-top:12px}
+.result-card{min-width:0}
 [hidden]{display:none!important}
 @media(max-width:900px){main{display:block}.cols{grid-template-columns:1fr 1fr}}
 @page{size:A4;margin:16mm 18mm}
 @media print{
- body{background:white}header,main{display:none!important}
- #printHost{display:block!important;margin:0!important;padding:0!important}
- #printHost h1{font-size:17px}#printHost h2{font-size:13px}
- #printHost .equation,#printHost table{break-inside:avoid}
- #printHost h2{break-after:avoid}#printHost tr{break-inside:avoid}
+ body{background:white;color:#243449}
+ header,aside,.export-card,.result-card>h2,.result-card>#status{display:none!important}
+ main{display:block!important;max-width:none!important;margin:0!important;padding:0!important}
+ article,.result-card{display:block!important;width:100%!important;margin:0!important;padding:0!important}
+ .result-card{border:0!important;box-shadow:none!important}
+ #globalReport{display:block!important;border:0!important;padding:0!important;margin:0!important}
+ #globalReport h1{font-size:17px}#globalReport h2{font-size:13px}
+ #globalReport table{break-inside:avoid}
+ #globalReport h2{break-after:avoid}#globalReport tr{break-inside:avoid}
 }
 </style></head><body>
 <header><h1>PHS | Fuerzas sísmicas de equipos y anclajes</h1><small>NCh2369:2025 capítulo 7 · Anexo Técnico CNE, artículos 87 y 88 · Aplicación offline</small></header>
@@ -98,10 +106,10 @@ details summary{font-size:12px;font-weight:650;color:#24577f;cursor:pointer}deta
 <option value="ground">Losa/fundación basal</option>
 <option value="modular">Sala modular con apoyo basal equivalente</option>
 <option value="floor">Piso superior real, edificio hasta tres pisos</option></select></div>
-<details><summary>Ver Tabla 4 — referencia de clasificación</summary>
-<p class="muted">Los factores de soportes y anclajes no reemplazan el R de la celda autosoportada.</p>
+<section class="reference-block" aria-label="Tabla 4 de referencia"><h3>Tabla 4 — Factores de importancia IE y reducción R</h3>
+<p class="muted">Referencia de consulta. La fila destacada corresponde a la celda calculada. Los factores de soportes y anclajes no reemplazan el R del equipo.</p>
 <table class="reference"><thead><tr><th>Elemento</th><th>IE</th><th>R</th></tr></thead><tbody>
-<tr><td>Equipo eléctrico general</td><td><span data-local-number="1.00" data-decimals="2">1.00</span></td><td><span data-local-number="1.00" data-decimals="2">1.00</span></td></tr>
+<tr class="applied"><td>Equipo eléctrico general</td><td><span data-local-number="1.00" data-decimals="2">1.00</span></td><td><span data-local-number="1.00" data-decimals="2">1.00</span></td></tr>
 <tr><td>Soporte dúctil sin redundancia</td><td>Del equipo</td><td><span data-local-number="1.50" data-decimals="2">1.50</span></td></tr>
 <tr><td>Soporte dúctil con redundancia</td><td>Del equipo</td><td>≤<span data-local-number="3.00" data-decimals="2">3.00</span></td></tr>
 <tr><td>Reticulado de acero con rigidez global Art. 122</td><td>Del equipo</td><td><span data-local-number="3.00" data-decimals="2">3.00</span></td></tr>
@@ -118,28 +126,21 @@ details summary{font-size:12px;font-weight:650;color:#24577f;cursor:pointer}deta
 <tr><td>Otros elementos sistemas de anclaje (Título XXX)</td><td>Del equipo</td><td><span data-local-number="2.00" data-decimals="2">2.00</span></td></tr>
 <tr><td>Fundación superficial de hormigón</td><td>Del equipo</td><td><span data-local-number="3.00" data-decimals="2">3.00</span></td></tr>
 <tr><td>Sistema estructural rígido</td><td>Del equipo</td><td><span data-local-number="1.00" data-decimals="2">1.00</span></td></tr>
-</tbody></table></details>
+</tbody></table></section>
 </section>
 </section>
 </aside>
 <article>
-<section class="card"><h2>2. Resultados de cálculo</h2><div id="status" class="status invalid">Complete los parámetros.</div>
-<p class="muted" id="methodDetail">—</p><div id="forces"><p>Sin resultados.</p></div>
-<p class="muted">Acciones sísmicas como magnitudes por dirección. No incluyen combinaciones gravitacionales, reacciones individuales ni verificaciones resistentes de anclajes.</p>
+<section class="card result-card"><h2>2. Resultados globales — pantalla y PDF</h2><div id="status" class="status invalid">Complete los parámetros.</div>
+<div class="report" id="globalReport">Sin resultados disponibles.</div>
 </section>
-<section class="card"><h2>3. Reportes PDF y TXT</h2>
-<div class="cols">
-<div class="field"><label for="pdfLevel">Nivel del PDF</label><select id="pdfLevel"><option value="global">Global</option><option value="detallado">Detallado</option></select></div>
-<div class="field"><label for="txtLevel">Nivel del TXT</label><select id="txtLevel"><option value="global">Global</option><option value="detallado" selected>Detallado</option></select></div>
-</div>
-<div class="button-row"><button id="pdfButton" disabled>Guardar como PDF</button><button id="txtButton" class="secondary" disabled>Descargar TXT</button></div>
-<p class="muted">El PDF se guarda mediante impresión del navegador en tamaño A4. El TXT se descarga como archivo UTF-8. Cada formato permite seleccionar su propio nivel.</p>
-<h3>Vista previa del PDF seleccionado</h3><div class="report" id="pdfPreview">Sin resultados disponibles.</div>
-<details><summary>Vista previa del TXT seleccionado</summary><pre id="txtPreview">Sin resultados disponibles.</pre></details>
+<section class="card export-card"><h2>3. Exportar resultados</h2>
+<div class="button-row"><button id="pdfButton" disabled>Guardar PDF global</button><button id="txtButton" class="secondary" disabled>Descargar TXT detallado</button></div>
+<p class="muted">El PDF imprime directamente el bloque de resultados de pantalla en A4. El TXT contiene antecedentes, factores, ecuaciones y fuerzas finales, en UTF-8.</p>
+<details><summary>Consultar contenido del TXT detallado</summary><pre id="txtPreview">Sin resultados disponibles.</pre></details>
 </section>
 </article>
 </main>
-<div id="printHost"></div>
 <script>
 /* PHS Fuerzas Sísmicas — motor numérico (criterios FS-01..FS-05)
  * Funciones puras. Los resultados representan magnitudes por dirección, no combinaciones.
@@ -324,21 +325,18 @@ function htmlTable(data,forceMode=false){
 function buildReports(r){
  const d=lineData(r),rows=rowsForces(r),name=caption(r);
  const head='<div class="report-kicker">PHS | INGENIERÍA ESTRUCTURAL</div><h1>FUERZAS SÍSMICAS DE DISEÑO</h1><p>'+esc(name)+'</p><hr>';
- const summary='<h2>Resumen de fuerzas de diseño</h2>'+htmlTable(rows,true);
- const base=head+'<h2>Antecedentes principales</h2>'+htmlTable(d.inputs.filter((x,i)=>i===0||x[0]==='Ubicación'||x[0]==='Clasificación equipo'||x[0]==='Clasificación'||x[0]==='Modelo vertical'))+summary;
- const detail=head+'<h2>1. Antecedentes</h2>'+htmlTable(d.inputs)+
-  '<h2>2. Parámetros y factores</h2>'+htmlTable(d.factors)+
-  '<h2>3. Ecuaciones y resultados principales</h2>'+
-  d.equations.map(x=>'<div class="equation">'+esc(x)+'</div>').join('')+
-  '<h2>4. Resumen de fuerzas de diseño</h2>'+htmlTable(rows,true);
- const footer='<p class="report-foot">Acciones sísmicas como magnitudes por dirección. No incluye combinaciones gravitacionales ni diseño resistente de anclajes.</p>';
+ const summary='<h2>2. Fuerzas sísmicas finales</h2>'+htmlTable(rows,true);
+ const essential=d.inputs.filter((x,i)=>i===0||['Ubicación','Clasificación equipo','Clasificación','Modelo vertical','Categoría','Zona sísmica','Suelo','Sistema de anclaje','Frecuencia X','Frecuencia Y'].includes(x[0]));
+ const wanted=r.method==='NCh2369:2025-cap7'?['I','Rp']:r.method==='CNE-Art87'?['Kh,X','Kh,Y']:['IE (Tabla 4)','R (Tabla 4)','A0/g','Sa,máx/g'];
+ const factors=d.factors.filter(x=>wanted.includes(x[0]));
+ const globalHtml=head+'<h2>1. Antecedentes y factores principales</h2>'+htmlTable([...essential,...factors])+summary+
+ '<p class="report-foot">Acciones sísmicas como magnitudes por dirección. No incluye combinaciones gravitacionales ni diseño resistente de anclajes.</p>';
  const txthead=['PHS | INGENIERÍA ESTRUCTURAL','FUERZAS SÍSMICAS DE DISEÑO',name,'='.repeat(64)];
  const txtpairs=(arr)=>arr.map(x=>x[0]+' : '+x[1]);
  const txtresult=['ACCIÓN | ESTRUCTURA (kgf) | ANCLAJES (kgf)',...rows.map(x=>x[0]+' | '+display(x[1],1)+' | '+display(x[2],1))];
  const txtfoot=['','Magnitudes sísmicas por dirección; no incluye combinaciones ni verificación resistente.'];
- const globalTxt=[...txthead,'','ANTECEDENTES PRINCIPALES',...txtpairs(d.inputs.filter((x,i)=>i===0||x[0]==='Ubicación'||x[0]==='Clasificación equipo'||x[0]==='Clasificación'||x[0]==='Modelo vertical')),'','RESULTADOS',...txtresult,...txtfoot].join('\n');
  const detailTxt=[...txthead,'','1. ANTECEDENTES',...txtpairs(d.inputs),'','2. PARÁMETROS Y FACTORES',...txtpairs(d.factors),'','3. ECUACIONES PRINCIPALES',...d.equations,'','4. RESULTADOS',...txtresult,...txtfoot].join('\n');
- return {globalHtml:base+footer,detailHtml:detail+footer,globalTxt,detailTxt};
+ return {globalHtml,detailTxt};
 }
 function read(){
  const standard=$('norm').value;
@@ -363,44 +361,34 @@ function updateVisibility(){
 }
 function refreshReports(){
  if(!reports)return;
- const pdf=$('pdfLevel').value==='global'?reports.globalHtml:reports.detailHtml;
- const txt=$('txtLevel').value==='global'?reports.globalTxt:reports.detailTxt;
- $('pdfPreview').innerHTML=pdf;$('txtPreview').textContent=txt;$('printHost').innerHTML=pdf;
+ $('globalReport').innerHTML=reports.globalHtml;
+ $('txtPreview').textContent=reports.detailTxt;
 }
 function render(){
  updateVisibility();
  try{
    const r=read();active=r;reports=buildReports(r);
    $('status').textContent='Cálculo actualizado';$('status').className='status valid';
-   $('forces').innerHTML=htmlTable(rowsForces(r),true);
-   $('methodDetail').textContent=caption(r);
    $('pdfButton').disabled=false;$('txtButton').disabled=false;
    refreshReports();
  }catch(e){
    active=null;reports=null;$('status').textContent=e.message;$('status').className='status invalid';
-   $('forces').innerHTML='<p class="empty">Ingresa los datos necesarios para calcular.</p>';
-   $('methodDetail').textContent='—';
-   $('pdfPreview').innerHTML='<p>Sin resultados disponibles.</p>';
+   $('globalReport').innerHTML='<p class="empty">Ingresa los datos necesarios para calcular.</p>';
    $('txtPreview').textContent='Sin resultados disponibles.';
-   $('printHost').innerHTML='';
    $('pdfButton').disabled=true;$('txtButton').disabled=true;
  }
 }
 function saveTxt(){
  if(!active||!reports)return;
- const level=$('txtLevel').value;
- const name='PHS_'+active.method.replace(/[^a-z0-9]+/gi,'_')+'_'+level+'.txt';
- const file=new Blob([level==='global'?reports.globalTxt:reports.detailTxt],{type:'text/plain;charset=utf-8'});
+ const name='PHS_'+active.method.replace(/[^a-z0-9]+/gi,'_')+'_detallado.txt';
+ const file=new Blob([reports.detailTxt],{type:'text/plain;charset=utf-8'});
  const url=URL.createObjectURL(file),link=document.createElement('a');
  link.href=url;link.download=name;document.body.appendChild(link);link.click();link.remove();
  setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 $('pdfButton').addEventListener('click',()=>{if(active)window.print()});
 $('txtButton').addEventListener('click',saveTxt);
-$('pdfLevel').addEventListener('change',refreshReports);
-$('txtLevel').addEventListener('change',refreshReports);
 document.querySelectorAll('input,select').forEach(el=>{
- if(['pdfLevel','txtLevel'].includes(el.id))return;
  el.addEventListener('input',render);el.addEventListener('change',render);
 });
 localizeStaticNumbers();

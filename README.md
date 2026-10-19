@@ -26,7 +26,7 @@ Los resultados son magnitudes por dirección `Ex`, `Ey` y `Ez`, separadas para e
 
 Se exportan **únicamente PDF global y TXT detallado**, sin selectores de nivel:
 - **Pantalla y PDF global:** exactamente el mismo bloque, compuesto solo por datos de entrada, factores normativos esenciales y fuerzas Ex/Ey/Ez para equipo/estructura y anclajes. El PDF lo imprime en A4.
-- **TXT detallado:** antecedentes completos, todos los factores utilizados, ecuaciones principales, sustituciones numéricas, coeficientes y fuerzas finales (equipo y anclajes) para los tres procedimientos. UTF-8, archivo `*_detallado.txt`. No incorpora verificaciones resistentes ni combinaciones de carga.
+- **TXT detallado:** datos de entrada y parámetros normativos; ecuación simbólica inmediatamente seguida de su resultado, coeficientes intermedios relevantes y tabla final de fuerzas para los tres procedimientos. **No incluye sustituciones numéricas.** Los coeficientes calculados se presentan con precisión decimal adaptativa respecto del peso y la demanda (sin ceros innecesarios), sin redondeo interno del motor. UTF-8, archivo `*_detallado.txt`. No incorpora verificaciones resistentes ni combinaciones de carga.
 - **Artículo 88:** Tabla 4 de IE/R visible como referencia, con la fila del equipo eléctrico destacada. No modifica el R del equipo calculado.
 
 No hay salida JSON, Excel ni integración con PHS Anchor Design.

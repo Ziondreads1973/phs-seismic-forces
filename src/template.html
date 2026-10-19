@@ -30,16 +30,24 @@ pre{font:11px/1.65 Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywher
 .reference th,.reference td{text-align:left;white-space:normal}
 .reference td:nth-child(2),.reference td:nth-child(3){text-align:right}
 details summary{font-size:12px;font-weight:650;color:#24577f;cursor:pointer}details{margin-top:14px}
-#printHost{display:none}
+.reference-block{margin-top:18px;padding:12px;border:1px solid #d5e1eb;border-radius:8px;background:#f9fbfd}
+.reference-block h3{margin:0 0 8px}.reference-block table{margin-top:10px}
+.reference-block tr.applied td{background:#e9f2fb;font-weight:700;color:#153f62}
+#globalReport{margin-top:12px}
+.result-card{min-width:0}
 [hidden]{display:none!important}
 @media(max-width:900px){main{display:block}.cols{grid-template-columns:1fr 1fr}}
 @page{size:A4;margin:16mm 18mm}
 @media print{
- body{background:white}header,main{display:none!important}
- #printHost{display:block!important;margin:0!important;padding:0!important}
- #printHost h1{font-size:17px}#printHost h2{font-size:13px}
- #printHost .equation,#printHost table{break-inside:avoid}
- #printHost h2{break-after:avoid}#printHost tr{break-inside:avoid}
+ body{background:white;color:#243449}
+ header,aside,.export-card,.result-card>h2,.result-card>#status{display:none!important}
+ main{display:block!important;max-width:none!important;margin:0!important;padding:0!important}
+ article,.result-card{display:block!important;width:100%!important;margin:0!important;padding:0!important}
+ .result-card{border:0!important;box-shadow:none!important}
+ #globalReport{display:block!important;border:0!important;padding:0!important;margin:0!important}
+ #globalReport h1{font-size:17px}#globalReport h2{font-size:13px}
+ #globalReport table{break-inside:avoid}
+ #globalReport h2{break-after:avoid}#globalReport tr{break-inside:avoid}
 }
 </style></head><body>
 <header><h1>PHS | Fuerzas sísmicas de equipos y anclajes</h1><small>NCh2369:2025 capítulo 7 · Anexo Técnico CNE, artículos 87 y 88 · Aplicación offline</small></header>
@@ -98,10 +106,10 @@ details summary{font-size:12px;font-weight:650;color:#24577f;cursor:pointer}deta
 <option value="ground">Losa/fundación basal</option>
 <option value="modular">Sala modular con apoyo basal equivalente</option>
 <option value="floor">Piso superior real, edificio hasta tres pisos</option></select></div>
-<details><summary>Ver Tabla 4 — referencia de clasificación</summary>
-<p class="muted">Los factores de soportes y anclajes no reemplazan el R de la celda autosoportada.</p>
+<section class="reference-block" aria-label="Tabla 4 de referencia"><h3>Tabla 4 — Factores de importancia IE y reducción R</h3>
+<p class="muted">Referencia de consulta. La fila destacada corresponde a la celda calculada. Los factores de soportes y anclajes no reemplazan el R del equipo.</p>
 <table class="reference"><thead><tr><th>Elemento</th><th>IE</th><th>R</th></tr></thead><tbody>
-<tr><td>Equipo eléctrico general</td><td><span data-local-number="1.00" data-decimals="2">1.00</span></td><td><span data-local-number="1.00" data-decimals="2">1.00</span></td></tr>
+<tr class="applied"><td>Equipo eléctrico general</td><td><span data-local-number="1.00" data-decimals="2">1.00</span></td><td><span data-local-number="1.00" data-decimals="2">1.00</span></td></tr>
 <tr><td>Soporte dúctil sin redundancia</td><td>Del equipo</td><td><span data-local-number="1.50" data-decimals="2">1.50</span></td></tr>
 <tr><td>Soporte dúctil con redundancia</td><td>Del equipo</td><td>≤<span data-local-number="3.00" data-decimals="2">3.00</span></td></tr>
 <tr><td>Reticulado de acero con rigidez global Art. 122</td><td>Del equipo</td><td><span data-local-number="3.00" data-decimals="2">3.00</span></td></tr>
@@ -118,28 +126,21 @@ details summary{font-size:12px;font-weight:650;color:#24577f;cursor:pointer}deta
 <tr><td>Otros elementos sistemas de anclaje (Título XXX)</td><td>Del equipo</td><td><span data-local-number="2.00" data-decimals="2">2.00</span></td></tr>
 <tr><td>Fundación superficial de hormigón</td><td>Del equipo</td><td><span data-local-number="3.00" data-decimals="2">3.00</span></td></tr>
 <tr><td>Sistema estructural rígido</td><td>Del equipo</td><td><span data-local-number="1.00" data-decimals="2">1.00</span></td></tr>
-</tbody></table></details>
+</tbody></table></section>
 </section>
 </section>
 </aside>
 <article>
-<section class="card"><h2>2. Resultados de cálculo</h2><div id="status" class="status invalid">Complete los parámetros.</div>
-<p class="muted" id="methodDetail">—</p><div id="forces"><p>Sin resultados.</p></div>
-<p class="muted">Acciones sísmicas como magnitudes por dirección. No incluyen combinaciones gravitacionales, reacciones individuales ni verificaciones resistentes de anclajes.</p>
+<section class="card result-card"><h2>2. Resultados globales — pantalla y PDF</h2><div id="status" class="status invalid">Complete los parámetros.</div>
+<div class="report" id="globalReport">Sin resultados disponibles.</div>
 </section>
-<section class="card"><h2>3. Reportes PDF y TXT</h2>
-<div class="cols">
-<div class="field"><label for="pdfLevel">Nivel del PDF</label><select id="pdfLevel"><option value="global">Global</option><option value="detallado">Detallado</option></select></div>
-<div class="field"><label for="txtLevel">Nivel del TXT</label><select id="txtLevel"><option value="global">Global</option><option value="detallado" selected>Detallado</option></select></div>
-</div>
-<div class="button-row"><button id="pdfButton" disabled>Guardar como PDF</button><button id="txtButton" class="secondary" disabled>Descargar TXT</button></div>
-<p class="muted">El PDF se guarda mediante impresión del navegador en tamaño A4. El TXT se descarga como archivo UTF-8. Cada formato permite seleccionar su propio nivel.</p>
-<h3>Vista previa del PDF seleccionado</h3><div class="report" id="pdfPreview">Sin resultados disponibles.</div>
-<details><summary>Vista previa del TXT seleccionado</summary><pre id="txtPreview">Sin resultados disponibles.</pre></details>
+<section class="card export-card"><h2>3. Exportar resultados</h2>
+<div class="button-row"><button id="pdfButton" disabled>Guardar PDF global</button><button id="txtButton" class="secondary" disabled>Descargar TXT detallado</button></div>
+<p class="muted">El PDF imprime directamente el bloque de resultados de pantalla en A4. El TXT contiene antecedentes, factores, ecuaciones y fuerzas finales, en UTF-8.</p>
+<details><summary>Consultar contenido del TXT detallado</summary><pre id="txtPreview">Sin resultados disponibles.</pre></details>
 </section>
 </article>
 </main>
-<div id="printHost"></div>
 <script>
 /*__PHS_MOTOR__*/ 
 </script>

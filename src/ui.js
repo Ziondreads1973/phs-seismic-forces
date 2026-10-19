@@ -52,6 +52,134 @@ function htmlTable(data,forceMode=false){
  data.map(x=>'<tr><td>'+esc(x[0])+'</td><td>'+display(x[1],1)+'</td><td>'+display(x[2],1)+'</td></tr>').join('')+'</tbody></table>';
  return '<table class="pairs"><tbody>'+data.map(x=>'<tr><td>'+esc(x[0])+'</td><td>'+esc(x[1])+'</td></tr>').join('')+'</tbody></table>';
 }
+
+/*
+ * Reporte TXT auditable: factores y cálculos derivados del mismo resultado
+ * del motor que alimenta pantalla/PDF. La sustitución no recalcula la demanda.
+ */
+function detailedFactors(r){
+ const k=r.factors;
+ if(r.method==='NCh2369:2025-cap7')
+  return [
+   ['I',factor(k.I)],['Ar/g',factor(k.Ar_over_g)],['S',factor(k.S)],
+   ['kv',factor(k.kv)],['Kp',factor(k.Kp)],['Rp',factor(k.Rp)],
+   ['ak/g',factor(k.ak_over_g)],['Cp sin limitar',factor(k.Cp)],
+   ['C horizontal mínimo',factor(k.Cmin)],['C horizontal máximo',factor(k.Cmax)],
+   ['C horizontal adoptado',factor(k.structure.X)],
+   ['Cv vertical',factor(k.structure.Z)],
+   ['Factor horizontal anclajes',factor(k.anchor_multiplier.horizontal)],
+   ['Factor vertical anclajes',factor(k.anchor_multiplier.vertical)]
+  ];
+ if(r.method==='CNE-Art87')
+  return [
+   ['Kh,X',factor(k.KhX)],['Kh,Y',factor(k.KhY)],['Kv',factor(k.Kv)],
+   ['Kh ubicación',factor(k.location.horizontal)],['Kv ubicación',factor(k.location.vertical)],
+   ['Coeficiente Cx',factor(k.structure.X)],['Coeficiente Cy',factor(k.structure.Y)],
+   ['Coeficiente Cz',factor(k.structure.Z)],
+   ['Factor horizontal anclajes',factor(k.anchor_multiplier.horizontal)],
+   ['Factor vertical anclajes',factor(k.anchor_multiplier.vertical)]
+  ];
+ return [
+  ['IE (Tabla 4)',factor(k.IE)],['R (Tabla 4)',factor(k.R)],
+  ['A0/g',factor(k.A0_g)],['Amortiguamiento xi (%)',factor(k.xi_pct)],
+  ['Fb',factor(k.Fb)],['Sa,máx/g',factor(k.Sa_over_g)],
+  ['Kh ubicación',factor(k.location.horizontal)],['Kv ubicación',factor(k.location.vertical)],
+  ['Coeficiente Cx/Cy',factor(k.structure.X)],['Coeficiente Cz',factor(k.structure.Z)],
+  ['Factor horizontal anclajes',factor(k.anchor_multiplier.horizontal)],
+  ['Factor vertical anclajes',factor(k.anchor_multiplier.vertical)]
+ ];
+}
+function detailedEquations(r){
+ const k=r.factors,p=r.inputs,W=inputValue('w'),n=factor,final=force;
+ let lines=[];
+ if(r.method==='NCh2369:2025-cap7'){
+  const elevated=p.location==='elevated';
+  lines.push('Aceleración horizontal en el nivel de apoyo:');
+  if(elevated){
+   lines.push('ak/g = I · (Ar/g) · S · (1 + 2 · Zk/H)');
+   lines.push('     = '+n(k.I)+' · '+n(k.Ar_over_g)+' · '+n(k.S)+' · (1 + 2 · '+inputValue('zk')+'/'+inputValue('height')+')');
+  }else{
+   lines.push('ak/g = I · (Ar/g) · S  [Zk = 0, instalación basal]');
+   lines.push('     = '+n(k.I)+' · '+n(k.Ar_over_g)+' · '+n(k.S));
+  }
+  lines.push('ak/g = '+n(k.ak_over_g),'',
+    'Coeficiente horizontal antes de límites:',
+    'Cp = (ak/g) · Kp / Rp',
+    '   = '+n(k.ak_over_g)+' · '+n(k.Kp)+' / '+n(k.Rp),
+    'Cp = '+n(k.Cp),'',
+    'Límites normativos del coeficiente horizontal:',
+    'Cmin = 0,7 · I · (Ar/g) · S',
+    '     = '+n(.7)+' · '+n(k.I)+' · '+n(k.Ar_over_g)+' · '+n(k.S),
+    'Cmin = '+n(k.Cmin),
+    'Cmax = 3 · I · (Ar/g) · S',
+    '     = 3 · '+n(k.I)+' · '+n(k.Ar_over_g)+' · '+n(k.S),
+    'Cmax = '+n(k.Cmax),
+    'C horizontal = mín(Cmax; máx(Cmin; Cp))',
+    '             = mín('+n(k.Cmax)+'; máx('+n(k.Cmin)+'; '+n(k.Cp)+'))',
+    'C horizontal = '+n(k.structure.X),'',
+    'Coeficiente vertical (§5.7.1):',
+    'Cv = kv · I · (Ar/g) · S',
+    '   = '+n(k.kv)+' · '+n(k.I)+' · '+n(k.Ar_over_g)+' · '+n(k.S),
+    'Cv = '+n(k.structure.Z),'',
+    'Fuerzas sobre equipo/estructura:',
+    'Ex = C horizontal · Pp = '+n(k.structure.X)+' · '+W+' = '+final(r.structure.Ex),
+    'Ey = C horizontal · Pp = '+n(k.structure.Y)+' · '+W+' = '+final(r.structure.Ey),
+    'Ez = Cv · Pp           = '+n(k.structure.Z)+' · '+W+' = '+final(r.structure.Ez),'',
+    'Fuerzas sísmicas para anclajes:',
+    'Factor H = '+(p.anchor==='ductile'?'0,7 · Rp (§7.3.2)':'Rp (§7.3.3)')+' = '+n(k.anchor_multiplier.horizontal),
+    'Ex,a = Ex · Factor H = '+n(r.structure.Ex)+' · '+n(k.anchor_multiplier.horizontal)+' = '+final(r.anchors.Ex),
+    'Ey,a = Ey · Factor H = '+n(r.structure.Ey)+' · '+n(k.anchor_multiplier.horizontal)+' = '+final(r.anchors.Ey),
+    'Ez,a = Ez · 1 = '+final(r.anchors.Ez));
+ }else if(r.method==='CNE-Art87'){
+  const L=k.location,IE=n(p.IE);
+  lines.push('Selección de factores por frecuencia:',
+   'Kh,X = '+n(k.KhX)+'  (fX = '+inputValue('fx')+' Hz)',
+   'Kh,Y = '+n(k.KhY)+'  (fY = '+inputValue('fy')+' Hz)',
+   'Kv = '+n(k.Kv)+'; Kh ubicación = '+n(L.horizontal)+'; Kv ubicación = '+n(L.vertical),'',
+   'Fuerzas sobre equipo/estructura:',
+   'Ex = 0,60 · IE · W · Kh,X · Kh ubicación',
+   '   = '+n(.6)+' · '+IE+' · '+W+' · '+n(k.KhX)+' · '+n(L.horizontal),
+   'Ex = '+final(r.structure.Ex),
+   'Ey = 0,60 · IE · W · Kh,Y · Kh ubicación',
+   '   = '+n(.6)+' · '+IE+' · '+W+' · '+n(k.KhY)+' · '+n(L.horizontal),
+   'Ey = '+final(r.structure.Ey),
+   'Ez = 0,36 · IE · W · Kv · Kv ubicación',
+   '   = '+n(.36)+' · '+IE+' · '+W+' · '+n(k.Kv)+' · '+n(L.vertical),
+   'Ez = '+final(r.structure.Ez),'',
+   'Fuerzas sísmicas para anclajes:',
+   'Ex,a = 1,25 · Ex = '+n(k.anchor_multiplier.horizontal)+' · '+n(r.structure.Ex)+' = '+final(r.anchors.Ex),
+   'Ey,a = 1,25 · Ey = '+n(k.anchor_multiplier.horizontal)+' · '+n(r.structure.Ey)+' = '+final(r.anchors.Ey),
+   'Ez,a = 1 · Ez = '+final(r.anchors.Ez));
+ }else{
+  const L=k.location,V=p.vertical;
+  lines.push('Aceleración espectral máxima (xi = 2 %, A0/g = 0,5):',
+   'Fb = (3,21 − 0,68 · ln(xi)) / 2,1156',
+   '   = ('+n(3.21)+' − '+n(.68)+' · ln('+n(k.xi_pct)+')) / '+n(2.1156),
+   'Fb = '+n(k.Fb),
+   'Sa,máx/g = 2,12 · (A0/g) · Fb',
+   '         = '+n(2.12)+' · '+n(k.A0_g)+' · '+n(k.Fb),
+   'Sa,máx/g = '+n(k.Sa_over_g),'',
+   'Fuerzas horizontales del equipo:',
+   'Ex = 1,20 · IE · (Sa/g) · W · Kh ubicación / R',
+   '   = '+n(1.2)+' · '+n(k.IE)+' · '+n(k.Sa_over_g)+' · '+W+' · '+n(L.horizontal)+' / '+n(k.R),
+   'Ex = '+final(r.structure.Ex),
+   'Ey = 1,20 · IE · (Sa/g) · W · Kh ubicación / R',
+   '   = '+n(1.2)+' · '+n(k.IE)+' · '+n(k.Sa_over_g)+' · '+W+' · '+n(L.horizontal)+' / '+n(k.R),
+   'Ey = '+final(r.structure.Ey),'',
+   'Fuerza vertical ('+(V==='rigid'?'V1 — rígido':'V2 — no rígido')+'):');
+  if(V==='rigid')lines.push('Ez = 0,36 · IE · W · Kv ubicación',
+   '   = '+n(.36)+' · '+n(k.IE)+' · '+W+' · '+n(L.vertical));
+  else lines.push('Ez = 0,72 · IE · (Sa/g) · W · Kv ubicación / R',
+   '   = '+n(.72)+' · '+n(k.IE)+' · '+n(k.Sa_over_g)+' · '+W+' · '+n(L.vertical)+' / '+n(k.R));
+  lines.push('Ez = '+final(r.structure.Ez),'',
+   'Fuerzas sísmicas para anclajes:',
+   'Ex,a = 1,50 · Ex = '+n(k.anchor_multiplier.horizontal)+' · '+n(r.structure.Ex)+' = '+final(r.anchors.Ex),
+   'Ey,a = 1,50 · Ey = '+n(k.anchor_multiplier.horizontal)+' · '+n(r.structure.Ey)+' = '+final(r.anchors.Ey),
+   'Ez,a = 1 · Ez = '+final(r.anchors.Ez));
+ }
+ return lines;
+}
+
 function buildReports(r){
  const d=lineData(r),rows=rowsForces(r),name=caption(r);
  const head='<div class="report-kicker">PHS | INGENIERÍA ESTRUCTURAL</div>'+
@@ -65,8 +193,14 @@ function buildReports(r){
  const txtresult=['ACCIÓN | ESTRUCTURA (kgf) | ANCLAJES (kgf)',
   ...rows.map(x=>x[0]+' | '+display(x[1],1)+' | '+display(x[2],1))];
  const footer=['','Magnitudes por dirección; sin combinaciones ni verificación resistente.'];
- const textReport=[...txthead,'','1. DATOS Y FACTORES DE DISEÑO',...txtpairs(data),'',
-  '2. FUERZAS SÍSMICAS FINALES',...txtresult,...footer].join('\n');
+ const textReport=[...txthead,'',
+  '1. ANTECEDENTES',...txtpairs(d.inputs),'',
+  '2. PARÁMETROS Y FACTORES DE DISEÑO',...txtpairs(detailedFactors(r)),'',
+  '3. DESARROLLO DEL CÁLCULO',...detailedEquations(r),'',
+  '4. FUERZAS SÍSMICAS FINALES',...txtresult,...footer,
+  'Los coeficientes calculados se muestran con hasta 12 decimales.',
+  'El motor conserva precisión numérica completa; las fuerzas se presentan a 1 decimal.'
+ ].join('\n');
  return {globalHtml,textReport};
 }
 function read(){
@@ -111,7 +245,7 @@ function render(){
 }
 function saveTxt(){
  if(!active||!reports)return;
- const name='PHS_'+active.method.replace(/[^a-z0-9]+/gi,'_')+'_resultados.txt';
+ const name='PHS_'+active.method.replace(/[^a-z0-9]+/gi,'_')+'_detallado.txt';
  const file=new Blob([reports.textReport],{type:'text/plain;charset=utf-8'});
  const url=URL.createObjectURL(file),link=document.createElement('a');
  link.href=url;link.download=name;document.body.appendChild(link);link.click();link.remove();

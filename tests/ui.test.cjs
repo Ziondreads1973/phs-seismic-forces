@@ -278,18 +278,47 @@ test('FS-06-C04: Art87 y Art88 tienen fórmula y resultado consecutivos',()=>{
     assert.doesNotMatch(d.nodes.globalReport.innerHTML,/2\.1\. Aceleración|Factor H =|Fb =/);
   }
 });
-test('FS-06-C04: precisión de coeficientes crece con W y respeta decimal regional',()=>{
-  for(const locale of ['es-CL','en-US']){
-    for(const weight of [100,1000,10000,1000000]){
-      const d=mount({norm:'2369',w:String(weight)},locale);
-      const txt=d.nodes.txtPreview.textContent;
-      const match=txt.match(/^Ch = ([0-9.,]+)$/m);
-      assert.ok(match,'Ch missing');
-      const value=Number(match[1].replace(',','.'));
-      const full=.38808; // Referencia independiente: I=1,2, Ar=0,42, S=1,05, Kp=2,2, Rp=3
-      const forceDelta=Math.abs((value-full)*weight*2.1);
-      assert.ok(forceDelta<=.011,locale+' W='+weight+': error '+forceDelta);
-      assert.doesNotMatch(match[1],locale==='en-US'?/,/:/\./);
-    }
+test('FS-06-C05: hasta tres decimales y sin ceros sobrantes en NCh2369',()=>{
+ for(const locale of ['es-CL','en-US']){
+  for(const weight of ['1000','1000000']){
+   const d=mount({norm:'2369',w:weight},locale);
+   const txt=d.nodes.txtPreview.textContent;
+   const decimal=locale==='es-CL'?',':'.';
+   const expected={'ak/g':'0.529','Cp':'0.388','Cmin':'0.37','Cmax':'1.588','Ch':'0.388','Cv':'0.635'};
+   for(const [key,value] of Object.entries(expected)){
+    const actual=value.replace('.',decimal);
+    assert.ok(txt.includes(key+' = '+actual+'\n')||txt.includes(key+' = '+actual+'\r\n'),
+      key+' = '+actual+' no aparece para '+locale+' peso '+weight);
+   }
+   const ex=(Number(weight)*.38808).toLocaleString(locale,
+    {minimumFractionDigits:1,maximumFractionDigits:1,useGrouping:false});
+   assert.ok(txt.includes('Ex = '+ex+' kgf'),'Fuerza sin redondeo intermedio');
+   assert.match(txt,/Condición controlante: Cp/);
   }
+ }
+});
+
+test('FS-06-C05: coeficientes de todas las rutas con máximo tres decimales',()=>{
+ for(const locale of ['es-CL','en-US']){
+  for(const params of [
+   {norm:'2369',w:'1000',loc2369:'elevated',height:'6',zk:'2'},
+   {norm:'87',w:'1000',fx:'25',fy:'35',loc87:'floor'},
+   {norm:'88',w:'1000',vertical:'rigid',loc88:'floor'},
+   {norm:'88',w:'1000',vertical:'flex',loc88:'floor'}
+  ]){
+   const d=mount(params,locale);
+   const txt=d.nodes.txtPreview.textContent;
+   const coef=[...txt.matchAll(/^(?:ak\/g|Cp|Cmin|Cmax|Ch|Cv|Cx|Cy|Cz|Fb|Sa,máx\/g) = (\d+(?:[.,]\d+)?)$/gm)];
+   assert.ok(coef.length>=2,params.norm+' no presenta coeficientes');
+   for(const match of coef){
+    const fraction=(match[1].split(/[.,]/)[1]||'');
+    assert.ok(fraction.length<=3,'Demasiados decimales: '+match[0]);
+    assert.ok(!fraction.endsWith('0'),'Cero innecesario: '+match[0]);
+   }
+   const inputs=d.nodes.globalReport.innerHTML;
+   assert.equal(d.nodes.pdfButton.disabled,false);
+   assert.ok(inputs.includes('Fuerzas sísmicas finales'));
+   assert.doesNotMatch(txt,/^\s+= /m);
+  }
+ }
 });

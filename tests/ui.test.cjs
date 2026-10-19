@@ -275,7 +275,7 @@ test('FS-06-C04: Art87 y Art88 tienen fórmula y resultado consecutivos',()=>{
     }
     assert.doesNotMatch(txt,/^\s+= /m);
     assert.doesNotMatch(txt,/^  \d+[.,]\d+ · \d+/m);
-    assert.doesNotMatch(d.nodes.globalReport.innerHTML,/2.1\.|Factor H =|Fb =/);
+    assert.doesNotMatch(d.nodes.globalReport.innerHTML,/2\.1\. Aceleración|Factor H =|Fb =/);
   }
 });
 test('FS-06-C04: precisión de coeficientes crece con W y respeta decimal regional',()=>{

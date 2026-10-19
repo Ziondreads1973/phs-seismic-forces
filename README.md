@@ -22,12 +22,12 @@ Los resultados son magnitudes por dirección `Ex`, `Ey` y `Ez`, separadas para e
 
 ## Reportes
 
-**Formato numérico:** la coma o el punto decimal se toma automáticamente de la configuración regional del navegador/sistema mediante `Intl.NumberFormat`, siempre con `useGrouping: false` (sin separador de miles). El formato se aplica uniformemente a pantalla, PDF, TXT, factores y ecuaciones; los cálculos internos conservan precisión completa.
+**Formato numérico:** el separador decimal sigue la configuración regional del navegador, **sin separador de miles**. Las entradas conservan los decimales efectivamente ingresados (por ejemplo, 25 Hz no se presenta como 25,00 Hz); los factores normativos automáticos se muestran sin ceros decimales superfluos y las fuerzas finales con **un decimal fijo en kgf**. Los cálculos internos conservan precisión completa.
 
-Se exportan **únicamente PDF global y TXT detallado**, sin selectores de nivel:
-- **Pantalla y PDF global:** un mismo bloque de resultados con antecedentes, factores principales y fuerzas Ex/Ey/Ez para estructura y anclajes. El PDF imprime ese bloque directamente en A4.
-- **TXT detallado:** antecedentes completos, factores, ecuaciones principales con valores y resultados. Se descarga en UTF-8.
-- **Artículo 88:** Tabla 4 de IE/R visible y completa como referencia de consulta, con la fila del equipo eléctrico destacada. No modifica automáticamente el R del equipo calculado.
+Se exportan **únicamente PDF global y TXT de resultados**, sin selectores de nivel:
+- **Pantalla y PDF global:** exactamente el mismo bloque, compuesto solo por datos de entrada, factores normativos esenciales y fuerzas Ex/Ey/Ez para equipo/estructura y anclajes. El PDF lo imprime en A4.
+- **TXT:** los mismos antecedentes y resultados finales, con estructura legible UTF-8, **sin ecuaciones ni desarrollos intermedios**.
+- **Artículo 88:** Tabla 4 de IE/R visible como referencia, con la fila del equipo eléctrico destacada. No modifica el R del equipo calculado.
 
 No hay salida JSON, Excel ni integración con PHS Anchor Design.
 

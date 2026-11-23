@@ -34,8 +34,9 @@ function lineData(r){
   f.push(['I',factor(k.I)],['Rp',factor(k.Rp)]);
  }else if(r.method==='CNE-Art87'){
   const p=r.inputs;
-  a.push(['IE',inputValue('ie')],['Frecuencia X',inputValue('fx')+' Hz'],
+  a.push(['Frecuencia X',inputValue('fx')+' Hz'],
    ['Frecuencia Y',inputValue('fy')+' Hz'],['Ubicación',place(p.location)]);
+  f.push(['IE (Tabla 4)',factor(r.factors.IE)]);
  }else{
   const p=r.inputs,k=r.factors;
   a.push(['Clasificación','Celda metálica autosoportada'],['Ubicación',place(p.location)],
@@ -72,7 +73,7 @@ function normativeFactors(r){
   ['Kp',factor(k.Kp)],['Rp',factor(k.Rp)],['kv',factor(k.kv)]
  ];
  if(r.method==='CNE-Art87')return [
-  ['Kh,X',factor(k.KhX)],['Kh,Y',factor(k.KhY)],['Kv',factor(k.Kv)],
+  ['IE (Tabla 4)',factor(k.IE)],['Kh,X',factor(k.KhX)],['Kh,Y',factor(k.KhY)],['Kv',factor(k.Kv)],
   ['Kh ubicación',factor(k.location.horizontal)],['Kv ubicación',factor(k.location.vertical)],
   ['Factor anclajes H',factor(k.anchor_multiplier.horizontal)]
  ];
@@ -201,7 +202,7 @@ function read(){
    return motor.calculate2369({weight_kgf:W,category:$('cat').value,zone:$('zone').value,soil:$('soil').value,
      equipment:$('equipment').value,anchor:$('duct').value,location:$('loc2369').value,height_m:num('height'),level_m:num('zk')});
  }
- if(standard==='87')return motor.calculate87({weight_kgf:W,IE:num('ie'),fx:num('fx'),fy:num('fy'),location:$('loc87').value});
+ if(standard==='87')return motor.calculate87({weight_kgf:W,fx:num('fx'),fy:num('fy'),location:$('loc87').value});
  return motor.calculate88({weight_kgf:W,vertical:$('vertical').value,location:$('loc88').value});
 }
 function localizeStaticNumbers(){

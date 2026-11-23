@@ -93,3 +93,37 @@ test('Invalidaciones',()=>{
  ()=>m.calculate88(b({location:'special'}))
  ])assert.throws(fn,RangeError);
 });
+
+test('Auditoría NCh2369: techo horizontal 3B con anclaje no dúctil en coronación',()=>{
+ const r=m.calculate2369(n({location:'elevated',height_m:10,level_m:10,anchor:'nonductile'}));
+ const B=1.2*0.42*1.05;
+ near(r.factors.Cp,3*B*2.2/1.5);
+ near(r.factors.Cmax,3*B);
+ near(r.factors.structure.X,3*B);
+ near(r.structure.Ex,1587.6);
+ near(r.anchors.Ex,2381.4);
+});
+test('Auditoría NCh2369: vertical del suelo D independiente del coeficiente horizontal',()=>{
+ const r=m.calculate2369(n({category:'II',zone:1,soil:'D',equipment:'secondary-nonductile',anchor:'nonductile'}));
+ near(r.factors.I,1);
+ near(r.factors.Ar_over_g,0.28);
+ near(r.factors.structure.Z,0.308);
+ near(r.structure.Ez,308);
+ near(r.structure.Ex,0.28*2.2/1.5*1000);
+});
+test('Auditoría Art87: piso superior con fX=20 Hz y fY=30 Hz',()=>{
+ const r=m.calculate87(a({fx:20,fy:30,location:'floor'}));
+ near(r.structure.Ex,1215);
+ near(r.structure.Ey,900);
+ near(r.structure.Ez,504);
+ near(r.anchors.Ex,1518.75);
+ near(r.anchors.Ey,1125);
+ near(r.anchors.Ez,504);
+});
+test('Auditoría Art88: V2 en piso superior, Sa máximo de Art19 ξ=2%',()=>{
+ const r=m.calculate88(b({vertical:'flex',location:'floor'}));
+ near(r.factors.Sa_over_g,1.3721778749538622);
+ near(r.structure.Ex,2469.9201749169524);
+ near(r.structure.Ez,1383.1552979534931);
+ near(r.anchors.Ex,3704.880262375428);
+});

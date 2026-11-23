@@ -14,7 +14,7 @@ Se calculan **magnitudes de fuerzas sísmicas globales** por dirección para equ
 
 ## Anexo Técnico CNE artículo 87 — interpretación de «cualquier dirección»
 
-**Decisión FS-08, 23-11-2026.** El artículo 87 exige frecuencia equivalente mínima de 20 Hz «en cualquier dirección» y remite al artículo 122.4.iii, que define su determinación utilizando masa y **rigidez lateral** de la estructura de soporte y el equipo como masa concentrada. El proyecto interpreta esa remisión como exigencia de frecuencias **horizontales X e Y** para aplicar el cálculo de fuerzas; se admite `fX>=20 Hz` y `fY>=20 Hz` independientemente, con `KhX` y `KhY` por eje.
+**Decisión FS-08, 23-11-2026.** El artículo 87 exige frecuencia equivalente mínima de 20 Hz «en cualquier dirección» y remite al artículo 122.4.iii, que define su determinación utilizando masa y **rigidez lateral** de la estructura de soporte. **Importante: el artículo 87 especifica que la masa de las celdas de baterías se distribuya en sus bases de apoyo sobre la estructura**, mientras que el artículo 122.4.iii presenta, con carácter general, una masa concentrada en el tope. Al determinar la frecuencia de baterías corresponde respetar su disposición específica. El proyecto interpreta la referencia a rigidez lateral como exigencia de frecuencias **horizontales X e Y** para aplicar el cálculo de fuerzas; se admite `fX>=20 Hz` y `fY>=20 Hz` independientemente, con `KhX` y `KhY` por eje.
 
 **No se solicita ni verifica fZ.** `Kv=1` cualquiera sea la frecuencia vertical. El software no verifica rigidez vertical ni declara cumplimiento integral del artículo 87.
 
@@ -33,3 +33,10 @@ Se calculan **magnitudes de fuerzas sísmicas globales** por dirección para equ
 Cálculo interno con precisión completa; pantalla/PDF: entradas, factores esenciales, fuerzas; TXT: fórmulas y resultados consecutivos sin sustituciones, hasta tres decimales en coeficientes calculados, fuerzas con un decimal en kgf, punto o coma decimal según configuración regional, sin separador de miles.
 
 Referencias: [Anexo Técnico CNE, artículos 87 y 122.4.iii](https://www.cne.cl/wp-content/uploads/2025/01/AT-Requisitos-Sismo.pdf); NCh2369:2025 §§5.7 y 7.2–7.3.
+
+## Reservas de la auditoría (23-11-2026)
+
+- **NCh2369 §5.8:** el módulo NO calcula el caso específico de equipos rígidos apoyados en suelo (`T<0,06 s`; `Kp=1` y vertical `0,7 Fh`). Una instalación basal no acredita automáticamente aplicabilidad del procedimiento §7.2 con `Kp=2,2`.
+- **NCh2369 §7.3:** la decisión de no amplificar `Ez` para anclajes no ha quedado acreditada inequívocamente a partir del alcance literal de «fuerzas sísmicas establecidas en 7.2». Mantener la ruta implementada **con reserva**, no certificar esa condición hasta resolverla con copia autorizada.
+- **CNE Art. 19:** el espectro aplicado es válido para suelos A–D; Art. 20 exige tratamiento especial fuera de ese ámbito. La app no identifica el suelo y el usuario debe verificarlo externamente.
+- **NCh2369 §7.1:** cuando la estructura sismorresistente es parte integral del equipo, el diseño se remite a cláusula 5 y no se cubre automáticamente con este calculador de cargas para elementos secundarios.

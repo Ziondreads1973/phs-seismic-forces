@@ -168,7 +168,7 @@ test('FS-06-C02: factores normativos sin ceros sobrantes, fuerzas con un decimal
 
 test('FS-06-C02: pantalla y TXT contienen el mismo valor de cada fuerza',()=>{
  for(const norm of ['2369','87','88']){
-  const d=mount({norm,w:'2000',fx:'25',fy:'30'});
+  const d=mount({norm,w:'2000',fx:'25',fy:'30',vertical:'rigid'});
   const preview=d.nodes.globalReport.innerHTML;
   const txt=d.nodes.txtPreview.textContent;
   const finalBlock=txt.split('4. RESUMEN DE RESULTADOS')[1];

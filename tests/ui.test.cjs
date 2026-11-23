@@ -391,7 +391,9 @@ test('NCh2369: TXT y PDF declaran anclajes solo horizontales y vertical sin fact
 
 
 test('La clasificación principal muestra exactamente las tres rutas aprobadas',()=>{
- assert.match(html,/<select id="duct" class="anchor-route-list" size="3">/);
+ assert.match(html,/<select id="duct">/);
+ assert.doesNotMatch(html,/<select id="duct"[^>]*\bsize=/);
+ assert.doesNotMatch(html,/anchor-route-list/);
  for(const label of ['Sistema dúctil que cumple §8.5',
   'Sistema de materiales dúctiles que no cumple §8.5',
   'Sistema de materiales no dúctiles'])assert.ok(html.includes(label));

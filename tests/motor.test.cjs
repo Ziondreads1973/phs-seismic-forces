@@ -38,6 +38,19 @@ test('Art87 aplica IE=1 fijo de Tabla 4',()=>{
   near(r.anchors.Ex,750);
  }
 });
+test('Art87: solo fX/fY gobiernan Kh y fZ no se solicita ni afecta fuerzas',()=>{
+ const base=m.calculate87(a({fx:25,fy:35}));
+ const sinRestriccionVertical=m.calculate87(a({fx:25,fy:35,fz:0}));
+ near(base.factors.KhX,1.35);
+ near(base.factors.KhY,1);
+ near(base.factors.Kv,1);
+ for(const direction of ['Ex','Ey','Ez']){
+  near(sinRestriccionVertical.structure[direction],base.structure[direction]);
+  near(sinRestriccionVertical.anchors[direction],base.anchors[direction]);
+ }
+ assert.equal('fz' in base.inputs,false);
+ assert.equal('fz' in sinRestriccionVertical.inputs,false);
+});
 test('Art87 caso A basal',()=>{
  const r=m.calculate87(a());near(r.anchors.Ex,750);near(r.anchors.Ey,750);near(r.anchors.Ez,360);
 });

@@ -8,9 +8,9 @@ const html=fs.readFileSync(path.resolve(__dirname,'../index.html'),'utf8');
 const scripts=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(x=>x[1]);
 
 function mount(changes={},locale){
-  const start={norm:'87',w:'1000',ie:'1',fx:'25',fy:'35',loc87:'ground',
+  const start={norm:'87',w:'1000',fx:'25',fy:'35',loc87:'ground',
     cat:'III',zone:'2',soil:'C',equipment:'electrical-mechanical',duct:'ductile',
-    loc2369:'ground',height:'',zk:'',loc88:'ground',vertical:'rigid',...changes};
+    loc2369:'ground',height:'',zk:'',loc88:'ground',vertical:'',...changes};
   const nodes={},saved={files:[],printed:0,payload:null,printedView:null};
   const element=id=>nodes[id]||(nodes[id]={id,value:start[id]??'',hidden:false,disabled:false,
     innerHTML:'',textContent:'',className:'',events:{},
@@ -71,6 +71,23 @@ test('TXT: fórmulas con resultados consecutivos, sin sustituciones numéricas',
     assert.ok(d.saved.payload.includes(fragment),fragment);
 });
 
+test('Art. 87: IE=1 fijo y sin campo editable',()=>{
+ const d=mount({norm:'87'});
+ assert.doesNotMatch(html,/id="ie"/);
+ assert.match(d.nodes.globalReport.innerHTML,/IE \(Tabla 4\)/);
+ assert.match(d.nodes.txtPreview.textContent,/IE \(Tabla 4\)/);
+});
+test('Art. 88: exige seleccionar modelo vertical',()=>{
+ const d=mount({norm:'88'});
+ assert.equal(d.nodes.pdfButton.disabled,true);
+ assert.equal(d.nodes.txtButton.disabled,true);
+ d.set('vertical','rigid');
+ assert.equal(d.nodes.pdfButton.disabled,false);
+ d.set('vertical','');
+ assert.equal(d.nodes.pdfButton.disabled,true);
+ assert.equal(d.nodes.txtButton.disabled,true);
+ assert.match(html,/<option value="" selected>Seleccionar comportamiento vertical<\/option>/);
+});
 test('Art. 88: tabla IE/R a la vista y fila del equipo destacada',()=>{
   const d=mount({norm:'88',vertical:'flex',loc88:'floor'});
   assert.equal(d.nodes.pdfButton.disabled,false);
@@ -119,9 +136,9 @@ test('Formato local: coma o punto decimal, sin separador de miles, en ambas sali
 
 test('FS-06-C02: entradas conservan exactamente los decimales introducidos',()=>{
   for(const [locale,decimal] of [['es-CL',','],['en-US','.']]){
-    const d=mount({norm:'87',w:'1000.125',ie:'1.20',fx:'29.99',fy:'30'},locale);
+    const d=mount({norm:'87',w:'1000.125',fx:'29.99',fy:'30'},locale);
     const content=d.nodes.globalReport.innerHTML,txt=d.nodes.txtPreview.textContent;
-    for(const label of ['1000'+decimal+'125 kgf','1'+decimal+'20','29'+decimal+'99 Hz','30 Hz']){
+    for(const label of ['1000'+decimal+'125 kgf','29'+decimal+'99 Hz','30 Hz']){
       assert.ok(content.includes(label),'Pantalla: '+label);
       assert.ok(txt.includes(label),'TXT: '+label);
     }

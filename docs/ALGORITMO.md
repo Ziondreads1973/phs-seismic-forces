@@ -28,7 +28,7 @@
 6. `Ex = Ey = Ch W`; `Ez = Cv W`.
 7. Demanda de anclajes horizontales: `alpha=0,7 Rp` en ruta dúctil §7.3.2, o `alpha=Rp` en ruta no dúctil §7.3.3; `Ex,a = alpha Ex`, `Ey,a = alpha Ey`, `Ez,a = Ez`.
 
-Fuera de alcance: análisis de la estructura principal (§7.2.2, ecuaciones basadas en análisis), alternativa independiente del §7.2.4, **procedimiento especial §5.8 para equipos rígidos apoyados en suelo** (requiere Kp=1 y Fv=0,7 Fh), fuerzas locales y combinaciones. La ruta basal no supone automáticamente aplicabilidad de §7.2. **Reserva normativa**: §§7.3.2–7.3.3 requieren revisar si la amplificación de anclajes incluye también Ez; el motor mantiene el criterio previo de solo amplificación horizontal hasta aclararlo.
+Fuera de alcance: análisis de la estructura principal (§7.2.2, ecuaciones basadas en análisis), alternativa independiente del §7.2.4, **procedimiento particular §5.8 para equipos rígidos apoyados en suelo** (Kp=1 y Fv=0,7 Fh), fuerzas locales y combinaciones. La ruta basal no supone automáticamente aplicabilidad de §7.2: el ingeniero debe determinar cuál corresponde. **Criterio del proyecto para anclajes (§7.3.2–7.3.3):** la amplificación por `0,7Rp` o `Rp` actúa solo en las componentes horizontales; `Ez,a=Ez` se mantiene sin amplificación. La aclaración fue comunicada por el responsable técnico, sin fuente pública independiente que permita atribuirla formalmente a los redactores de la norma.
 
 ## B. Anexo Técnico CNE, artículo 87 — banco de baterías estacionarias
 

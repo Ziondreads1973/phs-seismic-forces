@@ -87,7 +87,7 @@ details summary{font-size:12px;font-weight:650;color:#24577f;cursor:pointer}deta
 </section>
 <section id="block87" hidden>
 <h3>Art. 87 — Bancos de baterías sobre soporte</h3>
-<div class="field"><label for="ie">Factor importancia IE (editable)</label><input id="ie" type="number" min="0" step="any" value="1"></div>
+<p class="muted">Factor de importancia I<sub>E</sub> = 1 (Tabla 4; fijo para equipo eléctrico).</p>
 <div class="cols"><div class="field"><label for="fx">Frecuencia horizontal fX [Hz]</label><input id="fx" type="number" min="0" step="any" placeholder="fX"></div>
 <div class="field"><label for="fy">Frecuencia horizontal fY [Hz]</label><input id="fy" type="number" min="0" step="any" placeholder="fY"></div></div>
 <p class="muted">Frecuencias horizontales mínimas 20 Hz. Kh se calcula independientemente en X e Y.</p>
@@ -100,6 +100,7 @@ details summary{font-size:12px;font-weight:650;color:#24577f;cursor:pointer}deta
 <h3>Art. 88 — Celda metálica autosoportada</h3>
 <p class="muted">Clasificación del equipo: IE = <span data-local-number="1" data-decimals="0">1</span> y R = <span data-local-number="1" data-decimals="0">1</span> (Tabla 4). A0 = <span data-local-number="0.5" data-decimals="1">0.5</span>g y amortiguamiento = 2 %. La aceleración espectral máxima es automática.</p>
 <div class="field"><label for="vertical">Comportamiento vertical</label><select id="vertical">
+<option value="" selected>Seleccionar comportamiento vertical</option>
 <option value="rigid">V1 — Rígido verticalmente</option>
 <option value="flex">V2 — No rígido verticalmente</option></select></div>
 <div class="field"><label for="loc88">Condición de instalación</label><select id="loc88">
@@ -194,7 +195,7 @@ details summary{font-size:12px;font-weight:650;color:#24577f;cursor:pointer}deta
     let H=null,Zk=0;
     if(location==='elevated'){
       H=finite(d.height_m,'altura H',true);
-      Zk=finite(d.level_m,'altura Zk',true);
+      Zk=finite(d.level_m,'altura Zk');
       if(Zk>H)throw new RangeError('Zk no puede superar H');
     }
     const I=IMPORTANCE[category],Ar=AR[zone],S=SOIL[soil],kv=KV[soil];
@@ -222,7 +223,7 @@ details summary{font-size:12px;font-weight:650;color:#24577f;cursor:pointer}deta
   }
   function calculate87(d){
     const W=finite(d.weight_kgf,'peso sísmico',true);
-    const IE=finite(d.IE,'IE',true);
+    const IE=1; // Tabla 4: factor fijo del equipo eléctrico general
     const fx=finite(d.fx,'fX',true),fy=finite(d.fy,'fY',true);
     const KhX=kh(fx,'fX'),KhY=kh(fy,'fY');
     const location=oneOf(d.location,['ground','modular','floor'],'ubicación');
@@ -231,7 +232,7 @@ details summary{font-size:12px;font-weight:650;color:#24577f;cursor:pointer}deta
     const s={Ex:Cx*W,Ey:Cy*W,Ez:Cv*W};
     return complete({method:'CNE-Art87',weight_kgf:W,
       inputs:{IE,fx,fy,location},
-      factors:{KhX,KhY,Kv:1,location:loc,structure:{X:Cx,Y:Cy,Z:Cv},
+      factors:{IE,KhX,KhY,Kv:1,location:loc,structure:{X:Cx,Y:Cy,Z:Cv},
         anchor_multiplier:{horizontal:1.25,vertical:1}},
       structure:s,anchors:{Ex:s.Ex*1.25,Ey:s.Ey*1.25,Ez:s.Ez}});
   }
@@ -292,8 +293,9 @@ function lineData(r){
   f.push(['I',factor(k.I)],['Rp',factor(k.Rp)]);
  }else if(r.method==='CNE-Art87'){
   const p=r.inputs;
-  a.push(['IE',inputValue('ie')],['Frecuencia X',inputValue('fx')+' Hz'],
+  a.push(['Frecuencia X',inputValue('fx')+' Hz'],
    ['Frecuencia Y',inputValue('fy')+' Hz'],['Ubicación',place(p.location)]);
+  f.push(['IE (Tabla 4)',factor(r.factors.IE)]);
  }else{
   const p=r.inputs,k=r.factors;
   a.push(['Clasificación','Celda metálica autosoportada'],['Ubicación',place(p.location)],
@@ -330,7 +332,7 @@ function normativeFactors(r){
   ['Kp',factor(k.Kp)],['Rp',factor(k.Rp)],['kv',factor(k.kv)]
  ];
  if(r.method==='CNE-Art87')return [
-  ['Kh,X',factor(k.KhX)],['Kh,Y',factor(k.KhY)],['Kv',factor(k.Kv)],
+  ['IE (Tabla 4)',factor(k.IE)],['Kh,X',factor(k.KhX)],['Kh,Y',factor(k.KhY)],['Kv',factor(k.Kv)],
   ['Kh ubicación',factor(k.location.horizontal)],['Kv ubicación',factor(k.location.vertical)],
   ['Factor anclajes H',factor(k.anchor_multiplier.horizontal)]
  ];
@@ -459,7 +461,7 @@ function read(){
    return motor.calculate2369({weight_kgf:W,category:$('cat').value,zone:$('zone').value,soil:$('soil').value,
      equipment:$('equipment').value,anchor:$('duct').value,location:$('loc2369').value,height_m:num('height'),level_m:num('zk')});
  }
- if(standard==='87')return motor.calculate87({weight_kgf:W,IE:num('ie'),fx:num('fx'),fy:num('fy'),location:$('loc87').value});
+ if(standard==='87')return motor.calculate87({weight_kgf:W,fx:num('fx'),fy:num('fy'),location:$('loc87').value});
  return motor.calculate88({weight_kgf:W,vertical:$('vertical').value,location:$('loc88').value});
 }
 function localizeStaticNumbers(){

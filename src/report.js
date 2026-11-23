@@ -170,7 +170,13 @@ function buildReports(r,rawInputs){
    '<h1>FUERZAS SÍSMICAS DE DISEÑO</h1><p>'+esc(name)+'</p><hr>';
  const data=[...d.inputs,...d.factors];
  const summary='<h2>2. Fuerzas sísmicas finales</h2>'+htmlTable(rows,true);
+ const is2369=r.method==='NCh2369:2025-cap7';
+ const basalSoil=is2369&&r.inputs.location==='ground';
+ const anchorCriterion='Amplificación de anclajes solo en Ex/Ey; Ez,a = Ez sin amplificación.';
+ const basalCriterion='Verificar aplicabilidad de NCh2369 §5.8 para equipos rígidos apoyados en suelo (T < 0,06 s); no implementado.';
  const globalHtml=head+'<h2>1. Datos y factores de diseño</h2>'+htmlTable(data)+summary+
+  (is2369?'<p class="report-foot">'+esc(anchorCriterion)+'</p>':'')+
+  (basalSoil?'<p class="report-foot">'+esc(basalCriterion)+'</p>':'')+
   '<p class="report-foot">Magnitudes por dirección. No incluye combinaciones gravitacionales ni verificación resistente de anclajes.</p>';
  const txthead=['PHS | INGENIERÍA ESTRUCTURAL','FUERZAS SÍSMICAS DE DISEÑO',name,'='.repeat(54)];
  const txtpairs=arr=>arr.map(x=>x[0].padEnd(24,' ')+' : '+x[1]);
@@ -191,6 +197,8 @@ function buildReports(r,rawInputs){
   '- Magnitudes positivas por dirección.',
   '- Sin combinaciones ni verificaciones resistentes.',
   '- Cálculo interno sin redondeos intermedios.',
+  ...(is2369?['- '+anchorCriterion]:[]),
+  ...(basalSoil?['- '+basalCriterion]:[]),
   '='.repeat(54),'PHS | INGENIERÍA ESTRUCTURAL'
  ].join('\n');
  return {globalHtml,textReport};

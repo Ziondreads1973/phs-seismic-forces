@@ -52,3 +52,9 @@ No añadir comprobaciones ajenas al alcance sin acuerdo técnico. No se usan Act
 - **AU-R7 — Evidencia:** para cerrar formalmente trazabilidad NCh2369 se requiere contraste final con copia oficial autorizada; la reproducción consultada no constituye fuente normativa certificada. Inspección visual de PDF continúa pendiente.
 
 **Cierre de observaciones del 23-11-2026:** AU-R1 queda clasificada como **advertencia de alcance**, no como fallo aritmético ni razón para alterar Kp por ubicación; AU-R2 queda **cerrada conforme al criterio técnico del proyecto**, sin amplificar Ez en anclajes. Permanecen las otras condiciones de aplicabilidad, la reserva interpretativa FS-08, el contraste formal de NCh2369 con copia autorizada y la inspección visual de PDF. No se cambian motor, interfaz ni resultados.
+
+## Aplicación de los criterios AU-R1 y AU-R2 en interfaz y reportes (2026-11-23)
+
+- En NCh2369, cuando se selecciona «Nivel de terreno / losa basal», se informa sin bloquear el cálculo que **§5.8 para equipos rígidos apoyados en suelo no está implementado**. La opción basal por sí sola no selecciona ese procedimiento. El aviso también se incorpora al PDF global y al TXT del caso basal; no aparece para ubicaciones que no representan apoyo directo en suelo.
+- Para cualquier ubicación NCh2369, los reportes PDF/TXT indican expresamente que el factor de anclajes se aplica **solo a Ex/Ey**, manteniendo **Ez,a=Ez** sin esa amplificación, conforme al criterio técnico AU-R2.
+- **No se modificaron ecuaciones, parámetros Kp ni respuestas del motor**, y no se agregó cálculo §5.8. Se añadieron pruebas de comportamiento, observaciones y visibilidad.

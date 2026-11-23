@@ -27,6 +27,7 @@ function updateVisibility(){
  const n=$('norm').value;
  for(const v of ['2369','87','88'])$('block'+v).hidden=n!==v;
  $('heightGroup').hidden=$('loc2369').value!=='elevated';
+ $('scope58Note').hidden=n!=='2369'||$('loc2369').value!=='ground';
 }
 function refreshReports(){
  if(!reports)return;

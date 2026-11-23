@@ -363,3 +363,28 @@ test('FS-06-C05: coeficientes de todas las rutas con máximo tres decimales',()=
   }
  }
 });
+
+test('NCh2369: aviso §5.8 solo en ubicación basal directa; no bloquea cálculo',()=>{
+ const d=mount({norm:'2369',loc2369:'ground'});
+ assert.equal(d.nodes.scope58Note.hidden,false);
+ assert.equal(d.nodes.pdfButton.disabled,false);
+ assert.match(d.nodes.globalReport.innerHTML,/NCh2369 §5\.8/);
+ assert.match(d.nodes.txtPreview.textContent,/NCh2369 §5\.8/);
+ d.set('loc2369','modular');
+ assert.equal(d.nodes.scope58Note.hidden,true);
+ assert.doesNotMatch(d.nodes.globalReport.innerHTML,/§5\.8/);
+ assert.doesNotMatch(d.nodes.txtPreview.textContent,/§5\.8/);
+ d.set('loc2369','elevated');
+ assert.equal(d.nodes.scope58Note.hidden,true);
+});
+test('NCh2369: TXT y PDF declaran anclajes solo horizontales y vertical sin factor',()=>{
+ for(const duct of ['ductile','nonductile']){
+  const d=mount({norm:'2369',duct,loc2369:'ground'});
+  const htmlReport=d.nodes.globalReport.innerHTML;
+  const txt=d.nodes.txtPreview.textContent;
+  assert.match(htmlReport,/Amplificación de anclajes solo en Ex\/Ey/);
+  assert.match(txt,/Amplificación de anclajes solo en Ex\/Ey/);
+  assert.match(txt,/Ez,a = Ez\nEz,a =/);
+  assert.equal(d.nodes.pdfButton.disabled,false);
+ }
+});

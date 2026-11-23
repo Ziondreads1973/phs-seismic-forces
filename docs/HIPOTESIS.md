@@ -36,7 +36,7 @@ Referencias: [Anexo Técnico CNE, artículos 87 y 122.4.iii](https://www.cne.cl/
 
 ## Reservas de la auditoría (23-11-2026)
 
-- **NCh2369 §5.8:** el módulo NO calcula el caso específico de equipos rígidos apoyados en suelo (`T<0,06 s`; `Kp=1` y vertical `0,7 Fh`). Una instalación basal no acredita automáticamente aplicabilidad del procedimiento §7.2 con `Kp=2,2`.
-- **NCh2369 §7.3:** la decisión de no amplificar `Ez` para anclajes no ha quedado acreditada inequívocamente a partir del alcance literal de «fuerzas sísmicas establecidas en 7.2». Mantener la ruta implementada **con reserva**, no certificar esa condición hasta resolverla con copia autorizada.
+- **NCh2369 §5.8 — advertencia de alcance:** existe un procedimiento particular para equipos rígidos apoyados en suelo (`T<0,06 s`; `Kp=1` y vertical `0,7 Fh`) que esta aplicación no implementa. La selección «Nivel basal» no basta para decidir si corresponde ese procedimiento o la ruta §7.2. La elección queda a cargo del ingeniero.
+- **NCh2369 §7.3 — decisión técnica cerrada:** la amplificación de anclajes por `0,7Rp` o `Rp` se aplica a **Ex y Ey**, no a **Ez**. El responsable del proyecto indicó que este criterio fue aclarado por participantes en la elaboración de la norma; no hay una referencia pública verificada que permita presentarlo como pronunciamiento oficial. Se conserva `Ez,a=Ez`, sin bloquear la liberación por esta observación.
 - **CNE Art. 19:** el espectro aplicado es válido para suelos A–D; Art. 20 exige tratamiento especial fuera de ese ámbito. La app no identifica el suelo y el usuario debe verificarlo externamente.
 - **NCh2369 §7.1:** cuando la estructura sismorresistente es parte integral del equipo, el diseño se remite a cláusula 5 y no se cubre automáticamente con este calculador de cargas para elementos secundarios.

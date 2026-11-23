@@ -61,3 +61,11 @@ Modelo vertical (selección obligatoria, sin valor predeterminado):
 Entrada no válida (peso no positivo, frecuencia horizontal Art. 87 menor de 20 Hz, clasificación/ubicación incompatible, V1/V2 sin elegir, `H<=0`, `Zk<0`, `Zk>H`) invalida resultados y deshabilita exportaciones. Las pruebas de regresión están en `tests/`.
 
 **Fuentes de contraste:** NCh2369:2025 §§5.7, 7.2–7.3 y Tablas pertinentes; [Anexo Técnico CNE, arts. 19, 21, 38–39, 83, 87–88, 122.4.iii](https://www.cne.cl/wp-content/uploads/2025/01/AT-Requisitos-Sismo.pdf). La reproducción de una fórmula no equivale a certificar todos los requisitos de aplicabilidad.
+
+## Asistente informativo para clasificación (no vinculante)
+`src/anchor_assistant.js` compara declaraciones de material, detallamiento, transferencia de corte, capacidad no fusible y fundación. Una geometría convencional con silla o perno reemplazable requiere longitud libre ≥ máx(250 mm, 8d) y hilo bajo la tuerca ≥75 mm; excepción de §8.5.2 por §4.5 y 0,7R₁≥1 queda como declaración respaldada externamente.
+- Material no dúctil con alargamiento ≥14 %: ruta orientativa §7.3.3.
+- Material dúctil ≥20 % con incumplimiento explícito de §8.5: §7.3.2.
+- Material dúctil con todas las declaraciones de §8.5 afirmativas: posible §8.5, **sin cálculo del motor para ese procedimiento**.
+- Sin evidencia suficiente: pendiente; material <14 %: no cumple mínimo general.
+- No hay transmisión automática al `calculate2369`. PDF/TXT diferencian decisión documental de supuesto del motor.

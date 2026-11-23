@@ -32,3 +32,11 @@ Start-Process ".\\dist\\PHS Seismic Forces.html"
 - [ESTADO.md](docs/ESTADO.md): alcance implementado, pruebas y limitaciones pendientes.
 
 La documentación y ejemplos de versiones JSON 0.4/0.5 fueron retirados de la rama activa. Permanecen recuperables en el historial Git. No se utilizan GitHub Actions ni servicios externos.
+
+## Asistente de clasificación de anclajes (primera etapa)
+En la ruta **NCh2369**, desplegar «Asistente de clasificación de anclajes — §§8.2 y 8.5».
+Registra la certificación de material (alargamiento ≥20 %, ≥14 % o menor), silla/reemplazabilidad y tramo libre, o excepción de §8.5.2; el mecanismo de corte §8.5.3; la exclusión de grout/roce §8.5.4; la transferencia a fundación §8.5.5; y la capacidad de componentes no fusibles.
+
+Realiza **solo la comprobación geométrica** L ≥ máx(250 mm, 8d) e hilo bajo la tuerca ≥75 mm cuando se introduce un detalle convencional, y registra las declaraciones en el PDF y TXT. No verifica resistencia, reemplazabilidad real, capacidad sísmica ni certifica §8.5.
+
+**Fase documental, sin cambios de fuerzas:** el selector de anclajes actual sigue controlando `Rp` y la amplificación horizontal. El asistente **no aplica automáticamente su propuesta**. Ante conflicto, la salida advierte que las demandas de anclajes son provisionales. La posible ruta §8.5 permanece fuera del motor.

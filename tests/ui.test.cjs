@@ -38,7 +38,7 @@ function mount(changes={},locale){
 }
 
 test('Contrato: PDF y TXT de entradas y fuerzas sin selectores ni JSON',()=>{
-  assert.equal(scripts.length,3);
+  assert.equal(scripts.length,4);
   for(const old of ['pdfLevel','txtLevel','printHost','pdfPreview','saveJson'])
     assert.doesNotMatch(html,new RegExp('id="'+old+'"'));
   assert.match(html,/id="globalReport"/);
@@ -386,5 +386,47 @@ test('NCh2369: TXT y PDF declaran anclajes solo horizontales y vertical sin fact
   assert.match(txt,/Amplificación de anclajes solo en Ex\/Ey/);
   assert.match(txt,/Ez,a = Ez\nEz,a =/);
   assert.equal(d.nodes.pdfButton.disabled,false);
+ }
+});
+
+test('Asistente: clasificación pendiente visible en PDF y TXT, sin bloquear el motor',()=>{
+ const d=mount({norm:'2369'});
+ assert.match(d.nodes.anchorGuideStatus.textContent,/Clasificación pendiente/);
+ assert.match(d.nodes.globalReport.innerHTML,/Asistente de anclajes/);
+ assert.match(d.nodes.txtPreview.textContent,/ASISTENTE DE CLASIFICACIÓN DE ANCLAJES/);
+ assert.match(d.nodes.txtPreview.textContent,/No verificado/);
+ assert.equal(d.nodes.pdfButton.disabled,false);
+});
+test('Asistente: cambio de ruta declarado deja registro de discrepancia',()=>{
+ const d=mount({norm:'2369',duct:'ductile'});
+ d.set('anchorMat','limited');
+ assert.match(d.nodes.anchorGuideStatus.textContent,/Incompatibilidad/);
+ assert.match(d.nodes.txtPreview.textContent,/§7\.3\.3/);
+ assert.match(d.nodes.globalReport.innerHTML,/provisionales/);
+ d.set('duct','nonductile');
+ assert.match(d.nodes.anchorGuideStatus.textContent,/Ruta orientativa compatible/);
+});
+test('Asistente: cambia visibilidad de detalles y no altera tabla de fuerzas',()=>{
+ const d=mount({norm:'2369',duct:'ductile'});
+ const table=()=>d.nodes.globalReport.innerHTML.match(/<h2>2\. Fuerzas sísmicas finales<\/h2>([\s\S]*?)<p class="report-foot"/)[1];
+ const before=table();
+ d.set('anchorMat','ductile');
+ d.set('anchorDetail','saddle');
+ assert.equal(d.nodes.anchorGeometryGroup.hidden,false);
+ d.set('anchorDiameter','40');d.set('anchorFree','300');d.set('anchorThread','80');
+ assert.match(d.nodes.txtPreview.textContent,/320 mm/);
+ assert.equal(table(),before);
+ d.set('anchorDetail','exception');
+ assert.equal(d.nodes.anchorGeometryGroup.hidden,true);
+ assert.equal(d.nodes.anchorDetailExceptionGroup.hidden,false);
+ d.set('anchorBaseType','fixed');
+ assert.equal(d.nodes.anchorFixedMomentGroup.hidden,false);
+ assert.equal(d.nodes.pdfButton.disabled,false);
+});
+test('Asistente: no aparece en PDF/TXT CNE',()=>{
+ for(const norm of ['87','88']){
+  const d=mount({norm,vertical:'rigid'});
+  assert.doesNotMatch(d.nodes.globalReport.innerHTML,/Asistente de anclajes/);
+  assert.doesNotMatch(d.nodes.txtPreview.textContent,/ASISTENTE DE CLASIFICACIÓN DE ANCLAJES/);
  }
 });

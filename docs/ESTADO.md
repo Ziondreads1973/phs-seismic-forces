@@ -58,3 +58,9 @@ No añadir comprobaciones ajenas al alcance sin acuerdo técnico. No se usan Act
 - En NCh2369, cuando se selecciona «Nivel de terreno / losa basal», se informa sin bloquear el cálculo que **§5.8 para equipos rígidos apoyados en suelo no está implementado**. La opción basal por sí sola no selecciona ese procedimiento. El aviso también se incorpora al PDF global y al TXT del caso basal; no aparece para ubicaciones que no representan apoyo directo en suelo.
 - Para cualquier ubicación NCh2369, los reportes PDF/TXT indican expresamente que el factor de anclajes se aplica **solo a Ex/Ey**, manteniendo **Ez,a=Ez** sin esa amplificación, conforme al criterio técnico AU-R2.
 - **No se modificaron ecuaciones, parámetros Kp ni respuestas del motor**, y no se agregó cálculo §5.8. Se añadieron pruebas de comportamiento, observaciones y visibilidad.
+
+## Asistente de clasificación del anclaje — primera etapa (23-11-2026)
+- Implementado `src/anchor_assistant.js`, formulario desplegable, controles geométricos y resultados documentales en PDF y TXT.
+- Clasificaciones orientativas: pendiente, §7.3.2, §7.3.3, posible §8.5 o material bajo mínimo §8.2.3.
+- Ninguna respuesta cambia el motor ni equivale a certificación de §8.5. Se registran conflictos entre clasificación declarada y ruta usada.
+- **Pendiente para fase 2:** definir cómo seleccionar ruta y Rp coherentemente, qué debe pasar con el caso §8.5 que no está implementado, y reglas de bloqueo/rotulado definitivo. No cambiar el motor sin cerrar esos criterios.

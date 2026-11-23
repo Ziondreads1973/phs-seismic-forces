@@ -40,3 +40,11 @@ Referencias: [Anexo Técnico CNE, artículos 87 y 122.4.iii](https://www.cne.cl/
 - **NCh2369 §7.3 — decisión técnica cerrada:** la amplificación de anclajes por `0,7Rp` o `Rp` se aplica a **Ex y Ey**, no a **Ez**. El responsable del proyecto indicó que este criterio fue aclarado por participantes en la elaboración de la norma; no hay una referencia pública verificada que permita presentarlo como pronunciamiento oficial. Se conserva `Ez,a=Ez`, sin bloquear la liberación por esta observación.
 - **CNE Art. 19:** el espectro aplicado es válido para suelos A–D; Art. 20 exige tratamiento especial fuera de ese ámbito. La app no identifica el suelo y el usuario debe verificarlo externamente.
 - **NCh2369 §7.1:** cuando la estructura sismorresistente es parte integral del equipo, el diseño se remite a cláusula 5 y no se cubre automáticamente con este calculador de cargas para elementos secundarios.
+
+## Asistente de clasificación de anclajes, fase 1 (23-11-2026)
+- No equivale a una revisión resistente. Los «Sí» son declaraciones del ingeniero, nunca verificaciones realizadas por PHS.
+- Material (§8.2.3): ductilidad por alargamiento en probeta de 50 mm (umbral 20 %; mínimo general 14 %).
+- Detalle (§8.5.2): silla y tramo expuesto inspeccionable/reparable, perno reemplazable con longitud libre equivalente o excepción por diseño con §4.5 y horizontal 0,7R₁≥1. La comprobación automática solo cubre L ≥ máx(250 mm, 8d) e hilo ≥75 mm; no acredita la excepción.
+- Corte (§8.5.3): llave/tope de corte total o excepción documentada, con control adicional §8.5.4 de no usar grout/fricción. No comprueba interacción ni límites de excepciones.
+- Capacidad de elementos no fusibles, pedestal/fundación (§8.5.5 y cláusula 9) y caso especial de columna empotrada requieren memoria externa.
+- El dictamen orientativo se registra en PDF/TXT, separado de la **ruta usada realmente por el motor**. No altera `Rp`, factores ni fuerzas; una declaración compatible no implica conformidad normativa integral y una candidatura a §8.5 no está cubierta por el cálculo de §7.3.2.

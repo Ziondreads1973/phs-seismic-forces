@@ -14,8 +14,8 @@ Abrir **`index.html`** directamente en un navegador moderno. No requiere instala
 
 Permite calcular:
 - **NCh2369:2025 capítulo 7:** método simplificado sin análisis de la estructura principal, clasificación automática de `Rp`, fuerzas horizontales y verticales y amplificación de anclajes. No incluye §5.8.
-- **Anexo Técnico CNE artículo 87:** banco de baterías estacionarias sobre soporte, método Art. 38, IE=1 por defecto editable, frecuencias horizontales y factores propios de anclajes.
-- **Anexo Técnico CNE artículo 88:** celdas metálicas autosoportadas, método Art. 39, IE=1 y R=1 para la celda, A0=0,50g, amortiguamiento 2 %, modelos verticales V1/V2 y ubicación.
+- **Anexo Técnico CNE artículo 87:** banco de baterías estacionarias sobre soporte, método Art. 38, IE=1 fijo conforme a Tabla 4, frecuencias horizontales y factores propios de anclajes.
+- **Anexo Técnico CNE artículo 88:** celdas metálicas autosoportadas, método Art. 39, IE=1 y R=1 para la celda, A0=0,50g, amortiguamiento 2 %, modelos verticales V1/V2 con selección obligatoria (sin valor predeterminado) y ubicación.
 - Instalación basal, sala modular con apoyo basal equivalente y ubicaciones adicionales expresamente consideradas por cada procedimiento.
 
 Los resultados son magnitudes por dirección `Ex`, `Ey` y `Ez`, separadas para estructura/equipo y anclajes. **No son reacciones individuales por perno, combinaciones de carga ni verificaciones resistentes.**

@@ -33,6 +33,12 @@ details summary{font-size:12px;font-weight:650;color:#24577f;cursor:pointer}deta
 .reference-block{margin-top:18px;padding:12px;border:1px solid #d5e1eb;border-radius:8px;background:#f9fbfd}
 .reference-block h3{margin:0 0 8px}.reference-block table{margin-top:10px}
 .reference-block tr.applied td{background:#e9f2fb;font-weight:700;color:#153f62}
+.anchor-route-list{height:auto;min-height:131px;padding:5px;overflow:hidden}
+.anchor-route-list option{white-space:normal;padding:10px 9px;border-radius:5px;line-height:1.4}
+.anchor-route-list option:checked{background:linear-gradient(#d9eaf8,#d9eaf8);color:#133c63;font-weight:700}
+#anchorWizard .field small{margin:6px 0 8px}
+#anchorApply{width:100%;margin-top:8px}
+.status.caution{background:#fff4df;color:#745116}
 #globalReport{margin-top:12px}
 .result-card{min-width:0}
 [hidden]{display:none!important}
@@ -72,66 +78,49 @@ details summary{font-size:12px;font-weight:650;color:#24577f;cursor:pointer}deta
 <option value="secondary-nonductile">Elemento secundario con componentes no dúctiles</option>
 <option value="other-specified">Otro equipo no especificado</option>
 </select></div>
-<div class="field"><label for="duct">Supuesto de cálculo del anclaje (§7.3)</label><select id="duct">
-<option value="ductile">Material dúctil sin acreditar §8.5 — §7.3.2</option>
-<option value="nonductile">Material no dúctil — §7.3.3</option>
-</select><small>Controla las fuerzas. El asistente verifica coherencia documental sin cambiar automáticamente la ruta.</small></div>
+<div class="field"><label for="duct">Clasificación del sistema de anclaje</label>
+<select id="duct" class="anchor-route-list" size="3">
+<option value="8.5">Sistema dúctil que cumple §8.5</option>
+<option value="7.3.2" selected>Sistema de materiales dúctiles que no cumple §8.5</option>
+<option value="7.3.3">Sistema de materiales no dúctiles</option>
+</select><small>La selección define la ruta. §8.5 no dispone de cálculo de anclajes en esta versión.</small></div>
 
 <div id="anchorAssistantWrap" class="reference-block">
  <details id="anchorWizard">
-  <summary>Asistente de clasificación de anclajes — §§8.2 y 8.5</summary>
-  <p class="muted">Ayuda de clasificación. La ruta calculada se elige arriba. No constituye diseño resistente ni certifica cumplimiento de §8.5.</p>
-  <h3>1. Material — §8.2.3</h3>
-  <div class="field"><label for="anchorMat">Alargamiento de rotura certificado (probeta 50 mm)</label><select id="anchorMat">
+  <summary>Asistente de clasificación — revisar §8.5</summary>
+  <p class="muted">Responde con antecedentes verificables. «Cumple» es una declaración del ingeniero y no una certificación automática.</p>
+  <h3>1. Material de los pernos — §8.2.3</h3>
+  <div class="field"><label for="anchorMat">Alargamiento de rotura certificado (probeta 50 mm)</label>
+  <select id="anchorMat">
    <option value="unknown" selected>No verificado</option>
-   <option value="ductile">≥20 % — material dúctil</option>
-   <option value="limited">≥14 % y &lt;20 % — no dúctil</option>
-   <option value="invalid">&lt;14 % — bajo mínimo general</option>
-  </select><small>El grado nominal del acero no reemplaza la verificación de sus propiedades exigidas.</small></div>
-  <h3>2. Detallamiento — §8.5.2</h3>
-  <div class="field"><label for="anchorDetail">Tipo de detalle</label><select id="anchorDetail">
-   <option value="unknown" selected>No verificado</option>
-   <option value="saddle">Con silla, inspeccionable y reparable</option>
-   <option value="replaceable">Reemplazable sin silla, con tramo libre equivalente</option>
-   <option value="exception">Excepción de detallamiento por diseño amplificado</option>
-   <option value="no">No satisface detallamiento §8.5.2</option>
-  </select></div>
-  <div id="anchorGeometryGroup" hidden>
-   <div class="cols">
-    <div class="field"><label for="anchorDiameter">Diámetro d [mm]</label><input id="anchorDiameter" type="number" min="0" step="any" placeholder="d"></div>
-    <div class="field"><label for="anchorFree">Longitud expuesta o libre [mm]</label><input id="anchorFree" type="number" min="0" step="any" placeholder="L"></div>
-    <div class="field"><label for="anchorThread">Longitud de hilo bajo la tuerca [mm]</label><input id="anchorThread" type="number" min="0" step="any" placeholder="Hilo"></div>
-   </div>
-   <p class="muted">Geometría: L ≥ máx(250 mm, 8d), hilo ≥75 mm. No prueba capacidad ni reemplazabilidad efectiva.</p>
+   <option value="ductile">Dúctil — alargamiento ≥20 %</option>
+   <option value="nonductile">No dúctil — 14 % ≤ alargamiento &lt;20 %</option>
+   <option value="invalid">Bajo mínimo general — alargamiento &lt;14 %</option>
+  </select><small>La denominación comercial del acero no acredita por sí sola su alargamiento.</small></div>
+  <div id="anchorChecks" hidden>
+   <h3>2. Requisitos de §8.5 para materiales dúctiles</h3>
+   <p class="muted">Selecciona Cumple, No cumple o No verificado en cada condición.</p>
+   <div class="field"><label for="anchorDetail">1. Detallamiento y reparación — §8.5.2</label>
+    <small>Silla con vástago inspeccionable/reparable, perno reemplazable equivalente o excepción justificada. Para el detalle convencional: longitud expuesta ≥ máx(250 mm, 8d), hilo bajo tuerca ≥75 mm.</small>
+    <select id="anchorDetail"><option value="unknown" selected>No verificado</option><option value="yes">Cumple</option><option value="no">No cumple</option></select></div>
+   <div class="field"><label for="anchorShear">2. Transferencia de corte — §8.5.3</label>
+    <small>Llave de corte, tope sísmico o excepción normativa debidamente comprobada.</small>
+    <select id="anchorShear"><option value="unknown" selected>No verificado</option><option value="yes">Cumple</option><option value="no">No cumple</option></select></div>
+   <div class="field"><label for="anchorFriction">3. Grout y fricción — §8.5.4</label>
+    <small>No considerar las contribuciones prohibidas del grout ni la fricción placa–hormigón para diseñar llaves o topes.</small>
+    <select id="anchorFriction"><option value="unknown" selected>No verificado</option><option value="yes">Cumple</option><option value="no">No cumple</option></select></div>
+   <div class="field"><label for="anchorCapacity">4. Diseño por capacidad</label>
+    <small>Placas, soldaduras, rigidizadores y otros componentes no fusibles dimensionados para el mecanismo previsto; revisar el caso de bases empotradas.</small>
+    <select id="anchorCapacity"><option value="unknown" selected>No verificado</option><option value="yes">Cumple</option><option value="no">No cumple</option></select></div>
+   <div class="field"><label for="anchorFoundation">5. Pedestal y fundación — §8.5.5</label>
+    <small>Transferencia de esfuerzos y revisión del hormigón y armaduras según cláusula 9.</small>
+    <select id="anchorFoundation"><option value="unknown" selected>No verificado</option><option value="yes">Cumple</option><option value="no">No cumple</option></select></div>
   </div>
-  <div id="anchorDetailExceptionGroup" hidden>
-   <div class="field"><label for="anchorDetailException">¿Se justificó en tracción con §4.5 y acción horizontal amplificada por 0,7R₁ ≥ 1?</label>
-    <select id="anchorDetailException"><option value="unknown" selected>No verificado</option><option value="yes">Sí, con respaldo externo</option><option value="no">No</option></select>
-   </div>
-  </div>
-  <h3>3. Transferencia de corte — §§8.5.3–8.5.4</h3>
-  <div class="field"><label for="anchorShear">Mecanismo de corte</label><select id="anchorShear">
-   <option value="unknown" selected>No verificado</option>
-   <option value="key">Llave de corte o tope diseñado para el corte total</option>
-   <option value="exception">Excepción §8.5.3 justificada externamente</option>
-   <option value="no">Sin mecanismo ni excepción justificada</option>
-  </select><small>Las excepciones requieren verificar número de pernos activos, corte e interacción con tracción.</small></div>
-  <div class="field"><label for="anchorNoFriction">¿Se excluyó la resistencia del grout y el roce placa-hormigón?</label>
-   <select id="anchorNoFriction"><option value="unknown" selected>No verificado</option><option value="yes">Sí</option><option value="no">No</option></select></div>
-  <h3>4. Componentes no fusibles y fundación</h3>
-  <div class="field"><label for="anchorCapacity">¿Componentes no fusibles con capacidad suficiente para desarrollar el mecanismo previsto?</label>
-   <select id="anchorCapacity"><option value="unknown" selected>No verificado</option><option value="yes">Sí, verificado externamente</option><option value="no">No</option></select></div>
-  <div class="field"><label for="anchorConcrete">¿Pedestal y zonas de fundación conforme a cláusula 9 (§8.5.5)?</label>
-   <select id="anchorConcrete"><option value="unknown" selected>No verificado</option><option value="yes">Sí, verificado externamente</option><option value="no">No</option></select></div>
-  <div class="field"><label for="anchorBaseType">¿Es una base de columna empotrada?</label>
-   <select id="anchorBaseType"><option value="unknown" selected>No verificado</option><option value="other">No</option><option value="fixed">Sí</option></select></div>
-  <div id="anchorFixedMomentGroup" hidden>
-   <div class="field"><label for="anchorFixedMoment">¿Se justificó el momento mínimo del 50 % de la capacidad flexural esperada de la columna?</label>
-    <select id="anchorFixedMoment"><option value="unknown" selected>No verificado</option><option value="yes">Sí, verificado externamente</option><option value="no">No</option></select></div>
-  </div>
-  <p class="muted">Cada «Sí» es una declaración del ingeniero. El asistente no revisa memorias externas ni verifica resistencias.</p>
+  <div class="rule"></div>
+  <p id="anchorGuideStatus" class="muted" aria-live="polite">Clasificación pendiente.</p>
+  <button type="button" id="anchorApply" class="secondary" disabled>Aplicar clasificación sugerida</button>
+  <p class="muted">Al aplicar la clasificación se actualizará el selector principal. La ruta §8.5 solo calcula fuerzas del equipo; no entrega demanda de anclajes.</p>
  </details>
- <p id="anchorGuideStatus" class="muted" aria-live="polite">Clasificación pendiente. El motor utiliza el supuesto seleccionado.</p>
 </div>
 <h3>Ubicación y altura</h3>
 <div class="field"><label for="loc2369">Condición de instalación</label><select id="loc2369">
@@ -318,84 +307,62 @@ details summary{font-size:12px;font-weight:650;color:#24577f;cursor:pointer}deta
 });
 </script>
 <script>
-/* Asistente documental de anclajes NCh2369:2025. No calcula resistencias. */
+/* Clasificación orientativa; la elección y la comprobación de resistencias son del ingeniero. */
 (function(root,factory){
  const api=factory();
  if(typeof module==='object'&&module.exports)module.exports=api;
  else root.PHSAnchorGuide=api;
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
 'use strict';
-const materialNames={unknown:'No verificado',ductile:'Dúctil: elongación certificada ≥20 % (50 mm)',limited:'No dúctil: 14 % ≤ elongación <20 %',invalid:'No alcanza 14 %'};
-const detailNames={unknown:'No verificado',saddle:'Silla con inspección/reparación',replaceable:'Perno reemplazable y tramo libre equivalente',exception:'Excepción de §8.5.2 con diseño amplificado',no:'Sin detalle conforme a §8.5.2'};
-const shearNames={unknown:'No verificado',key:'Llave/tope para corte total',exception:'Excepción §8.5.3 justificada externamente',no:'Sin transferencia conforme'};
-const yesNames={unknown:'No verificado',yes:'Sí, declarado por el ingeniero',no:'No'};
-const baseNames={unknown:'No verificado',other:'No es base de columna empotrada',fixed:'Base de columna empotrada'};
-const routeNames={pending:'Sin clasificar', '7.3.2':'§7.3.2 — material dúctil sin satisfacer §8.5',
- '7.3.3':'§7.3.3 — material no dúctil','8.5':'Posible §8.5 (fuera del motor)',invalid:'Material bajo mínimo general §8.2.3'};
-const choose=(obj,v)=>Object.prototype.hasOwnProperty.call(obj,v)?v:'unknown';
-const digit=raw=>(raw===undefined||raw===null||String(raw).trim()==='')?null:Number(raw);
-function evaluate(values={},calculation='ductile'){
- const material=choose(materialNames,values.material),detail=choose(detailNames,values.detail);
- const shear=choose(shearNames,values.shear),baseType=choose(baseNames,values.baseType);
- const truth=id=>values[id]==='yes'?true:values[id]==='no'?false:null;
- const checks=[]; const check=(name,value)=>checks.push({name,value});
- let geometry=null;
- if(detail==='saddle'||detail==='replaceable'){
-  const d=digit(values.diameter_mm),L=digit(values.free_mm),t=digit(values.thread_mm);
-  const required=d!==null&&Number.isFinite(d)&&d>0?Math.max(250,8*d):null;
-  const supplied=[d,L,t];
-  const bad=supplied.some(v=>v!==null&&(!Number.isFinite(v)||v<=0));
-  const pass=bad?false:supplied.every(v=>v!==null)?L>=required&&t>=75:null;
-  geometry={d,L,t,required,minimumThread:75,pass};
-  check('§8.5.2 — L ≥ máx(250 mm; 8d); hilo bajo tuerca ≥75 mm',pass);
- } else if(detail==='exception'){
-  check('§8.5.2 — excepción: §4.5 con sismo horizontal 0,7R₁ ≥ 1',truth('detailException'));
- } else check('§8.5.2 — detalle y posibilidad de reparación',detail==='no'?false:null);
- check('§8.5.3 — corte por llave/tope o excepción',shear==='unknown'?null:shear!=='no');
- check('§8.5.4 — no utilizar grout/fricción',truth('noFriction'));
- check('Capacidad de componentes no fusibles',truth('capacity'));
- check('§8.5.5 — pedestal y fundación según cláusula 9',truth('concrete'));
- check('§8.5.2 — demanda mínima de base empotrada',
-   baseType==='other'?true:baseType==='fixed'?truth('fixedMoment'):null);
- const anyFailed=checks.some(c=>c.value===false),anyPending=checks.some(c=>c.value===null);
- let route='pending';
+const routes=Object.freeze({
+ '8.5':'Sistema dúctil que cumple §8.5',
+ '7.3.2':'Sistema de materiales dúctiles que no cumple §8.5',
+ '7.3.3':'Sistema de materiales no dúctiles'
+});
+const names={
+ material:{unknown:'No verificado',ductile:'Dúctil (alargamiento ≥20 % en 50 mm)',
+  nonductile:'No dúctil (14 % ≤ alargamiento <20 %)',invalid:'Bajo mínimo general (<14 %)'},
+ answer:{unknown:'No verificado',yes:'Cumple (declaración del ingeniero)',no:'No cumple'}
+};
+const questions=[
+ ['detail','§8.5.2 — Detallamiento y posibilidad de reparación'],
+ ['shear','§8.5.3 — Transferencia del corte'],
+ ['friction','§8.5.4 — Exclusión de grout y fricción'],
+ ['capacity','Diseño por capacidad de los componentes no fusibles'],
+ ['foundation','§8.5.5 — Pedestal y fundación según cláusula 9']
+];
+const safe=(map,key)=>Object.prototype.hasOwnProperty.call(map,key)?key:'unknown';
+function evaluate(q={},selected='7.3.2'){
+ const material=safe(names.material,q.material);
+ const checks=questions.map(([key,label])=>{
+  const answer=safe(names.answer,q[key]);
+  return {key,label,answer,status:answer==='yes'?true:answer==='no'?false:null};
+ });
+ let route=null;
  if(material==='invalid')route='invalid';
- else if(material==='limited')route='7.3.3';
- else if(material==='ductile')
-  route=anyFailed?'7.3.2':anyPending?'pending':'8.5';
- const expected=route==='7.3.2'?'ductile':route==='7.3.3'?'nonductile':null;
- const compatible=expected!==null&&expected===calculation;
- const calcRoute=calculation==='ductile'?'§7.3.2 (supuesto del motor)':'§7.3.3 (supuesto del motor)';
- const status=route==='invalid'?'Material fuera del mínimo permitido':
-  route==='8.5'?'Posible ruta §8.5 (no implementada)':
-  route==='pending'?'Clasificación pendiente':
-  compatible?'Ruta orientativa compatible':'Incompatibilidad entre clasificación y motor';
- const warning=route==='invalid'?'No acreditar estos anclajes con el material declarado.':
-  route==='8.5'?'Las fuerzas de anclajes actuales NO constituyen diseño según §8.5.':
-  route==='pending'?'La clasificación está incompleta; el supuesto del motor no está acreditado.':
-  compatible?'Coherencia declarativa; NO demuestra resistencia ni conformidad integral.':
-  'La ruta declarada NO coincide con el motor: fuerzas de anclajes provisionales.';
- const answers=[
-  ['Material (§8.2.3)',materialNames[material]],
-  ['Detalle (§8.5.2)',detailNames[detail]],
-  ['Excepción de detalle',detail==='exception'?yesNames[choose(yesNames,values.detailException)]:'No aplica'],
-  ['Corte (§8.5.3)',shearNames[shear]],
-  ['Sin grout/roce (§8.5.4)',yesNames[choose(yesNames,values.noFriction)]],
-  ['Componentes no fusibles',yesNames[choose(yesNames,values.capacity)]],
-  ['Pedestal/fundación (§8.5.5)',yesNames[choose(yesNames,values.concrete)]],
-  ['Tipo de base',baseNames[baseType]],
-  ['Momento de base empotrada',baseType==='fixed'?yesNames[choose(yesNames,values.fixedMoment)]:'No aplica']
- ];
- if(geometry){
-  const fmt=v=>v===null||!Number.isFinite(v)?'No ingresado':String(v)+' mm';
-  answers.push(['Diámetro d',fmt(geometry.d)],['Longitud libre',fmt(geometry.L)],
-   ['Hilo bajo tuerca',fmt(geometry.t)],['Mínimo libre',fmt(geometry.required)],
-   ['Geometría',geometry.pass===null?'No verificada':geometry.pass?'Límites declarados satisfechos':'No satisface límites']);
+ else if(material==='nonductile')route='7.3.3';
+ else if(material==='ductile'){
+  if(checks.some(c=>c.status===false))route='7.3.2';
+  else if(checks.every(c=>c.status===true))route='8.5';
  }
- return Object.freeze({route,routeLabel:routeNames[route],status,warning,
-  compatible,calcRoute,geometry,checks,answers});
+ const compatible=route!==null&&route!=='invalid'&&route===selected;
+ const status=route==='invalid'?'Material fuera del mínimo general':
+  route===null?'Clasificación pendiente':
+  compatible?'Clasificación coherente con la selección':'Clasificación diferente de la seleccionada';
+ const warning=route==='invalid'?'No se recomienda una ruta de diseño para el material declarado.':
+  route===null?'Faltan antecedentes: ninguna clasificación queda acreditada por el asistente.':
+  route==='8.5'?'Posible §8.5 según declaraciones; su diseño de anclajes NO está implementado.':
+  route==='7.3.2'?'Material dúctil con al menos un requisito §8.5 no conforme; revisar §7.3.2.':
+  'Material no dúctil; revisar §7.3.3 y demás requisitos aplicables.';
+ const answers=[['Material (§8.2.3)',names.material[material]]];
+ if(material==='ductile')for(const c of checks)answers.push([c.label,names.answer[c.answer]]);
+ return Object.freeze({
+  route,routeLabel:routes[route]||'Sin clasificación sugerida',
+  selected,selectedLabel:routes[selected]||'Sin selección válida',
+  compatible,status,warning,checks,answers,canApply:route!==null&&route!=='invalid'
+ });
 }
-return Object.freeze({evaluate});
+return Object.freeze({evaluate,routes});
 });
 
 </script>
@@ -423,13 +390,13 @@ function inputValue(id,rawInputs){
    return raw.replace('.',decimalSeparator);
  return factor(Number(raw)); // Para notación exponencial válida en input[type=number]
 }
-function lineData(r,rawInputs){
+function lineData(r,rawInputs,route=null){
  const a=[['Peso sísmico',inputValue('w',rawInputs)+' kgf']],f=[];
  if(r.method==='NCh2369:2025-cap7'){
   const p=r.inputs,k=r.factors;
   a.push(['Categoría',p.category],['Zona sísmica',String(p.zone)],['Suelo',p.soil],
    ['Clasificación equipo',({'electrical-mechanical':'Equipo eléctrico/mecánico','secondary-ductile':'Elemento secundario con componentes dúctiles','secondary-nonductile':'Elemento secundario no dúctil','other-specified':'Otro no especificado'})[p.equipment]],
-   ['Sistema de anclaje',p.anchor==='ductile'?'Dúctil (§7.3.2)':'No dúctil (§7.3.3)'],
+   ['Sistema de anclaje',route==='8.5'?'Sistema dúctil que cumple §8.5 (anclajes no calculados)':route==='7.3.2'?'Materiales dúctiles, no cumple §8.5 (§7.3.2)':route==='7.3.3'?'Materiales no dúctiles (§7.3.3)':p.anchor==='ductile'?'Dúctil (§7.3.2)':'No dúctil (§7.3.3)'],
    ['Ubicación',place(p.location)]);
   if(p.location==='elevated')
    a.push(['Altura H',inputValue('height',rawInputs)+' m'],['Nivel Zk',inputValue('zk',rawInputs)+' m']);
@@ -447,12 +414,12 @@ function lineData(r,rawInputs){
  }
  return {inputs:a,factors:f};
 }
-function rowsForces(r){
- return [['Ex',r.structure.Ex,r.anchors.Ex],['Ey',r.structure.Ey,r.anchors.Ey],['Ez',r.structure.Ez,r.anchors.Ez]];
+function rowsForces(r,hideAnchors=false){
+ return [['Ex',r.structure.Ex,hideAnchors?null:r.anchors.Ex],['Ey',r.structure.Ey,hideAnchors?null:r.anchors.Ey],['Ez',r.structure.Ez,hideAnchors?null:r.anchors.Ez]];
 }
 function htmlTable(data,forceMode=false){
  if(forceMode)return '<table><thead><tr><th>Acción</th><th>Estructura (kgf)</th><th>Anclajes (kgf)</th></tr></thead><tbody>'+
- data.map(x=>'<tr><td>'+esc(x[0])+'</td><td>'+display(x[1],1)+'</td><td>'+display(x[2],1)+'</td></tr>').join('')+'</tbody></table>';
+ data.map(x=>'<tr><td>'+esc(x[0])+'</td><td>'+display(x[1],1)+'</td><td>'+(x[2]===null?'NO CALCULADO':display(x[2],1))+'</td></tr>').join('')+'</tbody></table>';
  return '<table class="pairs"><tbody>'+data.map(x=>'<tr><td>'+esc(x[0])+'</td><td>'+esc(x[1])+'</td></tr>').join('')+'</tbody></table>';
 }
 
@@ -486,7 +453,7 @@ function normativeFactors(r){
   ['Factor anclajes H',factor(k.anchor_multiplier.horizontal)]
  ];
 }
-function detailedEquations(r){
+function detailedEquations(r,hideAnchors=false){
  const k=r.factors,p=r.inputs,n=factor,final=force;
  const c=calculatedCoefficient;
  const calc=[],anchors=[];
@@ -512,6 +479,10 @@ function detailedEquations(r){
   add(calc,'Ex = Ch · W','Ex = '+final(r.structure.Ex));
   add(calc,'Ey = Ch · W','Ey = '+final(r.structure.Ey));
   add(calc,'Ez = Cv · W','Ez = '+final(r.structure.Ez));
+  if(hideAnchors){
+   anchors.push('Ruta §8.5: no implementada para demandas de anclajes.');
+   anchors.push('Ex,a / Ey,a / Ez,a: NO CALCULADO.');
+  }else{
   anchors.push('3.1. Amplificación horizontal ('+(p.anchor==='ductile'?'§7.3.2':'§7.3.3')+')');
   add(anchors,p.anchor==='ductile'?'Factor H = '+n(.7)+' · Rp':'Factor H = Rp',
    'Factor H = '+n(k.anchor_multiplier.horizontal));
@@ -519,6 +490,7 @@ function detailedEquations(r){
   add(anchors,'Ey,a = Factor H · Ey','Ey,a = '+final(r.anchors.Ey));
   anchors.push('3.2. Componente vertical');
   add(anchors,'Ez,a = Ez','Ez,a = '+final(r.anchors.Ez));
+  }
  }else if(r.method==='CNE-Art87'){
   calc.push('2.1. Factores por frecuencia horizontal');
   add(calc,'Kh,X = Kh(fX)','Kh,X = '+n(k.KhX));
@@ -566,8 +538,9 @@ function detailedEquations(r){
  return {calc,anchors};
 }
 
-function buildReports(r,rawInputs,guide=null){
- const d=lineData(r,rawInputs),rows=rowsForces(r),name=caption(r);
+function buildReports(r,rawInputs,guide=null,route=null){
+ const hideAnchors=r.method==='NCh2369:2025-cap7'&&route==='8.5';
+ const d=lineData(r,rawInputs,route),rows=rowsForces(r,hideAnchors),name=caption(r);
  const head='<div class="report-kicker">PHS | INGENIERÍA ESTRUCTURAL</div>'+
    '<h1>FUERZAS SÍSMICAS DE DISEÑO</h1><p>'+esc(name)+'</p><hr>';
  const data=[...d.inputs,...d.factors];
@@ -576,11 +549,12 @@ function buildReports(r,rawInputs,guide=null){
  const basalSoil=is2369&&r.inputs.location==='ground';
  const anchorCriterion='Amplificación de anclajes solo en Ex/Ey; Ez,a = Ez sin amplificación.';
  const basalCriterion='Verificar aplicabilidad de NCh2369 §5.8 para equipos rígidos apoyados en suelo (T < 0,06 s); no implementado.';
- const guideFooter=is2369&&guide?'<p class="report-foot"><strong>Asistente de anclajes (§8.5, informativo):</strong> '+
-   esc(guide.status)+'. '+esc(guide.warning)+' Ruta orientativa: '+esc(guide.routeLabel)+
-   '. Motor: '+esc(guide.calcRoute)+'.</p>':'';
+ const guideFooter=is2369&&guide?'<p class="report-foot"><strong>Asistente de anclajes (declarativo):</strong> '+
+   esc(guide.status)+'. '+esc(guide.warning)+' Selección aplicada: '+esc(guide.selectedLabel)+
+   '. Sugerencia: '+esc(guide.routeLabel)+'.</p>':'';
  const globalHtml=head+'<h2>1. Datos y factores de diseño</h2>'+htmlTable(data)+summary+guideFooter+
-  (is2369?'<p class="report-foot">'+esc(anchorCriterion)+'</p>':'')+
+  (hideAnchors?'<p class="report-foot"><strong>§8.5 no implementado:</strong> no se emiten demandas de anclajes con esta ruta.</p>':'')+
+  (is2369&&!hideAnchors?'<p class="report-foot">'+esc(anchorCriterion)+'</p>':'')+
   (basalSoil?'<p class="report-foot">'+esc(basalCriterion)+'</p>':'')+
   '<p class="report-foot">Magnitudes por dirección. No incluye combinaciones gravitacionales ni verificación resistente de anclajes.</p>';
  const txthead=['PHS | INGENIERÍA ESTRUCTURAL','FUERZAS SÍSMICAS DE DISEÑO',name,'='.repeat(54)];
@@ -588,16 +562,16 @@ function buildReports(r,rawInputs,guide=null){
  const txtresult=['                ESTRUCTURA        ANCLAJES',
   '                  [kgf]            [kgf]',
   '-'.repeat(54),
-  ...rows.map(x=>x[0].padEnd(15)+display(x[1],1).padStart(13)+display(x[2],1).padStart(17))];
- const lines=detailedEquations(r);
+  ...rows.map(x=>x[0].padEnd(15)+display(x[1],1).padStart(13)+(x[2]===null?'NO CALCULADO':display(x[2],1)).padStart(17))];
+ const lines=detailedEquations(r,hideAnchors);
  const guideTxt=is2369&&guide?[
    '5. ASISTENTE DE CLASIFICACIÓN DE ANCLAJES — INFORMATIVO','-'.repeat(54),
    'Estado: '+guide.status,'Ruta orientativa: '+guide.routeLabel,
-   'Motor: '+guide.calcRoute,'Advertencia: '+guide.warning,
+   'Selección aplicada: '+guide.selectedLabel,'Advertencia: '+guide.warning,
    ...guide.answers.map(x=>x[0]+' : '+x[1]),'',
    'Verificaciones declaradas (NO validan resistencias):',
-   ...guide.checks.map(x=>'- '+x.name+' : '+
-     (x.value===true?'Declarado conforme':x.value===false?'No conforme':'No verificado')),
+   ...guide.checks.filter(()=>guide.answers.length>1).map(x=>'- '+x.label+' : '+
+     (x.status===true?'Declarado conforme':x.status===false?'No conforme':'No verificado')),
    ''
  ]:[];
  const textReport=[
@@ -613,7 +587,8 @@ function buildReports(r,rawInputs,guide=null){
   '- Magnitudes positivas por dirección.',
   '- Sin combinaciones ni verificaciones resistentes.',
   '- Cálculo interno sin redondeos intermedios.',
-  ...(is2369?['- '+anchorCriterion]:[]),
+  ...(is2369&&!hideAnchors?['- '+anchorCriterion]:[]),
+  ...(hideAnchors?['- §8.5: anclajes no calculados; no utilizar resultados de §7.3 como sustituto.']:[]),
   ...(basalSoil?['- '+basalCriterion]:[]),
   '='.repeat(54),'PHS | INGENIERÍA ESTRUCTURAL'
  ].join('\n');
@@ -624,39 +599,41 @@ return Object.freeze({buildReports});
 
 </script>
 <script>
-/* PHS Seismic Forces — control de interfaz y exportaciones */
+/* PHS Seismic Forces — interfaz y exportaciones */
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
 const motor=globalThis.PHSSeismicMotor;
 const report=globalThis.PHSSeismicReport;
-const assistant=globalThis.PHSAnchorGuide;
+const guideEngine=globalThis.PHSAnchorGuide;
 let active=null,reports=null;
 const display=(n,d=1)=>new Intl.NumberFormat(undefined,{minimumFractionDigits:d,maximumFractionDigits:d,useGrouping:false}).format(n);
 const num=id=>$(id).value.trim()===''?NaN:Number($(id).value);
-function readGuide(){
- const v=id=>$(id).value;
- return assistant.evaluate({
-  material:v('anchorMat'),detail:v('anchorDetail'),diameter_mm:v('anchorDiameter'),
-  free_mm:v('anchorFree'),thread_mm:v('anchorThread'),detailException:v('anchorDetailException'),
-  shear:v('anchorShear'),noFriction:v('anchorNoFriction'),capacity:v('anchorCapacity'),
-  concrete:v('anchorConcrete'),baseType:v('anchorBaseType'),fixedMoment:v('anchorFixedMoment')
- },v('duct'));
+function guide(){
+ const value=id=>$(id).value;
+ return guideEngine.evaluate({
+  material:value('anchorMat'),detail:value('anchorDetail'),shear:value('anchorShear'),
+  friction:value('anchorFriction'),capacity:value('anchorCapacity'),foundation:value('anchorFoundation')
+ },value('duct'));
 }
 function read(){
- const standard=$('norm').value;
- const W=num('w');
+ const standard=$('norm').value,W=num('w');
  if(standard==='2369'){
-   return motor.calculate2369({weight_kgf:W,category:$('cat').value,zone:$('zone').value,soil:$('soil').value,
-     equipment:$('equipment').value,anchor:$('duct').value,location:$('loc2369').value,height_m:num('height'),level_m:num('zk')});
+  const route=$('duct').value;
+  // Para §8.5 se mantiene la clasificación dúctil para la fuerza del equipo.
+  // Las demandas de anclajes del §7.3.2 calculadas internamente NO se reportan.
+  const anchor=route==='7.3.3'?'nonductile':'ductile';
+  if(!['8.5','7.3.2','7.3.3'].includes(route))throw new RangeError('Ruta de anclaje no válida');
+  return motor.calculate2369({weight_kgf:W,category:$('cat').value,zone:$('zone').value,soil:$('soil').value,
+   equipment:$('equipment').value,anchor,location:$('loc2369').value,height_m:num('height'),level_m:num('zk')});
  }
  if(standard==='87')return motor.calculate87({weight_kgf:W,fx:num('fx'),fy:num('fy'),location:$('loc87').value});
  return motor.calculate88({weight_kgf:W,vertical:$('vertical').value,location:$('loc88').value});
 }
 function localizeStaticNumbers(){
  document.querySelectorAll('[data-local-number]').forEach(el=>{
-   if(el.dataset&&Object.prototype.hasOwnProperty.call(el.dataset,'localNumber'))
-     el.textContent=display(Number(el.dataset.localNumber),Number(el.dataset.decimals||0));
+  if(el.dataset&&Object.prototype.hasOwnProperty.call(el.dataset,'localNumber'))
+   el.textContent=display(Number(el.dataset.localNumber),Number(el.dataset.decimals||0));
  });
 }
 function updateVisibility(){
@@ -664,10 +641,7 @@ function updateVisibility(){
  for(const v of ['2369','87','88'])$('block'+v).hidden=n!==v;
  $('heightGroup').hidden=$('loc2369').value!=='elevated';
  $('scope58Note').hidden=n!=='2369'||$('loc2369').value!=='ground';
- const detail=$('anchorDetail').value;
- $('anchorGeometryGroup').hidden=detail!=='saddle'&&detail!=='replaceable';
- $('anchorDetailExceptionGroup').hidden=detail!=='exception';
- $('anchorFixedMomentGroup').hidden=$('anchorBaseType').value!=='fixed';
+ $('anchorChecks').hidden=$('anchorMat').value!=='ductile';
 }
 function refreshReports(){
  if(!reports)return;
@@ -676,22 +650,27 @@ function refreshReports(){
 }
 function render(){
  updateVisibility();
- const guide=readGuide();
- $('anchorGuideStatus').textContent=guide.status+'. '+guide.warning+
-  ' Motor: '+guide.calcRoute+'.';
+ const g=guide();
+ $('anchorGuideStatus').textContent=g.status+'. '+g.warning+
+  (g.canApply?' Sugerencia: '+g.routeLabel+'.':'');
+ $('anchorApply').disabled=!g.canApply;
  try{
-   const r=read();active=r;reports=report.buildReports(r,{
-     w:$('w').value,height:$('height').value,zk:$('zk').value,
-     fx:$('fx').value,fy:$('fy').value
-   },$('norm').value==='2369'?guide:null);
-   $('status').textContent='Cálculo actualizado';$('status').className='status valid';
-   $('pdfButton').disabled=false;$('txtButton').disabled=false;
-   refreshReports();
+  const r=read();active=r;
+  const route=$('norm').value==='2369'?$('duct').value:null;
+  reports=report.buildReports(r,{
+    w:$('w').value,height:$('height').value,zk:$('zk').value,
+    fx:$('fx').value,fy:$('fy').value
+  },route?g:null,route);
+  $('status').textContent=route==='8.5'?
+   'Fuerzas del equipo calculadas. Anclajes §8.5: no calculados.':'Cálculo actualizado';
+  $('status').className=route==='8.5'?'status caution':'status valid';
+  $('pdfButton').disabled=false;$('txtButton').disabled=false;
+  refreshReports();
  }catch(e){
-   active=null;reports=null;$('status').textContent=e.message;$('status').className='status invalid';
-   $('globalReport').innerHTML='<p class="empty">Ingresa los datos necesarios para calcular.</p>';
-   $('txtPreview').textContent='Sin resultados disponibles.';
-   $('pdfButton').disabled=true;$('txtButton').disabled=true;
+  active=null;reports=null;$('status').textContent=e.message;$('status').className='status invalid';
+  $('globalReport').innerHTML='<p class="empty">Ingresa los datos necesarios para calcular.</p>';
+  $('txtPreview').textContent='Sin resultados disponibles.';
+  $('pdfButton').disabled=true;$('txtButton').disabled=true;
  }
 }
 function saveTxt(){
@@ -704,6 +683,13 @@ function saveTxt(){
 }
 $('pdfButton').addEventListener('click',()=>{if(active)window.print()});
 $('txtButton').addEventListener('click',saveTxt);
+$('anchorApply').addEventListener('click',()=>{
+ const g=guide();
+ if(!g.canApply)return;
+ $('duct').value=g.route;
+ $('anchorWizard').open=false;
+ render();
+});
 document.querySelectorAll('input,select').forEach(el=>{
  el.addEventListener('input',render);el.addEventListener('change',render);
 });

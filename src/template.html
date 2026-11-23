@@ -33,6 +33,12 @@ details summary{font-size:12px;font-weight:650;color:#24577f;cursor:pointer}deta
 .reference-block{margin-top:18px;padding:12px;border:1px solid #d5e1eb;border-radius:8px;background:#f9fbfd}
 .reference-block h3{margin:0 0 8px}.reference-block table{margin-top:10px}
 .reference-block tr.applied td{background:#e9f2fb;font-weight:700;color:#153f62}
+.anchor-route-list{height:auto;min-height:131px;padding:5px;overflow:hidden}
+.anchor-route-list option{white-space:normal;padding:10px 9px;border-radius:5px;line-height:1.4}
+.anchor-route-list option:checked{background:linear-gradient(#d9eaf8,#d9eaf8);color:#133c63;font-weight:700}
+#anchorWizard .field small{margin:6px 0 8px}
+#anchorApply{width:100%;margin-top:8px}
+.status.caution{background:#fff4df;color:#745116}
 #globalReport{margin-top:12px}
 .result-card{min-width:0}
 [hidden]{display:none!important}
@@ -72,66 +78,49 @@ details summary{font-size:12px;font-weight:650;color:#24577f;cursor:pointer}deta
 <option value="secondary-nonductile">Elemento secundario con componentes no dúctiles</option>
 <option value="other-specified">Otro equipo no especificado</option>
 </select></div>
-<div class="field"><label for="duct">Supuesto de cálculo del anclaje (§7.3)</label><select id="duct">
-<option value="ductile">Material dúctil sin acreditar §8.5 — §7.3.2</option>
-<option value="nonductile">Material no dúctil — §7.3.3</option>
-</select><small>Controla las fuerzas. El asistente verifica coherencia documental sin cambiar automáticamente la ruta.</small></div>
+<div class="field"><label for="duct">Clasificación del sistema de anclaje</label>
+<select id="duct" class="anchor-route-list" size="3">
+<option value="8.5">Sistema dúctil que cumple §8.5</option>
+<option value="7.3.2" selected>Sistema de materiales dúctiles que no cumple §8.5</option>
+<option value="7.3.3">Sistema de materiales no dúctiles</option>
+</select><small>La selección define la ruta. §8.5 no dispone de cálculo de anclajes en esta versión.</small></div>
 
 <div id="anchorAssistantWrap" class="reference-block">
  <details id="anchorWizard">
-  <summary>Asistente de clasificación de anclajes — §§8.2 y 8.5</summary>
-  <p class="muted">Ayuda de clasificación. La ruta calculada se elige arriba. No constituye diseño resistente ni certifica cumplimiento de §8.5.</p>
-  <h3>1. Material — §8.2.3</h3>
-  <div class="field"><label for="anchorMat">Alargamiento de rotura certificado (probeta 50 mm)</label><select id="anchorMat">
+  <summary>Asistente de clasificación — revisar §8.5</summary>
+  <p class="muted">Responde con antecedentes verificables. «Cumple» es una declaración del ingeniero y no una certificación automática.</p>
+  <h3>1. Material de los pernos — §8.2.3</h3>
+  <div class="field"><label for="anchorMat">Alargamiento de rotura certificado (probeta 50 mm)</label>
+  <select id="anchorMat">
    <option value="unknown" selected>No verificado</option>
-   <option value="ductile">≥20 % — material dúctil</option>
-   <option value="limited">≥14 % y &lt;20 % — no dúctil</option>
-   <option value="invalid">&lt;14 % — bajo mínimo general</option>
-  </select><small>El grado nominal del acero no reemplaza la verificación de sus propiedades exigidas.</small></div>
-  <h3>2. Detallamiento — §8.5.2</h3>
-  <div class="field"><label for="anchorDetail">Tipo de detalle</label><select id="anchorDetail">
-   <option value="unknown" selected>No verificado</option>
-   <option value="saddle">Con silla, inspeccionable y reparable</option>
-   <option value="replaceable">Reemplazable sin silla, con tramo libre equivalente</option>
-   <option value="exception">Excepción de detallamiento por diseño amplificado</option>
-   <option value="no">No satisface detallamiento §8.5.2</option>
-  </select></div>
-  <div id="anchorGeometryGroup" hidden>
-   <div class="cols">
-    <div class="field"><label for="anchorDiameter">Diámetro d [mm]</label><input id="anchorDiameter" type="number" min="0" step="any" placeholder="d"></div>
-    <div class="field"><label for="anchorFree">Longitud expuesta o libre [mm]</label><input id="anchorFree" type="number" min="0" step="any" placeholder="L"></div>
-    <div class="field"><label for="anchorThread">Longitud de hilo bajo la tuerca [mm]</label><input id="anchorThread" type="number" min="0" step="any" placeholder="Hilo"></div>
-   </div>
-   <p class="muted">Geometría: L ≥ máx(250 mm, 8d), hilo ≥75 mm. No prueba capacidad ni reemplazabilidad efectiva.</p>
+   <option value="ductile">Dúctil — alargamiento ≥20 %</option>
+   <option value="nonductile">No dúctil — 14 % ≤ alargamiento &lt;20 %</option>
+   <option value="invalid">Bajo mínimo general — alargamiento &lt;14 %</option>
+  </select><small>La denominación comercial del acero no acredita por sí sola su alargamiento.</small></div>
+  <div id="anchorChecks" hidden>
+   <h3>2. Requisitos de §8.5 para materiales dúctiles</h3>
+   <p class="muted">Selecciona Cumple, No cumple o No verificado en cada condición.</p>
+   <div class="field"><label for="anchorDetail">1. Detallamiento y reparación — §8.5.2</label>
+    <small>Silla con vástago inspeccionable/reparable, perno reemplazable equivalente o excepción justificada. Para el detalle convencional: longitud expuesta ≥ máx(250 mm, 8d), hilo bajo tuerca ≥75 mm.</small>
+    <select id="anchorDetail"><option value="unknown" selected>No verificado</option><option value="yes">Cumple</option><option value="no">No cumple</option></select></div>
+   <div class="field"><label for="anchorShear">2. Transferencia de corte — §8.5.3</label>
+    <small>Llave de corte, tope sísmico o excepción normativa debidamente comprobada.</small>
+    <select id="anchorShear"><option value="unknown" selected>No verificado</option><option value="yes">Cumple</option><option value="no">No cumple</option></select></div>
+   <div class="field"><label for="anchorFriction">3. Grout y fricción — §8.5.4</label>
+    <small>No considerar las contribuciones prohibidas del grout ni la fricción placa–hormigón para diseñar llaves o topes.</small>
+    <select id="anchorFriction"><option value="unknown" selected>No verificado</option><option value="yes">Cumple</option><option value="no">No cumple</option></select></div>
+   <div class="field"><label for="anchorCapacity">4. Diseño por capacidad</label>
+    <small>Placas, soldaduras, rigidizadores y otros componentes no fusibles dimensionados para el mecanismo previsto; revisar el caso de bases empotradas.</small>
+    <select id="anchorCapacity"><option value="unknown" selected>No verificado</option><option value="yes">Cumple</option><option value="no">No cumple</option></select></div>
+   <div class="field"><label for="anchorFoundation">5. Pedestal y fundación — §8.5.5</label>
+    <small>Transferencia de esfuerzos y revisión del hormigón y armaduras según cláusula 9.</small>
+    <select id="anchorFoundation"><option value="unknown" selected>No verificado</option><option value="yes">Cumple</option><option value="no">No cumple</option></select></div>
   </div>
-  <div id="anchorDetailExceptionGroup" hidden>
-   <div class="field"><label for="anchorDetailException">¿Se justificó en tracción con §4.5 y acción horizontal amplificada por 0,7R₁ ≥ 1?</label>
-    <select id="anchorDetailException"><option value="unknown" selected>No verificado</option><option value="yes">Sí, con respaldo externo</option><option value="no">No</option></select>
-   </div>
-  </div>
-  <h3>3. Transferencia de corte — §§8.5.3–8.5.4</h3>
-  <div class="field"><label for="anchorShear">Mecanismo de corte</label><select id="anchorShear">
-   <option value="unknown" selected>No verificado</option>
-   <option value="key">Llave de corte o tope diseñado para el corte total</option>
-   <option value="exception">Excepción §8.5.3 justificada externamente</option>
-   <option value="no">Sin mecanismo ni excepción justificada</option>
-  </select><small>Las excepciones requieren verificar número de pernos activos, corte e interacción con tracción.</small></div>
-  <div class="field"><label for="anchorNoFriction">¿Se excluyó la resistencia del grout y el roce placa-hormigón?</label>
-   <select id="anchorNoFriction"><option value="unknown" selected>No verificado</option><option value="yes">Sí</option><option value="no">No</option></select></div>
-  <h3>4. Componentes no fusibles y fundación</h3>
-  <div class="field"><label for="anchorCapacity">¿Componentes no fusibles con capacidad suficiente para desarrollar el mecanismo previsto?</label>
-   <select id="anchorCapacity"><option value="unknown" selected>No verificado</option><option value="yes">Sí, verificado externamente</option><option value="no">No</option></select></div>
-  <div class="field"><label for="anchorConcrete">¿Pedestal y zonas de fundación conforme a cláusula 9 (§8.5.5)?</label>
-   <select id="anchorConcrete"><option value="unknown" selected>No verificado</option><option value="yes">Sí, verificado externamente</option><option value="no">No</option></select></div>
-  <div class="field"><label for="anchorBaseType">¿Es una base de columna empotrada?</label>
-   <select id="anchorBaseType"><option value="unknown" selected>No verificado</option><option value="other">No</option><option value="fixed">Sí</option></select></div>
-  <div id="anchorFixedMomentGroup" hidden>
-   <div class="field"><label for="anchorFixedMoment">¿Se justificó el momento mínimo del 50 % de la capacidad flexural esperada de la columna?</label>
-    <select id="anchorFixedMoment"><option value="unknown" selected>No verificado</option><option value="yes">Sí, verificado externamente</option><option value="no">No</option></select></div>
-  </div>
-  <p class="muted">Cada «Sí» es una declaración del ingeniero. El asistente no revisa memorias externas ni verifica resistencias.</p>
+  <div class="rule"></div>
+  <p id="anchorGuideStatus" class="muted" aria-live="polite">Clasificación pendiente.</p>
+  <button type="button" id="anchorApply" class="secondary" disabled>Aplicar clasificación sugerida</button>
+  <p class="muted">Al aplicar la clasificación se actualizará el selector principal. La ruta §8.5 solo calcula fuerzas del equipo; no entrega demanda de anclajes.</p>
  </details>
- <p id="anchorGuideStatus" class="muted" aria-live="polite">Clasificación pendiente. El motor utiliza el supuesto seleccionado.</p>
 </div>
 <h3>Ubicación y altura</h3>
 <div class="field"><label for="loc2369">Condición de instalación</label><select id="loc2369">

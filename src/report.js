@@ -21,13 +21,13 @@ function inputValue(id,rawInputs){
    return raw.replace('.',decimalSeparator);
  return factor(Number(raw)); // Para notación exponencial válida en input[type=number]
 }
-function lineData(r,rawInputs){
+function lineData(r,rawInputs,route=null){
  const a=[['Peso sísmico',inputValue('w',rawInputs)+' kgf']],f=[];
  if(r.method==='NCh2369:2025-cap7'){
   const p=r.inputs,k=r.factors;
   a.push(['Categoría',p.category],['Zona sísmica',String(p.zone)],['Suelo',p.soil],
    ['Clasificación equipo',({'electrical-mechanical':'Equipo eléctrico/mecánico','secondary-ductile':'Elemento secundario con componentes dúctiles','secondary-nonductile':'Elemento secundario no dúctil','other-specified':'Otro no especificado'})[p.equipment]],
-   ['Sistema de anclaje',p.anchor==='ductile'?'Dúctil (§7.3.2)':'No dúctil (§7.3.3)'],
+   ['Sistema de anclaje',route==='8.5'?'Sistema dúctil que cumple §8.5 (anclajes no calculados)':route==='7.3.2'?'Materiales dúctiles, no cumple §8.5 (§7.3.2)':route==='7.3.3'?'Materiales no dúctiles (§7.3.3)':p.anchor==='ductile'?'Dúctil (§7.3.2)':'No dúctil (§7.3.3)'],
    ['Ubicación',place(p.location)]);
   if(p.location==='elevated')
    a.push(['Altura H',inputValue('height',rawInputs)+' m'],['Nivel Zk',inputValue('zk',rawInputs)+' m']);
@@ -45,12 +45,12 @@ function lineData(r,rawInputs){
  }
  return {inputs:a,factors:f};
 }
-function rowsForces(r){
- return [['Ex',r.structure.Ex,r.anchors.Ex],['Ey',r.structure.Ey,r.anchors.Ey],['Ez',r.structure.Ez,r.anchors.Ez]];
+function rowsForces(r,hideAnchors=false){
+ return [['Ex',r.structure.Ex,hideAnchors?null:r.anchors.Ex],['Ey',r.structure.Ey,hideAnchors?null:r.anchors.Ey],['Ez',r.structure.Ez,hideAnchors?null:r.anchors.Ez]];
 }
 function htmlTable(data,forceMode=false){
  if(forceMode)return '<table><thead><tr><th>Acción</th><th>Estructura (kgf)</th><th>Anclajes (kgf)</th></tr></thead><tbody>'+
- data.map(x=>'<tr><td>'+esc(x[0])+'</td><td>'+display(x[1],1)+'</td><td>'+display(x[2],1)+'</td></tr>').join('')+'</tbody></table>';
+ data.map(x=>'<tr><td>'+esc(x[0])+'</td><td>'+display(x[1],1)+'</td><td>'+(x[2]===null?'NO CALCULADO':display(x[2],1))+'</td></tr>').join('')+'</tbody></table>';
  return '<table class="pairs"><tbody>'+data.map(x=>'<tr><td>'+esc(x[0])+'</td><td>'+esc(x[1])+'</td></tr>').join('')+'</tbody></table>';
 }
 
@@ -84,7 +84,7 @@ function normativeFactors(r){
   ['Factor anclajes H',factor(k.anchor_multiplier.horizontal)]
  ];
 }
-function detailedEquations(r){
+function detailedEquations(r,hideAnchors=false){
  const k=r.factors,p=r.inputs,n=factor,final=force;
  const c=calculatedCoefficient;
  const calc=[],anchors=[];
@@ -110,6 +110,10 @@ function detailedEquations(r){
   add(calc,'Ex = Ch · W','Ex = '+final(r.structure.Ex));
   add(calc,'Ey = Ch · W','Ey = '+final(r.structure.Ey));
   add(calc,'Ez = Cv · W','Ez = '+final(r.structure.Ez));
+  if(hideAnchors){
+   anchors.push('Ruta §8.5: no implementada para demandas de anclajes.');
+   anchors.push('Ex,a / Ey,a / Ez,a: NO CALCULADO.');
+  }else{
   anchors.push('3.1. Amplificación horizontal ('+(p.anchor==='ductile'?'§7.3.2':'§7.3.3')+')');
   add(anchors,p.anchor==='ductile'?'Factor H = '+n(.7)+' · Rp':'Factor H = Rp',
    'Factor H = '+n(k.anchor_multiplier.horizontal));
@@ -117,6 +121,7 @@ function detailedEquations(r){
   add(anchors,'Ey,a = Factor H · Ey','Ey,a = '+final(r.anchors.Ey));
   anchors.push('3.2. Componente vertical');
   add(anchors,'Ez,a = Ez','Ez,a = '+final(r.anchors.Ez));
+  }
  }else if(r.method==='CNE-Art87'){
   calc.push('2.1. Factores por frecuencia horizontal');
   add(calc,'Kh,X = Kh(fX)','Kh,X = '+n(k.KhX));
@@ -164,8 +169,9 @@ function detailedEquations(r){
  return {calc,anchors};
 }
 
-function buildReports(r,rawInputs,guide=null){
- const d=lineData(r,rawInputs),rows=rowsForces(r),name=caption(r);
+function buildReports(r,rawInputs,guide=null,route=null){
+ const hideAnchors=r.method==='NCh2369:2025-cap7'&&route==='8.5';
+ const d=lineData(r,rawInputs,route),rows=rowsForces(r,hideAnchors),name=caption(r);
  const head='<div class="report-kicker">PHS | INGENIERÍA ESTRUCTURAL</div>'+
    '<h1>FUERZAS SÍSMICAS DE DISEÑO</h1><p>'+esc(name)+'</p><hr>';
  const data=[...d.inputs,...d.factors];
@@ -174,11 +180,12 @@ function buildReports(r,rawInputs,guide=null){
  const basalSoil=is2369&&r.inputs.location==='ground';
  const anchorCriterion='Amplificación de anclajes solo en Ex/Ey; Ez,a = Ez sin amplificación.';
  const basalCriterion='Verificar aplicabilidad de NCh2369 §5.8 para equipos rígidos apoyados en suelo (T < 0,06 s); no implementado.';
- const guideFooter=is2369&&guide?'<p class="report-foot"><strong>Asistente de anclajes (§8.5, informativo):</strong> '+
-   esc(guide.status)+'. '+esc(guide.warning)+' Ruta orientativa: '+esc(guide.routeLabel)+
-   '. Motor: '+esc(guide.calcRoute)+'.</p>':'';
+ const guideFooter=is2369&&guide?'<p class="report-foot"><strong>Asistente de anclajes (declarativo):</strong> '+
+   esc(guide.status)+'. '+esc(guide.warning)+' Selección aplicada: '+esc(guide.selectedLabel)+
+   '. Sugerencia: '+esc(guide.routeLabel)+'.</p>':'';
  const globalHtml=head+'<h2>1. Datos y factores de diseño</h2>'+htmlTable(data)+summary+guideFooter+
-  (is2369?'<p class="report-foot">'+esc(anchorCriterion)+'</p>':'')+
+  (hideAnchors?'<p class="report-foot"><strong>§8.5 no implementado:</strong> no se emiten demandas de anclajes con esta ruta.</p>':'')+
+  (is2369&&!hideAnchors?'<p class="report-foot">'+esc(anchorCriterion)+'</p>':'')+
   (basalSoil?'<p class="report-foot">'+esc(basalCriterion)+'</p>':'')+
   '<p class="report-foot">Magnitudes por dirección. No incluye combinaciones gravitacionales ni verificación resistente de anclajes.</p>';
  const txthead=['PHS | INGENIERÍA ESTRUCTURAL','FUERZAS SÍSMICAS DE DISEÑO',name,'='.repeat(54)];
@@ -186,16 +193,16 @@ function buildReports(r,rawInputs,guide=null){
  const txtresult=['                ESTRUCTURA        ANCLAJES',
   '                  [kgf]            [kgf]',
   '-'.repeat(54),
-  ...rows.map(x=>x[0].padEnd(15)+display(x[1],1).padStart(13)+display(x[2],1).padStart(17))];
- const lines=detailedEquations(r);
+  ...rows.map(x=>x[0].padEnd(15)+display(x[1],1).padStart(13)+(x[2]===null?'NO CALCULADO':display(x[2],1)).padStart(17))];
+ const lines=detailedEquations(r,hideAnchors);
  const guideTxt=is2369&&guide?[
    '5. ASISTENTE DE CLASIFICACIÓN DE ANCLAJES — INFORMATIVO','-'.repeat(54),
    'Estado: '+guide.status,'Ruta orientativa: '+guide.routeLabel,
-   'Motor: '+guide.calcRoute,'Advertencia: '+guide.warning,
+   'Selección aplicada: '+guide.selectedLabel,'Advertencia: '+guide.warning,
    ...guide.answers.map(x=>x[0]+' : '+x[1]),'',
    'Verificaciones declaradas (NO validan resistencias):',
-   ...guide.checks.map(x=>'- '+x.name+' : '+
-     (x.value===true?'Declarado conforme':x.value===false?'No conforme':'No verificado')),
+   ...guide.checks.filter(()=>guide.answers.length>1).map(x=>'- '+x.label+' : '+
+     (x.status===true?'Declarado conforme':x.status===false?'No conforme':'No verificado')),
    ''
  ]:[];
  const textReport=[
@@ -211,7 +218,8 @@ function buildReports(r,rawInputs,guide=null){
   '- Magnitudes positivas por dirección.',
   '- Sin combinaciones ni verificaciones resistentes.',
   '- Cálculo interno sin redondeos intermedios.',
-  ...(is2369?['- '+anchorCriterion]:[]),
+  ...(is2369&&!hideAnchors?['- '+anchorCriterion]:[]),
+  ...(hideAnchors?['- §8.5: anclajes no calculados; no utilizar resultados de §7.3 como sustituto.']:[]),
   ...(basalSoil?['- '+basalCriterion]:[]),
   '='.repeat(54),'PHS | INGENIERÍA ESTRUCTURAL'
  ].join('\n');

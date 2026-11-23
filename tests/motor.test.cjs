@@ -23,8 +23,20 @@ test('2369 factores suelo y clasificación',()=>{
  near(m.classifyRp('secondary-nonductile','ductile'),1.5);
 });
 test('2369 alturas fuera de rango',()=>{
- for(const o of [{location:'elevated',height_m:0,level_m:1},{location:'elevated',height_m:2,level_m:0},{location:'elevated',height_m:2,level_m:3}])
+ for(const o of [{location:'elevated',height_m:0,level_m:1},{location:'elevated',height_m:2,level_m:3}])
  assert.throws(()=>m.calculate2369(n(o)),RangeError);
+});
+test('2369 permite Zk=0 con H>0',()=>{
+ const r=m.calculate2369(n({location:'elevated',height_m:8,level_m:0}));
+ near(r.factors.ak_over_g,1.2*.42*1.05);
+ near(r.inputs.level_m,0);
+});
+test('Art87 aplica IE=1 fijo de Tabla 4',()=>{
+ for(const IE of [undefined,0,0.8,1.5]){
+  const r=m.calculate87(a({IE}));
+  near(r.factors.IE,1);
+  near(r.anchors.Ex,750);
+ }
 });
 test('Art87 caso A basal',()=>{
  const r=m.calculate87(a());near(r.anchors.Ex,750);near(r.anchors.Ey,750);near(r.anchors.Ez,360);
@@ -61,9 +73,10 @@ test('Invalidaciones',()=>{
  for(const fn of [
  ()=>m.calculate2369(n({weight_kgf:0})),
  ()=>m.calculate2369(n({location:'unsupported'})),
- ()=>m.calculate87(a({IE:0})),
+ ()=>m.calculate87(a({fx:0})),
  ()=>m.calculate87(a({weight_kgf:Infinity})),
  ()=>m.calculate88(b({vertical:'unknown'})),
+ ()=>m.calculate88(b({vertical:''})),
  ()=>m.calculate88(b({location:'special'}))
  ])assert.throws(fn,RangeError);
 });

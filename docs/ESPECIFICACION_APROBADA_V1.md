@@ -155,3 +155,13 @@
 - Este es un límite de presentación, **no de precisión de cálculo**. El motor conserva todos sus valores internos y los reportes no recalculan fuerzas con coeficientes redondeados. Se acepta que al multiplicar manualmente un coeficiente visible por W se obtenga una fuerza ligeramente distinta de la fuerza final presentada.
 - Separador decimal según configuración regional del navegador, sin separador de miles.
 - Se mantiene el esquema fórmula simbólica seguida inmediatamente por su resultado; sin sustituciones numéricas. El PDF y el resumen en pantalla no cambian.
+
+## FS-07 — Ajustes confirmados 2026-11-23
+
+Estos criterios posteriores prevalecen sobre las disposiciones anteriores que los contradigan:
+
+1. **Art. 87:** el factor de importancia `IE=1` es fijo para el equipo eléctrico general (Tabla 4). El usuario no lo edita; el motor ignora cualquier `IE` recibido externamente. Se muestra como factor normativo en pantalla y en TXT.
+2. **Art. 87:** las entradas `fX` y `fY` gobiernan sus factores horizontales independientes; `Kv=1` permanece fijo. La exigencia de frecuencia equivalente de al menos 20 Hz en cualquier dirección se verifica externamente como condición de aplicabilidad. No se incorpora `fZ` como parámetro de cálculo ni se bloquea por un valor vertical no ingresado.
+3. **Art. 88:** el comportamiento vertical V1/V2 no tiene opción predeterminada; debe elegirse antes de calcular o exportar.
+4. **NCh2369 §7.2.3:** para ubicación elevada y `H>0`, permitir `0<=Zk<=H`. `Zk=0` representa apoyo en nivel basal aunque exista una estructura superior. En las ubicaciones basales el programa mantiene `Zk=0` implícito y no solicita H.
+5. **Presentación:** conservar hasta tres decimales en coeficientes calculados del TXT, un decimal en kgf para fuerzas, y precisión completa en el motor.

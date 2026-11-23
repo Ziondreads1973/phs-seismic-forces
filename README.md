@@ -1,63 +1,34 @@
-# PHS | Fuerzas sísmicas de diseño
+# PHS Seismic Forces
 
-Aplicación independiente para calcular **fuerzas sísmicas globales de equipos/estructuras y demandas para anclajes**, de acuerdo con los procedimientos simplificados definidos en el proyecto.
+Calculadora autónoma de fuerzas sísmicas globales para equipos/elementos y demandas de anclajes. Tres rutas: **NCh2369:2025 capítulo 7**, **Anexo Técnico CNE artículo 87** y **artículo 88**.
 
-## Estado
+## Ejecución
+Abrir **`dist/PHS Seismic Forces.html`** en un navegador moderno; funciona offline y no requiere instalar dependencias.
 
-**Versión candidata funcional (integración FS-01 a FS-05 en main).** El HTML implementa el alcance acordado; para liberar una versión 1.0.0 estable quedan por ejecutar las pruebas locales completas con Node y una inspección visual de los PDF A4 generados por navegador.
-
-Los 48 criterios aprobados se encuentran en [docs/ESPECIFICACION_APROBADA_V1.md](docs/ESPECIFICACION_APROBADA_V1.md). Ese documento prevalece sobre la documentación histórica v0.5.
-
-## Uso
-
-Abrir **`index.html`** directamente en un navegador moderno. No requiere instalar paquetes, ejecutar servidores ni disponer de internet.
-
-Permite calcular:
-- **NCh2369:2025 capítulo 7:** método simplificado sin análisis de la estructura principal, clasificación automática de `Rp`, fuerzas horizontales y verticales y amplificación de anclajes. No incluye §5.8.
-- **Anexo Técnico CNE artículo 87:** banco de baterías estacionarias sobre soporte, método Art. 38, IE=1 fijo conforme a Tabla 4, frecuencias equivalentes horizontales `fX`/`fY` y factores propios de anclajes.
-- **Anexo Técnico CNE artículo 88:** celdas metálicas autosoportadas, método Art. 39, IE=1 y R=1 para la celda, A0=0,50g, amortiguamiento 2 %, modelos verticales V1/V2 con selección obligatoria (sin valor predeterminado) y ubicación.
-- Instalación basal, sala modular con apoyo basal equivalente y ubicaciones adicionales expresamente consideradas por cada procedimiento.
-
-**Interpretación adoptada para el artículo 87 (FS-08):** la expresión «en cualquier dirección» se aplica a las direcciones de rigidez lateral X e Y, conforme a la definición de Frecuencia Equivalente del artículo 122.4.iii. Se requiere `fX>=20 Hz` y `fY>=20 Hz`; `KhX` y `KhY` se asignan por eje, `Kv=1` y no se solicita ni verifica `fZ`. Es una interpretación técnica del proyecto, no una aclaración expresa de la CNE. Referencia: [Anexo Técnico CNE, arts. 87 y 122.4.iii](https://www.cne.cl/wp-content/uploads/2025/01/AT-Requisitos-Sismo.pdf).
-
-Los resultados son magnitudes por dirección `Ex`, `Ey` y `Ez`, separadas para estructura/equipo y anclajes. **No son reacciones individuales por perno, combinaciones de carga ni verificaciones resistentes.**
-
-## Reportes
-
-**Formato numérico:** el separador decimal sigue la configuración regional del navegador, **sin separador de miles**. Las entradas conservan los decimales efectivamente ingresados (por ejemplo, 25 Hz no se presenta como 25,00 Hz); los factores normativos automáticos se muestran sin ceros decimales superfluos y las fuerzas finales con **un decimal fijo en kgf**. Los cálculos internos conservan precisión completa.
-
-Se exportan **únicamente PDF global y TXT detallado**, sin selectores de nivel:
-- **Pantalla y PDF global:** exactamente el mismo bloque, compuesto solo por datos de entrada, factores normativos esenciales y fuerzas Ex/Ey/Ez para equipo/estructura y anclajes. El PDF lo imprime en A4.
-- **TXT detallado:** datos de entrada y parámetros normativos; ecuación simbólica inmediatamente seguida de su resultado, coeficientes intermedios relevantes y tabla final de fuerzas para los tres procedimientos. **No incluye sustituciones numéricas.** Los coeficientes calculados se presentan **con un máximo de 3 decimales y sin ceros finales innecesarios**, independientemente del peso. Este redondeo afecta únicamente al reporte, no al motor; por ello, las fuerzas finales pueden diferir ligeramente de recalcular con los coeficientes visibles. UTF-8, archivo `*_detallado.txt`. No incorpora verificaciones resistentes ni combinaciones de carga.
-- **Artículo 88:** Tabla 4 de IE/R visible como referencia, con la fila del equipo eléctrico destacada. No modifica el R del equipo calculado.
-
-No hay salida JSON, Excel ni integración con PHS Anchor Design.
-
-## Arquitectura
-
-- `src/motor.js`: motor de cálculo puro con tres procedimientos.
-- `src/ui.js`: interfaz, validaciones de presentación y reportes.
-- `src/template.html`: diseño de pantalla y reporte.
-- `scripts/build.cjs`: genera `index.html` autónomo, incrustando los dos módulos.
-- `tests/motor.test.cjs`: pruebas de referencia, frecuencia límite y entradas inválidas.
-- `tests/ui.test.cjs`: pruebas de comportamiento HTML y reportes simulados.
-- `tests/smoke_dom.cjs`: verificación básica del HTML entregable.
-- `reference/` y documentación `schema/`, `examples/`, `docs/GUIA_COMPLETA.md`: **histórico de v0.5**. No forman parte del producto actual ni habilitan salida JSON.
-
-## Comandos locales (Node.js, sin dependencias externas)
+## Compilación y validación
+Requiere Python 3 para generar el entregable y Node.js únicamente para ejecutar la suite automatizada:
 
 ```powershell
-node scripts/build.cjs
+py tools/build.py
+py tools/build.py --check
 node --test tests/*.test.cjs
 node tests/smoke_dom.cjs
-Start-Process (Resolve-Path ".\index.html")
+Start-Process ".\\dist\\PHS Seismic Forces.html"
 ```
 
-Las pruebas numéricas automatizadas verifican los resultados de referencia acordados. La inspección de paginación y aspecto del PDF mediante el navegador es un control adicional **necesario para cerrar la versión estable**.
+**Fuente de verdad:** `src/motor.js` (cálculo), `src/report.js` (presentación y reportes), `src/ui.js` (interfaz), `src/template.html` (estructura visual). El compilador **reemplaza tres marcadores una sola vez** y genera el archivo listo para entregar. `--check` detecta modificaciones manuales o un `dist` desactualizado.
 
-## Restricciones
+## Alcance
+- NCh2369:2025: método simplificado del capítulo 7, sin análisis de edificio; coeficientes y fuerzas X/Y/Z para equipo y anclajes. Para apoyo basal `Zk=0`; al seleccionar «Estructura elevada» aparecen `H` y `Zk` (se admite `0<=Zk<=H`, `H>0`).
+- Art. 87: banco de baterías sobre soporte; `IE=1` por Tabla 4. `fX` y `fY` fijan `KhX` y `KhY`; `Kv=1`. La decisión de **no solicitar frecuencia vertical** es una interpretación de ingeniería documentada en [HIPOTESIS.md](docs/HIPOTESIS.md).
+- Art. 88: celda metálica autosoportada; `IE=R=1`, `A0=0.5g`, `xi=2 %`; obliga a seleccionar modelo vertical V1/V2.
+- Reportes: resumen de pantalla = PDF global A4, TXT detallado con ecuación simbólica seguida del resultado, sin sustituciones. Un decimal fijo en kgf y hasta tres decimales en coeficientes calculados; motor sin redondeos intermedios.
 
-- No crear, habilitar ni ejecutar GitHub Actions, pipelines CI/CD ni automatizaciones de pago.
-- No modificar `phs-anchor-design`.
-- Pruebas locales; no se bloquean cálculos por existencia de auditorías normativas pendientes.
-- No utilizar resultados numéricamente inválidos ni extrapolar procedimientos fuera del alcance expresamente acordado.
+**No** calcula reacciones individuales de pernos, análisis sísmico estructural global, combinaciones de carga ni resistencia de anclajes. Los resultados son magnitudes direccionales, no estados simultáneos.
+
+## Documentación vigente
+- [ALGORITMO.md](docs/ALGORITMO.md): expresiones, coeficientes y clasificación.
+- [HIPOTESIS.md](docs/HIPOTESIS.md): condiciones de aplicación y decisiones interpretativas.
+- [ESTADO.md](docs/ESTADO.md): alcance implementado, pruebas y limitaciones pendientes.
+
+La documentación y ejemplos de versiones JSON 0.4/0.5 fueron retirados de la rama activa. Permanecen recuperables en el historial Git. No se utilizan GitHub Actions ni servicios externos.

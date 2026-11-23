@@ -79,8 +79,10 @@ details summary{font-size:12px;font-weight:650;color:#24577f;cursor:pointer}deta
 <div class="field"><label for="loc2369">Condición de instalación</label><select id="loc2369">
 <option value="ground">Nivel de terreno / losa basal</option>
 <option value="modular">Sala modular con apoyo basal equivalente</option>
-<option value="elevated">Estructura elevada</option></select></div>
+<option value="elevated">Estructura elevada</option></select>
+<small class="muted">Para instalación basal se adopta Zₖ = 0 y no se solicita H. Selecciona «Estructura elevada» para ingresar ambas alturas.</small></div>
 <div id="heightGroup" hidden>
+<p class="muted">H: altura de la estructura sobre el nivel basal. Zₖ: altura del nivel de apoyo del equipo respecto de la base (0 ≤ Zₖ ≤ H, H &gt; 0).</p>
 <div class="cols"><div class="field"><label for="height">Altura H [m]</label><input id="height" type="number" step="any" min="0" placeholder="H"></div>
 <div class="field"><label for="zk">Altura nivel Zk [m]</label><input id="zk" type="number" step="any" min="0" placeholder="Zk"></div></div>
 </div>
@@ -254,17 +256,17 @@ details summary{font-size:12px;font-weight:650;color:#24577f;cursor:pointer}deta
       structure:s,anchors:{Ex:s.Ex*1.5,Ey:s.Ey*1.5,Ez:s.Ez}});
   }
   return Object.freeze({calculate2369,calculate87,calculate88,classifyRp,locFactors});
-}); 
+});
 </script>
 <script>
-/* PHS Fuerzas Sísmicas — UI y reportes, sin dependencias externas */
-(function(){
+/* PHS Seismic Forces — presentación de resultados y TXT/PDF; sin lectura del DOM. */
+(function(root,factory){
+  const api=factory();
+  if(typeof module==='object'&&module.exports)module.exports=api;
+  else root.PHSSeismicReport=api;
+})(typeof globalThis!=='undefined'?globalThis:this,function(){
 'use strict';
-const $=id=>document.getElementById(id);
-const motor=globalThis.PHSSeismicMotor;
-let active=null,reports=null;
 const display=(n,d=1)=>new Intl.NumberFormat(undefined,{minimumFractionDigits:d,maximumFractionDigits:d,useGrouping:false}).format(n);
-const num=id=>$(id).value.trim()===''?NaN:Number($(id).value);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const force=n=>display(n,1)+' kgf';
 const caption=(r)=>r.method==='NCh2369:2025-cap7'?'NCh2369:2025 · Capítulo 7':r.method==='CNE-Art87'?'Anexo Técnico CNE · Artículo 87':'Anexo Técnico CNE · Artículo 88';
@@ -274,14 +276,14 @@ const place=s=>({'ground':'Nivel basal / terreno','modular':'Sala modular con ap
 const decimalSeparator=new Intl.NumberFormat(undefined,{useGrouping:false})
   .formatToParts(1.1).find(x=>x.type==='decimal')?.value||'.';
 const factor=n=>new Intl.NumberFormat(undefined,{maximumFractionDigits:12,useGrouping:false}).format(n);
-function inputValue(id){
- const raw=$(id).value.trim();
+function inputValue(id,rawInputs){
+ const raw=String(rawInputs[id]??'').trim();
  if(/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(raw))
    return raw.replace('.',decimalSeparator);
  return factor(Number(raw)); // Para notación exponencial válida en input[type=number]
 }
-function lineData(r){
- const a=[['Peso sísmico',inputValue('w')+' kgf']],f=[];
+function lineData(r,rawInputs){
+ const a=[['Peso sísmico',inputValue('w',rawInputs)+' kgf']],f=[];
  if(r.method==='NCh2369:2025-cap7'){
   const p=r.inputs,k=r.factors;
   a.push(['Categoría',p.category],['Zona sísmica',String(p.zone)],['Suelo',p.soil],
@@ -289,12 +291,12 @@ function lineData(r){
    ['Sistema de anclaje',p.anchor==='ductile'?'Dúctil (§7.3.2)':'No dúctil (§7.3.3)'],
    ['Ubicación',place(p.location)]);
   if(p.location==='elevated')
-   a.push(['Altura H',inputValue('height')+' m'],['Nivel Zk',inputValue('zk')+' m']);
+   a.push(['Altura H',inputValue('height',rawInputs)+' m'],['Nivel Zk',inputValue('zk',rawInputs)+' m']);
   f.push(['I',factor(k.I)],['Rp',factor(k.Rp)]);
  }else if(r.method==='CNE-Art87'){
   const p=r.inputs;
-  a.push(['Frecuencia X',inputValue('fx')+' Hz'],
-   ['Frecuencia Y',inputValue('fy')+' Hz'],['Ubicación',place(p.location)]);
+  a.push(['Frecuencia X',inputValue('fx',rawInputs)+' Hz'],
+   ['Frecuencia Y',inputValue('fy',rawInputs)+' Hz'],['Ubicación',place(p.location)]);
   f.push(['IE (Tabla 4)',factor(r.factors.IE)]);
  }else{
   const p=r.inputs,k=r.factors;
@@ -423,8 +425,8 @@ function detailedEquations(r){
  return {calc,anchors};
 }
 
-function buildReports(r){
- const d=lineData(r),rows=rowsForces(r),name=caption(r);
+function buildReports(r,rawInputs){
+ const d=lineData(r,rawInputs),rows=rowsForces(r),name=caption(r);
  const head='<div class="report-kicker">PHS | INGENIERÍA ESTRUCTURAL</div>'+
    '<h1>FUERZAS SÍSMICAS DE DISEÑO</h1><p>'+esc(name)+'</p><hr>';
  const data=[...d.inputs,...d.factors];
@@ -454,6 +456,20 @@ function buildReports(r){
  ].join('\n');
  return {globalHtml,textReport};
 }
+return Object.freeze({buildReports});
+});
+
+</script>
+<script>
+/* PHS Seismic Forces — control de interfaz y exportaciones */
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const motor=globalThis.PHSSeismicMotor;
+const report=globalThis.PHSSeismicReport;
+let active=null,reports=null;
+const display=(n,d=1)=>new Intl.NumberFormat(undefined,{minimumFractionDigits:d,maximumFractionDigits:d,useGrouping:false}).format(n);
+const num=id=>$(id).value.trim()===''?NaN:Number($(id).value);
 function read(){
  const standard=$('norm').value;
  const W=num('w');
@@ -483,7 +499,10 @@ function refreshReports(){
 function render(){
  updateVisibility();
  try{
-   const r=read();active=r;reports=buildReports(r);
+   const r=read();active=r;reports=report.buildReports(r,{
+     w:$('w').value,height:$('height').value,zk:$('zk').value,
+     fx:$('fx').value,fy:$('fy').value
+   });
    $('status').textContent='Cálculo actualizado';$('status').className='status valid';
    $('pdfButton').disabled=false;$('txtButton').disabled=false;
    refreshReports();

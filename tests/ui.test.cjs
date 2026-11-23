@@ -4,7 +4,7 @@ const assert=require('node:assert/strict');
 const vm=require('node:vm');
 const fs=require('node:fs');
 const path=require('node:path');
-const html=fs.readFileSync(path.resolve(__dirname,'../index.html'),'utf8');
+const html=fs.readFileSync(path.resolve(__dirname,'../dist/PHS Seismic Forces.html'),'utf8');
 const scripts=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(x=>x[1]);
 
 function mount(changes={},locale){
@@ -38,7 +38,7 @@ function mount(changes={},locale){
 }
 
 test('Contrato: PDF y TXT de entradas y fuerzas sin selectores ni JSON',()=>{
-  assert.equal(scripts.length,2);
+  assert.equal(scripts.length,3);
   for(const old of ['pdfLevel','txtLevel','printHost','pdfPreview','saveJson'])
     assert.doesNotMatch(html,new RegExp('id="'+old+'"'));
   assert.match(html,/id="globalReport"/);
@@ -71,6 +71,21 @@ test('TXT: fórmulas con resultados consecutivos, sin sustituciones numéricas',
     assert.ok(d.saved.payload.includes(fragment),fragment);
 });
 
+test('NCh2369: visibilidad y significado de H y Zk según ubicación',()=>{
+ const d=mount({norm:'2369'});
+ assert.equal(d.nodes.heightGroup.hidden,true);
+ assert.match(html,/Para instalación basal se adopta Zₖ = 0/);
+ d.set('loc2369','elevated');
+ assert.equal(d.nodes.heightGroup.hidden,false);
+ d.set('height','8');
+ d.set('zk','0');
+ assert.equal(d.nodes.pdfButton.disabled,false);
+ assert.match(d.nodes.globalReport.innerHTML,/Altura H/);
+ assert.match(d.nodes.globalReport.innerHTML,/Nivel Zk/);
+ d.set('loc2369','modular');
+ assert.equal(d.nodes.heightGroup.hidden,true);
+ assert.equal(d.nodes.pdfButton.disabled,false);
+});
 test('Art. 87: solo se solicitan frecuencias horizontales fX y fY',()=>{
  assert.match(html,/<label for="fx">Frecuencia horizontal fX/);
  assert.match(html,/<label for="fy">Frecuencia horizontal fY/);

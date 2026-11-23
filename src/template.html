@@ -79,8 +79,10 @@ details summary{font-size:12px;font-weight:650;color:#24577f;cursor:pointer}deta
 <div class="field"><label for="loc2369">Condición de instalación</label><select id="loc2369">
 <option value="ground">Nivel de terreno / losa basal</option>
 <option value="modular">Sala modular con apoyo basal equivalente</option>
-<option value="elevated">Estructura elevada</option></select></div>
+<option value="elevated">Estructura elevada</option></select>
+<small class="muted">Para instalación basal se adopta Zₖ = 0 y no se solicita H. Selecciona «Estructura elevada» para ingresar ambas alturas.</small></div>
 <div id="heightGroup" hidden>
+<p class="muted">H: altura de la estructura sobre el nivel basal. Zₖ: altura del nivel de apoyo del equipo respecto de la base (0 ≤ Zₖ ≤ H, H &gt; 0).</p>
 <div class="cols"><div class="field"><label for="height">Altura H [m]</label><input id="height" type="number" step="any" min="0" placeholder="H"></div>
 <div class="field"><label for="zk">Altura nivel Zk [m]</label><input id="zk" type="number" step="any" min="0" placeholder="Zk"></div></div>
 </div>
@@ -143,7 +145,10 @@ details summary{font-size:12px;font-weight:650;color:#24577f;cursor:pointer}deta
 </article>
 </main>
 <script>
-/*__PHS_MOTOR__*/ 
+/*__PHS_MOTOR__*/
+</script>
+<script>
+/*__PHS_REPORT__*/
 </script>
 <script>
 /*__PHS_UI__*/

@@ -161,7 +161,19 @@
 Estos criterios posteriores prevalecen sobre las disposiciones anteriores que los contradigan:
 
 1. **Art. 87:** el factor de importancia `IE=1` es fijo para el equipo eléctrico general (Tabla 4). El usuario no lo edita; el motor ignora cualquier `IE` recibido externamente. Se muestra como factor normativo en pantalla y en TXT.
-2. **Art. 87:** las entradas `fX` y `fY` gobiernan sus factores horizontales independientes; `Kv=1` permanece fijo. La exigencia de frecuencia equivalente de al menos 20 Hz en cualquier dirección se verifica externamente como condición de aplicabilidad. No se incorpora `fZ` como parámetro de cálculo ni se bloquea por un valor vertical no ingresado.
+2. **Art. 87:** las entradas `fX` y `fY` gobiernan sus factores horizontales independientes; `Kv=1` permanece fijo. La interpretación del alcance direccional y la no verificación de `fZ` se establecen en FS-08, que prevalece sobre cualquier descripción anterior.
 3. **Art. 88:** el comportamiento vertical V1/V2 no tiene opción predeterminada; debe elegirse antes de calcular o exportar.
 4. **NCh2369 §7.2.3:** para ubicación elevada y `H>0`, permitir `0<=Zk<=H`. `Zk=0` representa apoyo en nivel basal aunque exista una estructura superior. En las ubicaciones basales el programa mantiene `Zk=0` implícito y no solicita H.
 5. **Presentación:** conservar hasta tres decimales en coeficientes calculados del TXT, un decimal en kgf para fuerzas, y precisión completa en el motor.
+
+## FS-08 — Interpretación de frecuencias equivalentes del artículo 87 (2026-11-23)
+
+**Decisión de ingeniería adoptada para PHS Seismic Forces, que prevalece sobre FS-02 y FS-07 en cuanto al alcance direccional:**
+
+- El artículo 87 del Anexo Técnico CNE exige Frecuencia Equivalente >= 20 Hz «en cualquier dirección» y remite expresamente al artículo 122.4.iii. Este último define su determinación considerando **masa y rigidez lateral** del soporte y la masa del equipo. El artículo 87 no dice literalmente «solo direcciones horizontales».
+- Se interpreta «cualquier dirección» en el contexto de esa remisión como las dos direcciones horizontales de rigidez lateral **X e Y**. Es un **criterio interpretativo propio del proyecto**, no una aclaración normativa vinculante emitida por la CNE; su aplicabilidad debe ser asumida y sustentada por el ingeniero responsable.
+- Inputs requeridos: `fX >= 20 Hz` y `fY >= 20 Hz`. Determinar `KhX = 1.35` si `20 <= fX < 30`, y `1` si `fX >= 30`; análogamente `KhY` a partir de `fY`. Mantener `Kv = 1`, independiente de frecuencia.
+- **No solicitar, calcular, comprobar ni utilizar `fZ`** en el motor, interfaz, validación, PDF o TXT. La ausencia de `fZ` no debe bloquear resultados ni tratarse como verificación pendiente para el cálculo de fuerzas de esta aplicación.
+- La aplicación calcula **fuerzas sísmicas**, no valida integralmente los requisitos de rigidez global/local del soporte. No presentar esta interpretación como una certificación de cumplimiento de todo el artículo 87.
+
+**Referencia primaria:** Comisión Nacional de Energía, *Anexo Técnico Requisitos Sísmicos para Instalaciones Eléctricas de Alta Tensión* (enero 2025), [artículo 87, p. 127, y artículo 122.4.iii, p. 156](https://www.cne.cl/wp-content/uploads/2025/01/AT-Requisitos-Sismo.pdf).

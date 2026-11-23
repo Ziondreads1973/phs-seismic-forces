@@ -87,7 +87,7 @@ details summary{font-size:12px;font-weight:650;color:#24577f;cursor:pointer}deta
 </section>
 <section id="block87" hidden>
 <h3>Art. 87 — Bancos de baterías sobre soporte</h3>
-<div class="field"><label for="ie">Factor importancia IE (editable)</label><input id="ie" type="number" min="0" step="any" value="1"></div>
+<p class="muted">Factor de importancia I<sub>E</sub> = 1 (Tabla 4; fijo para equipo eléctrico).</p>
 <div class="cols"><div class="field"><label for="fx">Frecuencia horizontal fX [Hz]</label><input id="fx" type="number" min="0" step="any" placeholder="fX"></div>
 <div class="field"><label for="fy">Frecuencia horizontal fY [Hz]</label><input id="fy" type="number" min="0" step="any" placeholder="fY"></div></div>
 <p class="muted">Frecuencias horizontales mínimas 20 Hz. Kh se calcula independientemente en X e Y.</p>
@@ -100,6 +100,7 @@ details summary{font-size:12px;font-weight:650;color:#24577f;cursor:pointer}deta
 <h3>Art. 88 — Celda metálica autosoportada</h3>
 <p class="muted">Clasificación del equipo: IE = <span data-local-number="1" data-decimals="0">1</span> y R = <span data-local-number="1" data-decimals="0">1</span> (Tabla 4). A0 = <span data-local-number="0.5" data-decimals="1">0.5</span>g y amortiguamiento = 2 %. La aceleración espectral máxima es automática.</p>
 <div class="field"><label for="vertical">Comportamiento vertical</label><select id="vertical">
+<option value="" selected>Seleccionar comportamiento vertical</option>
 <option value="rigid">V1 — Rígido verticalmente</option>
 <option value="flex">V2 — No rígido verticalmente</option></select></div>
 <div class="field"><label for="loc88">Condición de instalación</label><select id="loc88">

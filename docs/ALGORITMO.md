@@ -62,16 +62,8 @@ Entrada no válida (peso no positivo, frecuencia horizontal Art. 87 menor de 20 
 
 **Fuentes de contraste:** NCh2369:2025 §§5.7, 7.2–7.3 y Tablas pertinentes; [Anexo Técnico CNE, arts. 19, 21, 38–39, 83, 87–88, 122.4.iii](https://www.cne.cl/wp-content/uploads/2025/01/AT-Requisitos-Sismo.pdf). La reproducción de una fórmula no equivale a certificar todos los requisitos de aplicabilidad.
 
-## Asistente informativo para clasificación (no vinculante)
-`src/anchor_assistant.js` compara declaraciones de material, detallamiento, transferencia de corte, capacidad no fusible y fundación. Una geometría convencional con silla o perno reemplazable requiere longitud libre ≥ máx(250 mm, 8d) y hilo bajo la tuerca ≥75 mm; excepción de §8.5.2 por §4.5 y 0,7R₁≥1 queda como declaración respaldada externamente.
-- Material no dúctil con alargamiento ≥14 %: ruta orientativa §7.3.3.
-- Material dúctil ≥20 % con incumplimiento explícito de §8.5: §7.3.2.
-- Material dúctil con todas las declaraciones de §8.5 afirmativas: posible §8.5, **sin cálculo del motor para ese procedimiento**.
-- Sin evidencia suficiente: pendiente; material <14 %: no cumple mínimo general.
-- No hay transmisión automática al `calculate2369`. PDF/TXT diferencian decisión documental de supuesto del motor.
+## Clasificación declarativa, selección y reportes
 
-## Actualización de clasificación de anclajes — 2026-11-23
+`src/anchor_assistant.js`: a partir del material (ductilidad ≥20 %, no dúctil 14–20 %, o fuera del mínimo <14 %), revisa cinco respuestas. Con material dúctil y cinco «Cumple», propone `8.5`; si existe algún «No cumple», propone `7.3.2`; con respuestas incompletas sin incumplimiento, no propone ninguna. Con material no dúctil propone `7.3.3`. El botón aplica la sugerencia al selector, nunca directamente al cálculo.
 
-- La ruta principal `8.5` no existe como cálculo de anclajes: `src/ui.js` conserva la clasificación ductil para calcular acciones del equipo, mientras `src/report.js` omite los tres resultados de anclajes y sus fórmulas de §7.3.2.
-- La ruta `7.3.2` utiliza `anchor=ductile`, amplificación horizontal `0,7 Rp`; la ruta `7.3.3` utiliza `anchor=nonductile`, amplificación horizontal `Rp`. En ambas `Ez,a=Ez`.
-- El asistente `src/anchor_assistant.js` propone ruta `8.5` únicamente con material dúctil y cinco declaraciones «Cumple», ruta `7.3.2` cuando hay algún «No cumple», ruta `7.3.3` con material no dúctil; desconocidos mantienen pendiente salvo incumplimiento explícito.
+`src/ui.js` envía `anchor='ductile'` para `7.3.2`, y `anchor='nonductile'` para `7.3.3`. Para `8.5` se calcula la fuerza del equipo con material dúctil, pero `src/report.js` presenta **NO CALCULADO** para `Ex,a`, `Ey,a`, `Ez,a`, y no reproduce las fórmulas de §7.3.2 bajo esa etiqueta. El motor numérico `src/motor.js` permanece sin cambios. La ayuda documenta declaraciones, no resistencia verificada.

@@ -41,17 +41,8 @@ Referencias: [Anexo Técnico CNE, artículos 87 y 122.4.iii](https://www.cne.cl/
 - **CNE Art. 19:** el espectro aplicado es válido para suelos A–D; Art. 20 exige tratamiento especial fuera de ese ámbito. La app no identifica el suelo y el usuario debe verificarlo externamente.
 - **NCh2369 §7.1:** cuando la estructura sismorresistente es parte integral del equipo, el diseño se remite a cláusula 5 y no se cubre automáticamente con este calculador de cargas para elementos secundarios.
 
-## Asistente de clasificación de anclajes, fase 1 (23-11-2026)
-- No equivale a una revisión resistente. Los «Sí» son declaraciones del ingeniero, nunca verificaciones realizadas por PHS.
-- Material (§8.2.3): ductilidad por alargamiento en probeta de 50 mm (umbral 20 %; mínimo general 14 %).
-- Detalle (§8.5.2): silla y tramo expuesto inspeccionable/reparable, perno reemplazable con longitud libre equivalente o excepción por diseño con §4.5 y horizontal 0,7R₁≥1. La comprobación automática solo cubre L ≥ máx(250 mm, 8d) e hilo ≥75 mm; no acredita la excepción.
-- Corte (§8.5.3): llave/tope de corte total o excepción documentada, con control adicional §8.5.4 de no usar grout/fricción. No comprueba interacción ni límites de excepciones.
-- Capacidad de elementos no fusibles, pedestal/fundación (§8.5.5 y cláusula 9) y caso especial de columna empotrada requieren memoria externa.
-- El dictamen orientativo se registra en PDF/TXT, separado de la **ruta usada realmente por el motor**. No altera `Rp`, factores ni fuerzas; una declaración compatible no implica conformidad normativa integral y una candidatura a §8.5 no está cubierta por el cálculo de §7.3.2.
+## Clasificación del sistema de anclaje (actual)
 
-## Actualización de clasificación de anclajes — 2026-11-23
+Las opciones principales son: `8.5` (sistema dúctil que cumple §8.5), `7.3.2` (material dúctil que no satisface §8.5) y `7.3.3` (material no dúctil). El usuario selecciona la ruta o utiliza un asistente de cinco declaraciones «Cumple / No cumple / No verificado» (detallamiento, corte, grout/fricción, capacidad de elementos no fusibles y fundación). La definición de material exige verificar su alargamiento según §8.2.3.
 
-- La selección principal tiene tres rutas (§8.5, §7.3.2 y §7.3.3). El asistente es declarativo; sus cinco respuestas «Cumple/No cumple/No verificado» no constituyen verificaciones resistentes y la elección permanece bajo responsabilidad del ingeniero.
-- Solo el botón «Aplicar clasificación sugerida» modifica la selección de ruta; §7.3.2 y §7.3.3 se traducen al tipo de anclaje utilizado por `src/motor.js`.
-- Para §8.5 se calcula únicamente la fuerza del equipo con la clasificación dúctil correspondiente a Tabla 8; las fuerzas de anclajes calculadas internamente por §7.3.2 se **suprimen de pantalla/PDF/TXT** y se etiquetan «NO CALCULADO». No se interpreta ninguna de ellas como demanda §8.5.
-- El asistente no comprueba geometría ni certifica que la ruta §8.5 cumple; la condición de las columnas empotradas y las excepciones deben verificarse en la documentación del proyecto.
+El asistente solo **sugiere** una ruta. Aplicarla requiere acción expresa; no se realizan comprobaciones resistentes ni se presume conformidad por rellenar el cuestionario. Las respuestas se registran en TXT/PDF. En la selección `8.5` el motor utiliza clasificación dúctil para obtener las acciones del equipo, pero las demandas de anclajes de §7.3.2 **no se muestran ni exportan**, ya que no existe cálculo para §8.5. Las rutas `7.3.2` y `7.3.3` conservan las ecuaciones actuales, con `Ez,a=Ez`.

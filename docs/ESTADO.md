@@ -59,15 +59,10 @@ No añadir comprobaciones ajenas al alcance sin acuerdo técnico. No se usan Act
 - Para cualquier ubicación NCh2369, los reportes PDF/TXT indican expresamente que el factor de anclajes se aplica **solo a Ex/Ey**, manteniendo **Ez,a=Ez** sin esa amplificación, conforme al criterio técnico AU-R2.
 - **No se modificaron ecuaciones, parámetros Kp ni respuestas del motor**, y no se agregó cálculo §5.8. Se añadieron pruebas de comportamiento, observaciones y visibilidad.
 
-## Asistente de clasificación del anclaje — primera etapa (23-11-2026)
-- Implementado `src/anchor_assistant.js`, formulario desplegable, controles geométricos y resultados documentales en PDF y TXT.
-- Clasificaciones orientativas: pendiente, §7.3.2, §7.3.3, posible §8.5 o material bajo mínimo §8.2.3.
-- Ninguna respuesta cambia el motor ni equivale a certificación de §8.5. Se registran conflictos entre clasificación declarada y ruta usada.
-- **Pendiente para fase 2:** definir cómo seleccionar ruta y Rp coherentemente, qué debe pasar con el caso §8.5 que no está implementado, y reglas de bloqueo/rotulado definitivo. No cambiar el motor sin cerrar esos criterios.
+## Clasificación y asistente (versión actual, 2026-11-23)
 
-## Actualización de clasificación de anclajes — 2026-11-23
-
-- Implementada la maqueta aprobada: selector visible de tres rutas, asistente desplegable de cinco requisitos y botón de aplicación. Se retira el cuestionario geométrico anterior.
-- Para §8.5 **no se presenta ninguna demanda de anclaje**; los reportes muestran «NO CALCULADO» y la advertencia de ausencia de algoritmo para esa ruta.
-- Para §7.3.2/§7.3.3 se mantienen exactamente las ecuaciones y fuerzas anteriores. Se agregaron pruebas específicas del asistente y selección.
-- La verificación completa de §8.5 sigue fuera de alcance. Las antiguas secciones «primera etapa» arriba son históricas y quedan sustituidas por este estado.
+- **Tres rutas visibles** para NCh2369: conforme §8.5, materiales dúctiles sin cumplir §8.5 (§7.3.2) y materiales no dúctiles (§7.3.3).
+- **Asistente opcional desplegable**: material y cinco declaraciones «Cumple / No cumple / No verificado». Puede recomendar una ruta, pero se aplica solo mediante botón. No realiza diseño de anclajes ni verifica automáticamente §8.5.
+- **Compatibilidad de cálculo:** §7.3.2/§7.3.3 usan exactamente los factores anteriores. Para §8.5 se reportan las acciones del equipo, y las tres demandas de anclajes quedan **NO CALCULADO**, sin mostrar fórmulas de §7.3.2 que confundan al usuario.
+- **Pruebas:** 63/63 (19 motor + 9 asistente + 35 interfaz) en validación JavaScript controlada; verificar en estación local con Node y `tools/build.py --check`. El HTML autocontenido coincide con las fuentes. La inspección manual de impresión A4 sigue pendiente.
+- **Alcance:** las declaraciones no certifican norma ni resistencia. §8.5 continúa fuera de las verificaciones resistentes del motor; las reservas normativas descritas arriba permanecen según corresponda.

@@ -71,6 +71,15 @@ test('TXT: fórmulas con resultados consecutivos, sin sustituciones numéricas',
     assert.ok(d.saved.payload.includes(fragment),fragment);
 });
 
+test('Art. 87: solo se solicitan frecuencias horizontales fX y fY',()=>{
+ assert.match(html,/<label for="fx">Frecuencia horizontal fX/);
+ assert.match(html,/<label for="fy">Frecuencia horizontal fY/);
+ assert.doesNotMatch(html,/(?:id|for)="f[zZ]"/);
+ const d=mount({norm:'87'});
+ assert.equal(d.nodes.pdfButton.disabled,false);
+ assert.match(d.nodes.txtPreview.textContent,/Kh,X/);
+ assert.match(d.nodes.txtPreview.textContent,/Kh,Y/);
+});
 test('Art. 87: IE=1 fijo y sin campo editable',()=>{
  const d=mount({norm:'87'});
  assert.doesNotMatch(html,/id="ie"/);

@@ -50,7 +50,7 @@
     let H=null,Zk=0;
     if(location==='elevated'){
       H=finite(d.height_m,'altura H',true);
-      Zk=finite(d.level_m,'altura Zk',true);
+      Zk=finite(d.level_m,'altura Zk');
       if(Zk>H)throw new RangeError('Zk no puede superar H');
     }
     const I=IMPORTANCE[category],Ar=AR[zone],S=SOIL[soil],kv=KV[soil];
@@ -78,7 +78,7 @@
   }
   function calculate87(d){
     const W=finite(d.weight_kgf,'peso sísmico',true);
-    const IE=finite(d.IE,'IE',true);
+    const IE=1; // Tabla 4: factor fijo del equipo eléctrico general
     const fx=finite(d.fx,'fX',true),fy=finite(d.fy,'fY',true);
     const KhX=kh(fx,'fX'),KhY=kh(fy,'fY');
     const location=oneOf(d.location,['ground','modular','floor'],'ubicación');
@@ -87,7 +87,7 @@
     const s={Ex:Cx*W,Ey:Cy*W,Ez:Cv*W};
     return complete({method:'CNE-Art87',weight_kgf:W,
       inputs:{IE,fx,fy,location},
-      factors:{KhX,KhY,Kv:1,location:loc,structure:{X:Cx,Y:Cy,Z:Cv},
+      factors:{IE,KhX,KhY,Kv:1,location:loc,structure:{X:Cx,Y:Cy,Z:Cv},
         anchor_multiplier:{horizontal:1.25,vertical:1}},
       structure:s,anchors:{Ex:s.Ex*1.25,Ey:s.Ey*1.25,Ez:s.Ez}});
   }

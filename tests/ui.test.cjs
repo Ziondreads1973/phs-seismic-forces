@@ -9,7 +9,7 @@ const scripts=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(x=>x[1]);
 
 function mount(changes={},locale){
   const start={norm:'87',w:'1000',fx:'25',fy:'35',loc87:'ground',
-    cat:'III',zone:'2',soil:'C',equipment:'electrical-mechanical',duct:'ductile',
+    cat:'III',zone:'2',soil:'C',equipment:'electrical-mechanical',duct:'7.3.2',
     loc2369:'ground',height:'',zk:'',loc88:'ground',vertical:'',...changes};
   const nodes={},saved={files:[],printed:0,payload:null,printedView:null};
   const element=id=>nodes[id]||(nodes[id]={id,value:start[id]??'',hidden:false,disabled:false,
@@ -224,7 +224,7 @@ test('FS-06-C02: Tabla 4 sin ceros añadidos en referencias, coma y punto decima
 
 
 test('TXT NCh2369: ruta basal y elevada contienen límites, Rp, vertical y amplificación',()=>{
- for(const data of [{loc2369:'ground',duct:'ductile'},{loc2369:'elevated',height:'8.50',zk:'4.25',duct:'nonductile'}]){
+ for(const data of [{loc2369:'ground',duct:'7.3.2'},{loc2369:'elevated',height:'8.50',zk:'4.25',duct:'7.3.3'}]){
    const d=mount({norm:'2369',w:'1000',...data});
    const txt=d.nodes.txtPreview.textContent;
    for(const fragment of ['Ar/g','ak/g','Cp =','Cmin','Cmax','Ch =',
@@ -281,7 +281,7 @@ test('TXT localización decimal aplica también a fórmulas y resultados',()=>{
 
 
 test('FS-06-C04: NCh2369 fórmula y resultado inmediatos, sin reemplazo de valores',()=>{
-  for(const p of [{loc2369:'ground',duct:'ductile'},{loc2369:'elevated',duct:'nonductile',height:'6.5',zk:'3.25'}]){
+  for(const p of [{loc2369:'ground',duct:'7.3.2'},{loc2369:'elevated',duct:'7.3.3',height:'6.5',zk:'3.25'}]){
     const d=mount({norm:'2369',w:'1000',...p});
     const txt=d.nodes.txtPreview.textContent;
     for(const expr of [
@@ -378,7 +378,7 @@ test('NCh2369: aviso §5.8 solo en ubicación basal directa; no bloquea cálculo
  assert.equal(d.nodes.scope58Note.hidden,true);
 });
 test('NCh2369: TXT y PDF declaran anclajes solo horizontales y vertical sin factor',()=>{
- for(const duct of ['ductile','nonductile']){
+ for(const duct of ['7.3.2','7.3.3']){
   const d=mount({norm:'2369',duct,loc2369:'ground'});
   const htmlReport=d.nodes.globalReport.innerHTML;
   const txt=d.nodes.txtPreview.textContent;
@@ -389,41 +389,98 @@ test('NCh2369: TXT y PDF declaran anclajes solo horizontales y vertical sin fact
  }
 });
 
-test('Asistente: clasificación pendiente visible en PDF y TXT, sin bloquear el motor',()=>{
+
+test('La clasificación principal muestra exactamente las tres rutas aprobadas',()=>{
+ assert.match(html,/<select id="duct" class="anchor-route-list" size="3">/);
+ for(const label of ['Sistema dúctil que cumple §8.5',
+  'Sistema de materiales dúctiles que no cumple §8.5',
+  'Sistema de materiales no dúctiles'])assert.ok(html.includes(label));
+ assert.doesNotMatch(html,/id="anchorDiameter"|id="anchorFree"|id="anchorThread"/);
+});
+test('Asistente: estado inicial pendiente y botón sin aplicación',()=>{
  const d=mount({norm:'2369'});
  assert.match(d.nodes.anchorGuideStatus.textContent,/Clasificación pendiente/);
+ assert.equal(d.nodes.anchorApply.disabled,true);
+ assert.equal(d.nodes.anchorChecks.hidden,true);
  assert.match(d.nodes.globalReport.innerHTML,/Asistente de anclajes/);
  assert.match(d.nodes.txtPreview.textContent,/ASISTENTE DE CLASIFICACIÓN DE ANCLAJES/);
- assert.match(d.nodes.txtPreview.textContent,/No verificado/);
  assert.equal(d.nodes.pdfButton.disabled,false);
 });
-test('Asistente: cambio de ruta declarado deja registro de discrepancia',()=>{
- const d=mount({norm:'2369',duct:'ductile'});
- d.set('anchorMat','limited');
- assert.match(d.nodes.anchorGuideStatus.textContent,/Incompatibilidad/);
+test('Asistente: material no dúctil sugiere ruta 7.3.3 y la aplica a las fuerzas',()=>{
+ const d=mount({norm:'2369',duct:'7.3.2'});
+ const before=d.nodes.globalReport.innerHTML.match(/<h2>2\. Fuerzas sísmicas finales<\/h2>([\s\S]*?)<p class="report-foot"/)[1];
+ d.set('anchorMat','nonductile');
+ assert.match(d.nodes.anchorGuideStatus.textContent,/Clasificación diferente/);
+ assert.equal(d.nodes.anchorApply.disabled,false);
+ assert.equal(d.nodes.duct.value,'7.3.2');
+ d.nodes.anchorApply.events.click();
+ assert.equal(d.nodes.duct.value,'7.3.3');
+ assert.match(d.nodes.globalReport.innerHTML,/Materiales no dúctiles/);
  assert.match(d.nodes.txtPreview.textContent,/§7\.3\.3/);
- assert.match(d.nodes.globalReport.innerHTML,/provisionales/);
- d.set('duct','nonductile');
- assert.match(d.nodes.anchorGuideStatus.textContent,/Ruta orientativa compatible/);
+ const after=d.nodes.globalReport.innerHTML.match(/<h2>2\. Fuerzas sísmicas finales<\/h2>([\s\S]*?)<p class="report-foot"/)[1];
+ assert.notEqual(before,after);
 });
-test('Asistente: cambia visibilidad de detalles y no altera tabla de fuerzas',()=>{
- const d=mount({norm:'2369',duct:'ductile'});
+test('Asistente: con material dúctil y un NO cumple propone §7.3.2',()=>{
+ const d=mount({norm:'2369',duct:'7.3.3'});
+ d.set('anchorMat','ductile');
+ assert.equal(d.nodes.anchorChecks.hidden,false);
+ d.set('anchorDetail','yes');d.set('anchorShear','no');
+ d.set('anchorFriction','yes');d.set('anchorCapacity','yes');d.set('anchorFoundation','yes');
+ assert.match(d.nodes.anchorGuideStatus.textContent,/§7\.3\.2/);
+ d.nodes.anchorApply.events.click();
+ assert.equal(d.nodes.duct.value,'7.3.2');
+ assert.equal(d.nodes.pdfButton.disabled,false);
+});
+test('Asistente: todos Cumple propone §8.5 y oculta fuerzas de anclajes',()=>{
+ const d=mount({norm:'2369',duct:'7.3.2'});
+ d.set('anchorMat','ductile');
+ for(const id of ['anchorDetail','anchorShear','anchorFriction','anchorCapacity','anchorFoundation'])d.set(id,'yes');
+ assert.match(d.nodes.anchorGuideStatus.textContent,/§8\.5/);
+ d.nodes.anchorApply.events.click();
+ assert.equal(d.nodes.duct.value,'8.5');
+ assert.match(d.nodes.status.textContent,/Anclajes §8\.5: no calculados/);
+ const page=d.nodes.globalReport.innerHTML;
+ const txt=d.nodes.txtPreview.textContent;
+ assert.match(page,/NO CALCULADO/);
+ assert.match(txt,/Ex,a \/ Ey,a \/ Ez,a: NO CALCULADO/);
+ assert.match(txt,/Ex\s+[0-9.,]+\s+NO CALCULADO/);
+ assert.doesNotMatch(txt,/Factor H = 0[.,]7 · Rp/);
+ assert.match(txt,/Ruta §8\.5: no implementada/);
+ assert.equal(d.nodes.pdfButton.disabled,false);
+ d.nodes.pdfButton.events.click();
+ assert.equal(d.saved.printedView,page);
+ d.nodes.txtButton.events.click();
+ assert.match(d.saved.payload,/NO CALCULADO/);
+});
+test('Ruta §8.5 elegida manualmente no expone las fuerzas provisionales de §7.3.2',()=>{
+ const d=mount({norm:'2369',duct:'8.5'});
+ assert.equal(d.nodes.pdfButton.disabled,false);
+ assert.match(d.nodes.globalReport.innerHTML,/NO CALCULADO/);
+ assert.match(d.nodes.txtPreview.textContent,/§8\.5: anclajes no calculados/);
+ assert.match(d.nodes.globalReport.innerHTML,/Fuerzas sísmicas finales/);
+});
+test('Asistente: respuestas No verificado mantienen sugerencia pendiente',()=>{
+ const d=mount({norm:'2369'});
+ d.set('anchorMat','ductile');
+ d.set('anchorDetail','yes');d.set('anchorShear','yes');
+ d.set('anchorFriction','yes');d.set('anchorCapacity','yes');
+ assert.match(d.nodes.anchorGuideStatus.textContent,/Clasificación pendiente/);
+ assert.equal(d.nodes.anchorApply.disabled,true);
+});
+test('Asistente: material bajo mínimo general no permite aplicar',()=>{
+ const d=mount({norm:'2369'});
+ d.set('anchorMat','invalid');
+ assert.match(d.nodes.anchorGuideStatus.textContent,/mínimo general/);
+ assert.equal(d.nodes.anchorApply.disabled,true);
+});
+test('Asistente: respuestas informativas no alteran fuerzas antes de aplicar ruta',()=>{
+ const d=mount({norm:'2369',duct:'7.3.2'});
  const table=()=>d.nodes.globalReport.innerHTML.match(/<h2>2\. Fuerzas sísmicas finales<\/h2>([\s\S]*?)<p class="report-foot"/)[1];
  const before=table();
- d.set('anchorMat','ductile');
- d.set('anchorDetail','saddle');
- assert.equal(d.nodes.anchorGeometryGroup.hidden,false);
- d.set('anchorDiameter','40');d.set('anchorFree','300');d.set('anchorThread','80');
- assert.match(d.nodes.txtPreview.textContent,/320 mm/);
+ d.set('anchorMat','ductile');d.set('anchorDetail','yes');d.set('anchorShear','no');
  assert.equal(table(),before);
- d.set('anchorDetail','exception');
- assert.equal(d.nodes.anchorGeometryGroup.hidden,true);
- assert.equal(d.nodes.anchorDetailExceptionGroup.hidden,false);
- d.set('anchorBaseType','fixed');
- assert.equal(d.nodes.anchorFixedMomentGroup.hidden,false);
- assert.equal(d.nodes.pdfButton.disabled,false);
 });
-test('Asistente: no aparece en PDF/TXT CNE',()=>{
+test('Asistente: no aparece en reportes CNE',()=>{
  for(const norm of ['87','88']){
   const d=mount({norm,vertical:'rigid'});
   assert.doesNotMatch(d.nodes.globalReport.innerHTML,/Asistente de anclajes/);

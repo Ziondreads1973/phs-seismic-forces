@@ -64,3 +64,10 @@ No añadir comprobaciones ajenas al alcance sin acuerdo técnico. No se usan Act
 - Clasificaciones orientativas: pendiente, §7.3.2, §7.3.3, posible §8.5 o material bajo mínimo §8.2.3.
 - Ninguna respuesta cambia el motor ni equivale a certificación de §8.5. Se registran conflictos entre clasificación declarada y ruta usada.
 - **Pendiente para fase 2:** definir cómo seleccionar ruta y Rp coherentemente, qué debe pasar con el caso §8.5 que no está implementado, y reglas de bloqueo/rotulado definitivo. No cambiar el motor sin cerrar esos criterios.
+
+## Actualización de clasificación de anclajes — 2026-11-23
+
+- Implementada la maqueta aprobada: selector visible de tres rutas, asistente desplegable de cinco requisitos y botón de aplicación. Se retira el cuestionario geométrico anterior.
+- Para §8.5 **no se presenta ninguna demanda de anclaje**; los reportes muestran «NO CALCULADO» y la advertencia de ausencia de algoritmo para esa ruta.
+- Para §7.3.2/§7.3.3 se mantienen exactamente las ecuaciones y fuerzas anteriores. Se agregaron pruebas específicas del asistente y selección.
+- La verificación completa de §8.5 sigue fuera de alcance. Las antiguas secciones «primera etapa» arriba son históricas y quedan sustituidas por este estado.

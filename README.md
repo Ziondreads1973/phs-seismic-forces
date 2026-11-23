@@ -33,10 +33,9 @@ Start-Process ".\\dist\\PHS Seismic Forces.html"
 
 La documentación y ejemplos de versiones JSON 0.4/0.5 fueron retirados de la rama activa. Permanecen recuperables en el historial Git. No se utilizan GitHub Actions ni servicios externos.
 
-## Asistente de clasificación de anclajes (primera etapa)
-En la ruta **NCh2369**, desplegar «Asistente de clasificación de anclajes — §§8.2 y 8.5».
-Registra la certificación de material (alargamiento ≥20 %, ≥14 % o menor), silla/reemplazabilidad y tramo libre, o excepción de §8.5.2; el mecanismo de corte §8.5.3; la exclusión de grout/roce §8.5.4; la transferencia a fundación §8.5.5; y la capacidad de componentes no fusibles.
+## Clasificación del sistema de anclaje
+Tres rutas seleccionables en NCh2369: **sistema dúctil conforme a §8.5**, **materiales dúctiles que no cumplen §8.5 (§7.3.2)** y **materiales no dúctiles (§7.3.3)**. Aparecen simultáneamente en el selector de tres opciones.
 
-Realiza **solo la comprobación geométrica** L ≥ máx(250 mm, 8d) e hilo bajo la tuerca ≥75 mm cuando se introduce un detalle convencional, y registra las declaraciones en el PDF y TXT. No verifica resistencia, reemplazabilidad real, capacidad sísmica ni certifica §8.5.
+El asistente desplegable permite declarar el material (§8.2.3) y cinco requisitos resumidos: detallamiento/reemplazabilidad (§8.5.2), transferencia de corte (§8.5.3), grout/fricción (§8.5.4), capacidad no fusible y fundación (§8.5.5). Las respuestas son **Cumple / No cumple / No verificado**. Un solo «No cumple» con material dúctil sugiere §7.3.2; cinco «Cumple» sugieren posible §8.5; con material no dúctil sugiere §7.3.3. «No verificado» impide recomendar §8.5 salvo que exista un incumplimiento explícito.
 
-**Fase documental, sin cambios de fuerzas:** el selector de anclajes actual sigue controlando `Rp` y la amplificación horizontal. El asistente **no aplica automáticamente su propuesta**. Ante conflicto, la salida advierte que las demandas de anclajes son provisionales. La posible ruta §8.5 permanece fuera del motor.
+**«Aplicar clasificación sugerida»** actualiza el selector y las fuerzas para §7.3.2/§7.3.3. Las respuestas del asistente no modifican el cálculo hasta pulsar ese botón. La opción **§8.5**, aún fuera del motor, conserva las fuerzas del equipo, pero **no emite fuerzas de anclajes**: pantalla, PDF y TXT indican «NO CALCULADO» en esa columna y no presentan la amplificación de §7.3.2 como sustituto. El asistente no verifica resistencias ni certifica cumplimiento normativo.

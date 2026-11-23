@@ -69,3 +69,9 @@ Entrada no válida (peso no positivo, frecuencia horizontal Art. 87 menor de 20 
 - Material dúctil con todas las declaraciones de §8.5 afirmativas: posible §8.5, **sin cálculo del motor para ese procedimiento**.
 - Sin evidencia suficiente: pendiente; material <14 %: no cumple mínimo general.
 - No hay transmisión automática al `calculate2369`. PDF/TXT diferencian decisión documental de supuesto del motor.
+
+## Actualización de clasificación de anclajes — 2026-11-23
+
+- La ruta principal `8.5` no existe como cálculo de anclajes: `src/ui.js` conserva la clasificación ductil para calcular acciones del equipo, mientras `src/report.js` omite los tres resultados de anclajes y sus fórmulas de §7.3.2.
+- La ruta `7.3.2` utiliza `anchor=ductile`, amplificación horizontal `0,7 Rp`; la ruta `7.3.3` utiliza `anchor=nonductile`, amplificación horizontal `Rp`. En ambas `Ez,a=Ez`.
+- El asistente `src/anchor_assistant.js` propone ruta `8.5` únicamente con material dúctil y cinco declaraciones «Cumple», ruta `7.3.2` cuando hay algún «No cumple», ruta `7.3.3` con material no dúctil; desconocidos mantienen pendiente salvo incumplimiento explícito.

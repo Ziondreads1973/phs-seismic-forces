@@ -48,3 +48,10 @@ Referencias: [Anexo Técnico CNE, artículos 87 y 122.4.iii](https://www.cne.cl/
 - Corte (§8.5.3): llave/tope de corte total o excepción documentada, con control adicional §8.5.4 de no usar grout/fricción. No comprueba interacción ni límites de excepciones.
 - Capacidad de elementos no fusibles, pedestal/fundación (§8.5.5 y cláusula 9) y caso especial de columna empotrada requieren memoria externa.
 - El dictamen orientativo se registra en PDF/TXT, separado de la **ruta usada realmente por el motor**. No altera `Rp`, factores ni fuerzas; una declaración compatible no implica conformidad normativa integral y una candidatura a §8.5 no está cubierta por el cálculo de §7.3.2.
+
+## Actualización de clasificación de anclajes — 2026-11-23
+
+- La selección principal tiene tres rutas (§8.5, §7.3.2 y §7.3.3). El asistente es declarativo; sus cinco respuestas «Cumple/No cumple/No verificado» no constituyen verificaciones resistentes y la elección permanece bajo responsabilidad del ingeniero.
+- Solo el botón «Aplicar clasificación sugerida» modifica la selección de ruta; §7.3.2 y §7.3.3 se traducen al tipo de anclaje utilizado por `src/motor.js`.
+- Para §8.5 se calcula únicamente la fuerza del equipo con la clasificación dúctil correspondiente a Tabla 8; las fuerzas de anclajes calculadas internamente por §7.3.2 se **suprimen de pantalla/PDF/TXT** y se etiquetan «NO CALCULADO». No se interpreta ninguna de ellas como demanda §8.5.
+- El asistente no comprueba geometría ni certifica que la ruta §8.5 cumple; la condición de las columnas empotradas y las excepciones deben verificarse en la documentación del proyecto.

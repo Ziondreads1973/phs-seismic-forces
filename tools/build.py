@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parent.parent
 OUTPUT = ROOT / "dist" / "PHS Seismic Forces.html"
 SOURCES = {
     "MOTOR": ROOT / "src" / "motor.js",
+    "ASSISTANT": ROOT / "src" / "anchor_assistant.js",
     "REPORT": ROOT / "src" / "report.js",
     "UI": ROOT / "src" / "ui.js",
 }

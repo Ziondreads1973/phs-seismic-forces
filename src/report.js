@@ -164,7 +164,7 @@ function detailedEquations(r){
  return {calc,anchors};
 }
 
-function buildReports(r,rawInputs){
+function buildReports(r,rawInputs,guide=null){
  const d=lineData(r,rawInputs),rows=rowsForces(r),name=caption(r);
  const head='<div class="report-kicker">PHS | INGENIERÍA ESTRUCTURAL</div>'+
    '<h1>FUERZAS SÍSMICAS DE DISEÑO</h1><p>'+esc(name)+'</p><hr>';
@@ -174,7 +174,10 @@ function buildReports(r,rawInputs){
  const basalSoil=is2369&&r.inputs.location==='ground';
  const anchorCriterion='Amplificación de anclajes solo en Ex/Ey; Ez,a = Ez sin amplificación.';
  const basalCriterion='Verificar aplicabilidad de NCh2369 §5.8 para equipos rígidos apoyados en suelo (T < 0,06 s); no implementado.';
- const globalHtml=head+'<h2>1. Datos y factores de diseño</h2>'+htmlTable(data)+summary+
+ const guideFooter=is2369&&guide?'<p class="report-foot"><strong>Asistente de anclajes (§8.5, informativo):</strong> '+
+   esc(guide.status)+'. '+esc(guide.warning)+' Ruta orientativa: '+esc(guide.routeLabel)+
+   '. Motor: '+esc(guide.calcRoute)+'.</p>':'';
+ const globalHtml=head+'<h2>1. Datos y factores de diseño</h2>'+htmlTable(data)+summary+guideFooter+
   (is2369?'<p class="report-foot">'+esc(anchorCriterion)+'</p>':'')+
   (basalSoil?'<p class="report-foot">'+esc(basalCriterion)+'</p>':'')+
   '<p class="report-foot">Magnitudes por dirección. No incluye combinaciones gravitacionales ni verificación resistente de anclajes.</p>';
@@ -185,6 +188,16 @@ function buildReports(r,rawInputs){
   '-'.repeat(54),
   ...rows.map(x=>x[0].padEnd(15)+display(x[1],1).padStart(13)+display(x[2],1).padStart(17))];
  const lines=detailedEquations(r);
+ const guideTxt=is2369&&guide?[
+   '5. ASISTENTE DE CLASIFICACIÓN DE ANCLAJES — INFORMATIVO','-'.repeat(54),
+   'Estado: '+guide.status,'Ruta orientativa: '+guide.routeLabel,
+   'Motor: '+guide.calcRoute,'Advertencia: '+guide.warning,
+   ...guide.answers.map(x=>x[0]+' : '+x[1]),'',
+   'Verificaciones declaradas (NO validan resistencias):',
+   ...guide.checks.map(x=>'- '+x.name+' : '+
+     (x.value===true?'Declarado conforme':x.value===false?'No conforme':'No verificado')),
+   ''
+ ]:[];
  const textReport=[
   ...txthead,'',
   '1. ANTECEDENTES','-'.repeat(54),
@@ -193,6 +206,7 @@ function buildReports(r,rawInputs){
   '2. CÁLCULO DE FUERZAS SÍSMICAS','-'.repeat(54),...lines.calc,
   '3. FUERZAS PARA ANCLAJES','-'.repeat(54),...lines.anchors,
   '4. RESUMEN DE RESULTADOS','-'.repeat(54),...txtresult,'-'.repeat(54),'',
+  ...guideTxt,
   'OBSERVACIONES',
   '- Magnitudes positivas por dirección.',
   '- Sin combinaciones ni verificaciones resistentes.',

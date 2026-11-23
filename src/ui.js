@@ -4,9 +4,19 @@
 const $=id=>document.getElementById(id);
 const motor=globalThis.PHSSeismicMotor;
 const report=globalThis.PHSSeismicReport;
+const assistant=globalThis.PHSAnchorGuide;
 let active=null,reports=null;
 const display=(n,d=1)=>new Intl.NumberFormat(undefined,{minimumFractionDigits:d,maximumFractionDigits:d,useGrouping:false}).format(n);
 const num=id=>$(id).value.trim()===''?NaN:Number($(id).value);
+function readGuide(){
+ const v=id=>$(id).value;
+ return assistant.evaluate({
+  material:v('anchorMat'),detail:v('anchorDetail'),diameter_mm:v('anchorDiameter'),
+  free_mm:v('anchorFree'),thread_mm:v('anchorThread'),detailException:v('anchorDetailException'),
+  shear:v('anchorShear'),noFriction:v('anchorNoFriction'),capacity:v('anchorCapacity'),
+  concrete:v('anchorConcrete'),baseType:v('anchorBaseType'),fixedMoment:v('anchorFixedMoment')
+ },v('duct'));
+}
 function read(){
  const standard=$('norm').value;
  const W=num('w');
@@ -28,6 +38,10 @@ function updateVisibility(){
  for(const v of ['2369','87','88'])$('block'+v).hidden=n!==v;
  $('heightGroup').hidden=$('loc2369').value!=='elevated';
  $('scope58Note').hidden=n!=='2369'||$('loc2369').value!=='ground';
+ const detail=$('anchorDetail').value;
+ $('anchorGeometryGroup').hidden=detail!=='saddle'&&detail!=='replaceable';
+ $('anchorDetailExceptionGroup').hidden=detail!=='exception';
+ $('anchorFixedMomentGroup').hidden=$('anchorBaseType').value!=='fixed';
 }
 function refreshReports(){
  if(!reports)return;
@@ -36,11 +50,14 @@ function refreshReports(){
 }
 function render(){
  updateVisibility();
+ const guide=readGuide();
+ $('anchorGuideStatus').textContent=guide.status+'. '+guide.warning+
+  ' Motor: '+guide.calcRoute+'.';
  try{
    const r=read();active=r;reports=report.buildReports(r,{
      w:$('w').value,height:$('height').value,zk:$('zk').value,
      fx:$('fx').value,fy:$('fy').value
-   });
+   },$('norm').value==='2369'?guide:null);
    $('status').textContent='Cálculo actualizado';$('status').className='status valid';
    $('pdfButton').disabled=false;$('txtButton').disabled=false;
    refreshReports();

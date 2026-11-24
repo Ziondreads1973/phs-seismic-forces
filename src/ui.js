@@ -6,7 +6,7 @@ const motor=globalThis.PHSSeismicMotor;
 const report=globalThis.PHSSeismicReport;
 const guideEngine=globalThis.PHSAnchorGuide;
 let active=null,reports=null;
-const display=(n,d=1)=>new Intl.NumberFormat(undefined,{minimumFractionDigits:d,maximumFractionDigits:d,useGrouping:false}).format(n);
+const display=(n,d=1)=>report.formatNumber(n,d);
 const num=id=>$(id).value.trim()===''?NaN:Number($(id).value);
 function guide(){
  const value=id=>$(id).value;

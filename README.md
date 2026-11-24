@@ -22,7 +22,7 @@ Start-Process ".\\dist\\PHS Seismic Forces.html"
 - NCh2369:2025: método simplificado del capítulo 7, sin análisis de edificio; coeficientes y fuerzas X/Y/Z para equipo y anclajes. Para apoyo basal `Zk=0`; al seleccionar «Estructura elevada» aparecen `H` y `Zk` (se admite `0<=Zk<=H`, `H>0`). La ubicación basal muestra un aviso no bloqueante sobre el procedimiento particular §5.8, fuera de alcance. Los reportes señalan explícitamente que el factor de anclajes afecta solo X/Y, no Ez.
 - Art. 87: banco de baterías sobre soporte; `IE=1` por Tabla 4. `fX` y `fY` fijan `KhX` y `KhY`; `Kv=1`. La decisión de **no solicitar frecuencia vertical** es una interpretación de ingeniería documentada en [HIPOTESIS.md](docs/HIPOTESIS.md).
 - Art. 88: celda metálica autosoportada; `IE=R=1`, `A0=0.5g`, `xi=2 %`; obliga a seleccionar modelo vertical V1/V2.
-- Reportes: resumen de pantalla = PDF global A4, TXT detallado con ecuación simbólica seguida del resultado, sin sustituciones. Un decimal fijo en kgf y hasta tres decimales en coeficientes calculados; motor sin redondeos intermedios.
+- Reportes: resumen de pantalla = PDF global A4, TXT detallado con ecuación simbólica seguida del resultado, sin sustituciones. **Sin agrupación de miles y decimal según la configuración regional predeterminada del navegador** (habitualmente la del sistema), tanto en pantalla como en PDF/TXT. Un decimal fijo en kgf y hasta tres decimales en coeficientes calculados; motor sin redondeos intermedios.
 
 **No** calcula reacciones individuales de pernos, análisis sísmico estructural global, combinaciones de carga ni resistencia de anclajes. Los resultados son magnitudes direccionales, no estados simultáneos.
 

@@ -489,3 +489,38 @@ test('Asistente: no aparece en reportes CNE',()=>{
   assert.doesNotMatch(d.nodes.txtPreview.textContent,/ASISTENTE DE CLASIFICACIÓN DE ANCLAJES/);
  }
 });
+
+test('Formato unificado: números mayores a un millón sin agrupación en pantalla, PDF y TXT',()=>{
+ for(const [locale,decimal] of [['es-CL',','],['en-US','.'],['de-DE',',']]){
+  const W='123456789.125';
+  const d=mount({norm:'87',w:W,fx:'35',fy:'35',loc87:'ground'},locale);
+  const nf=(n,places)=>new Intl.NumberFormat(locale,{
+   minimumFractionDigits:places,maximumFractionDigits:places,useGrouping:false
+  }).format(n);
+  const input='123456789'+decimal+'125 kgf';
+  const result=nf(123456789.125*.75,1);
+  for(const content of [d.nodes.globalReport.innerHTML,d.nodes.txtPreview.textContent]){
+   assert.ok(content.includes(input),'Entrada no preservada: '+locale);
+   assert.ok(content.includes(result),'Resultado no regional: '+locale);
+   assert.doesNotMatch(content,/123[., ]456[., ]789/);
+   assert.doesNotMatch(content,/92[., ]592[., ]591/);
+  }
+  d.nodes.pdfButton.events.click();
+  assert.ok(d.saved.printedView.includes(result));
+  d.nodes.txtButton.events.click();
+  assert.ok(d.saved.payload.includes(input));
+  assert.ok(d.saved.payload.includes(result));
+  assert.doesNotMatch(d.saved.payload,/123[., ]456[., ]789/);
+  assert.equal(d.nodes.pdfButton.disabled,false);
+ }
+});
+test('El texto numérico y las constantes locales comparten el formato regional sin grupos',()=>{
+ for(const [locale,decimal] of [['es-CL',','],['en-US','.']]){
+  const d=mount({norm:'88',vertical:'rigid',w:'2000000'},locale);
+  assert.ok(d.localNumbers.some(e=>e.textContent==='0'+decimal+'5'));
+  const expected=new Intl.NumberFormat(locale,{minimumFractionDigits:1,maximumFractionDigits:1,useGrouping:false}).format(2000000*.36);
+  assert.ok(d.nodes.globalReport.innerHTML.includes(expected));
+  assert.ok(d.nodes.txtPreview.textContent.includes(expected));
+  assert.doesNotMatch(d.nodes.globalReport.innerHTML,/720[., ]000[., ]0/);
+ }
+});

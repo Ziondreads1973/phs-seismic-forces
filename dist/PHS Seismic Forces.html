@@ -184,7 +184,7 @@ details summary{font-size:12px;font-weight:650;color:#24577f;cursor:pointer}deta
 </section>
 <section class="card export-card"><h2>3. Exportar resultados</h2>
 <div class="button-row"><button id="pdfButton" disabled>Guardar PDF global</button><button id="txtButton" class="secondary" disabled>Descargar TXT</button></div>
-<p class="muted">El PDF imprime el resumen de pantalla en A4. El TXT desarrolla las fórmulas seguidas de sus resultados numéricos y muestra los coeficientes relevantes, sin sustituciones de valores. Se conserva el separador decimal regional y no se agrupan miles.</p>
+<p class="muted">El PDF imprime el resumen de pantalla en A4. El TXT desarrolla las fórmulas seguidas de sus resultados numéricos y muestra los coeficientes relevantes, sin sustituciones de valores. Los resultados no usan separador de miles; el decimal sigue la configuración regional predeterminada del navegador (normalmente la del sistema).</p>
 <details><summary>Consultar contenido del TXT</summary><pre id="txtPreview">Sin resultados disponibles.</pre></details>
 </section>
 </article>
@@ -371,7 +371,12 @@ return Object.freeze({evaluate,routes});
   else root.PHSSeismicReport=api;
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
 'use strict';
-const display=(n,d=1)=>new Intl.NumberFormat(undefined,{minimumFractionDigits:d,maximumFractionDigits:d,useGrouping:false}).format(n);
+// Formato de presentación único: configuración regional predeterminada del navegador.
+ // Nunca agrupar miles; los redondeos se aplican solo al texto, no al motor.
+const formatNumber=(n,min=0,max=min)=>new Intl.NumberFormat(undefined,{
+ minimumFractionDigits:min,maximumFractionDigits:max,useGrouping:false
+}).format(n);
+const display=(n,d=1)=>formatNumber(n,d);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const force=n=>display(n,1)+' kgf';
 const caption=(r)=>r.method==='NCh2369:2025-cap7'?'NCh2369:2025 · Capítulo 7':r.method==='CNE-Art87'?'Anexo Técnico CNE · Artículo 87':'Anexo Técnico CNE · Artículo 88';
@@ -380,7 +385,7 @@ const place=s=>({'ground':'Nivel basal / terreno','modular':'Sala modular con ap
 // nunca reciben redondeos intermedios, únicamente formato de visualización.
 const decimalSeparator=new Intl.NumberFormat(undefined,{useGrouping:false})
   .formatToParts(1.1).find(x=>x.type==='decimal')?.value||'.';
-const factor=n=>new Intl.NumberFormat(undefined,{maximumFractionDigits:12,useGrouping:false}).format(n);
+const factor=n=>formatNumber(n,0,12);
 function inputValue(id,rawInputs){
  const raw=String(rawInputs[id]??'').trim();
  if(/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(raw))
@@ -428,9 +433,7 @@ function htmlTable(data,forceMode=false){
  * Este redondeo es solo de presentación; el motor conserva precisión completa.
  */
 function calculatedCoefficient(value){
- return new Intl.NumberFormat(undefined,{
-   minimumFractionDigits:0,maximumFractionDigits:3,useGrouping:false
- }).format(value);
+ return formatNumber(value,0,3);
 }
 function normativeFactors(r){
  const k=r.factors;
@@ -591,7 +594,7 @@ function buildReports(r,rawInputs,guide=null,route=null){
  ].join('\n');
  return {globalHtml,textReport};
 }
-return Object.freeze({buildReports});
+return Object.freeze({buildReports,formatNumber});
 });
 
 </script>
@@ -604,7 +607,7 @@ const motor=globalThis.PHSSeismicMotor;
 const report=globalThis.PHSSeismicReport;
 const guideEngine=globalThis.PHSAnchorGuide;
 let active=null,reports=null;
-const display=(n,d=1)=>new Intl.NumberFormat(undefined,{minimumFractionDigits:d,maximumFractionDigits:d,useGrouping:false}).format(n);
+const display=(n,d=1)=>report.formatNumber(n,d);
 const num=id=>$(id).value.trim()===''?NaN:Number($(id).value);
 function guide(){
  const value=id=>$(id).value;

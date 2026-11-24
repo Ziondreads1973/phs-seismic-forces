@@ -5,7 +5,12 @@
   else root.PHSSeismicReport=api;
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
 'use strict';
-const display=(n,d=1)=>new Intl.NumberFormat(undefined,{minimumFractionDigits:d,maximumFractionDigits:d,useGrouping:false}).format(n);
+// Formato de presentación único: configuración regional predeterminada del navegador.
+ // Nunca agrupar miles; los redondeos se aplican solo al texto, no al motor.
+const formatNumber=(n,min=0,max=min)=>new Intl.NumberFormat(undefined,{
+ minimumFractionDigits:min,maximumFractionDigits:max,useGrouping:false
+}).format(n);
+const display=(n,d=1)=>formatNumber(n,d);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const force=n=>display(n,1)+' kgf';
 const caption=(r)=>r.method==='NCh2369:2025-cap7'?'NCh2369:2025 · Capítulo 7':r.method==='CNE-Art87'?'Anexo Técnico CNE · Artículo 87':'Anexo Técnico CNE · Artículo 88';
@@ -14,7 +19,7 @@ const place=s=>({'ground':'Nivel basal / terreno','modular':'Sala modular con ap
 // nunca reciben redondeos intermedios, únicamente formato de visualización.
 const decimalSeparator=new Intl.NumberFormat(undefined,{useGrouping:false})
   .formatToParts(1.1).find(x=>x.type==='decimal')?.value||'.';
-const factor=n=>new Intl.NumberFormat(undefined,{maximumFractionDigits:12,useGrouping:false}).format(n);
+const factor=n=>formatNumber(n,0,12);
 function inputValue(id,rawInputs){
  const raw=String(rawInputs[id]??'').trim();
  if(/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(raw))
@@ -62,9 +67,7 @@ function htmlTable(data,forceMode=false){
  * Este redondeo es solo de presentación; el motor conserva precisión completa.
  */
 function calculatedCoefficient(value){
- return new Intl.NumberFormat(undefined,{
-   minimumFractionDigits:0,maximumFractionDigits:3,useGrouping:false
- }).format(value);
+ return formatNumber(value,0,3);
 }
 function normativeFactors(r){
  const k=r.factors;
@@ -225,5 +228,5 @@ function buildReports(r,rawInputs,guide=null,route=null){
  ].join('\n');
  return {globalHtml,textReport};
 }
-return Object.freeze({buildReports});
+return Object.freeze({buildReports,formatNumber});
 });

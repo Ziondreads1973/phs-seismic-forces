@@ -30,7 +30,7 @@ Se calculan **magnitudes de fuerzas sísmicas globales** por dirección para equ
 
 ## Presentación
 
-Cálculo interno con precisión completa; pantalla/PDF: entradas, factores esenciales, fuerzas; TXT: fórmulas y resultados consecutivos sin sustituciones, hasta tres decimales en coeficientes calculados, fuerzas con un decimal en kgf, punto o coma decimal según la configuración regional predeterminada del navegador, sin separador de miles en pantalla, PDF ni TXT.
+Cálculo interno con precisión completa; pantalla/PDF: entradas, factores esenciales, fuerzas; TXT: fórmulas y resultados consecutivos sin sustituciones, hasta tres decimales en coeficientes calculados, fuerzas con un decimal en kgf, punto por defecto o coma elegida explícitamente desde la aplicación, sin separador de miles en pantalla, PDF ni TXT. Un HTML en navegador no obtiene de forma fiable la preferencia personalizada de Windows/Excel.
 
 Referencias: [Anexo Técnico CNE, artículos 87 y 122.4.iii](https://www.cne.cl/wp-content/uploads/2025/01/AT-Requisitos-Sismo.pdf); NCh2369:2025 §§5.7 y 7.2–7.3.
 

@@ -9,7 +9,7 @@ const scripts=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(x=>x[1]);
 
 function mount(changes={},locale){
   const start={norm:'87',w:'1000',fx:'25',fy:'35',loc87:'ground',
-    cat:'III',zone:'2',soil:'C',equipment:'electrical-mechanical',duct:'7.3.2',
+    cat:'III',zone:'2',soil:'C',equipment:'electrical-mechanical',duct:'7.3.2',decimalFormat:'.',
     loc2369:'ground',height:'',zk:'',loc88:'ground',vertical:'',...changes};
   const nodes={},saved={files:[],printed:0,payload:null,printedView:null};
   const element=id=>nodes[id]||(nodes[id]={id,value:start[id]??'',hidden:false,disabled:false,
@@ -26,7 +26,7 @@ function mount(changes={},locale){
     return {href:'',download:'',click(){saved.files.push(this.download)},remove(){}};
   }};
   const baseIntl=Intl.NumberFormat;
-  const localeIntl={NumberFormat:function(ignored,options){return new baseIntl(locale,options)}};
+  const localeIntl={NumberFormat:function(requested,options){return new baseIntl(requested===undefined?locale:requested,options)}};
   class BlobCapture{constructor(parts){saved.payload=parts.join('')}}
   const context=vm.createContext({document,window:{print(){
     saved.printed++;saved.printedView=element('globalReport').innerHTML;
@@ -144,31 +144,37 @@ test('Art. 87: entradas inválidas borran resultados anteriores y bloquean ambos
   assert.equal(d.saved.printed,0);
 });
 
-test('Formato local: coma o punto decimal, sin separador de miles, en ambas salidas',()=>{
-  for(const [locale,separator] of [['es-CL',','],['en-US','.'],['de-DE',',']]){
-    const d=mount({w:'1000000',fx:'35',fy:'35'},locale);
-    const one=new Intl.NumberFormat(locale,{minimumFractionDigits:1,maximumFractionDigits:1,useGrouping:false}).format(750000);
-    assert.ok(one.includes(separator));
-    assert.ok(d.nodes.globalReport.innerHTML.includes(one));
-    assert.ok(d.nodes.txtPreview.textContent.includes(one));
-    d.nodes.txtButton.events.click();
-    assert.ok(d.saved.payload.includes(one));
-    assert.equal(d.nodes.pdfButton.disabled,false);
-    assert.equal(d.nodes.txtButton.disabled,false);
+test('Punto predeterminado y coma elegida, independiente del navegador, sin miles en pantalla/PDF/TXT',()=>{
+ for(const locale of ['es-CL','en-US','de-DE']){
+  for(const decimal of ['.',',']){
+   const d=mount({w:'1000000',fx:'35',fy:'35',decimalFormat:decimal},locale);
+   const output='750000'+decimal+'0';
+   assert.equal(d.nodes.decimalFormat.value,decimal);
+   assert.ok(d.nodes.globalReport.innerHTML.includes(output),locale+' '+decimal);
+   assert.ok(d.nodes.txtPreview.textContent.includes(output),locale+' '+decimal);
+   d.nodes.pdfButton.events.click();
+   assert.ok(d.saved.printedView.includes(output));
+   d.nodes.txtButton.events.click();
+   assert.ok(d.saved.payload.includes(output));
+   assert.doesNotMatch(d.saved.payload,/750[., ]000/);
+   assert.equal(d.nodes.pdfButton.disabled,false);
   }
+ }
 });
 
-test('FS-06-C02: entradas conservan exactamente los decimales introducidos',()=>{
-  for(const [locale,decimal] of [['es-CL',','],['en-US','.']]){
-    const d=mount({norm:'87',w:'1000.125',fx:'29.99',fy:'30'},locale);
-    const content=d.nodes.globalReport.innerHTML,txt=d.nodes.txtPreview.textContent;
-    for(const label of ['1000'+decimal+'125 kgf','29'+decimal+'99 Hz','30 Hz']){
-      assert.ok(content.includes(label),'Pantalla: '+label);
-      assert.ok(txt.includes(label),'TXT: '+label);
-    }
-    assert.doesNotMatch(content,/29[.,]99\s*Hz[^]*30[.,]00 Hz/);
-    assert.match(txt,/CÁLCULO DE FUERZAS SÍSMICAS/);
+test('FS-06-C02: entradas conservan decimales elegidos sin añadir ceros',()=>{
+ for(const locale of ['es-CL','en-US']){
+  for(const decimal of ['.',',']){
+   const d=mount({norm:'87',w:'1000.125',fx:'29.99',fy:'30',decimalFormat:decimal},locale);
+   const content=d.nodes.globalReport.innerHTML,txt=d.nodes.txtPreview.textContent;
+   for(const label of ['1000'+decimal+'125 kgf','29'+decimal+'99 Hz','30 Hz']){
+    assert.ok(content.includes(label),'Pantalla: '+label);
+    assert.ok(txt.includes(label),'TXT: '+label);
+   }
+   assert.doesNotMatch(content,/29[.,]99\s*Hz[^]*30[.,]00 Hz/);
+   assert.match(txt,/CÁLCULO DE FUERZAS SÍSMICAS/);
   }
+ }
 });
 
 test('FS-06-C02: factores normativos sin ceros sobrantes, fuerzas con un decimal fijo',()=>{
@@ -210,18 +216,19 @@ test('FS-06-C02: pantalla y TXT contienen el mismo valor de cada fuerza',()=>{
  }
 });
 
-test('FS-06-C02: Tabla 4 sin ceros añadidos en referencias, coma y punto decimal',()=>{
- for(const [locale,decimal] of [['es-CL',','],['en-US','.']]){
-  const d=mount({norm:'88'},locale);
-  const numbers=d.localNumbers.map(x=>x.textContent);
-  assert.ok(numbers.includes('1'));
-  assert.ok(numbers.includes('1'+decimal+'5'));
-  assert.ok(numbers.includes('0'+decimal+'5'));
-  assert.ok(!numbers.includes('1'+decimal+'00'));
-  assert.ok(!numbers.includes('1'+decimal+'50'));
+test('FS-06-C02: Tabla 4 usa el separador elegido y evita ceros innecesarios',()=>{
+ for(const locale of ['es-CL','en-US']){
+  for(const decimal of ['.',',']){
+   const d=mount({norm:'88',decimalFormat:decimal},locale);
+   const numbers=d.localNumbers.map(x=>x.textContent);
+   assert.ok(numbers.includes('1'));
+   assert.ok(numbers.includes('1'+decimal+'5'));
+   assert.ok(numbers.includes('0'+decimal+'5'));
+   assert.ok(!numbers.includes('1'+decimal+'00'));
+   assert.ok(!numbers.includes('1'+decimal+'50'));
+  }
  }
 });
-
 
 test('TXT NCh2369: ruta basal y elevada contienen límites, Rp, vertical y amplificación',()=>{
  for(const data of [{loc2369:'ground',duct:'7.3.2'},{loc2369:'elevated',height:'8.50',zk:'4.25',duct:'7.3.3'}]){
@@ -264,21 +271,19 @@ test('TXT Art88: desarrollo espectral y ambas hipótesis verticales',()=>{
  }
 });
 
-test('TXT localización decimal aplica también a fórmulas y resultados',()=>{
+test('TXT aplica el separador seleccionado en fórmulas y resultados',()=>{
  for(const locale of ['es-CL','en-US']){
-  const d=mount({norm:'87',w:'1000',fx:'25',fy:'25',loc87:'floor'},locale);
-  const txt=d.nodes.txtPreview.textContent;
-  const sep=locale==='en-US'?'.':',';
-  assert.ok(txt.includes('0'+sep+'6'),locale);
-  assert.ok(txt.includes('1'+sep+'25'),locale);
-  assert.ok(txt.includes('1'+sep+'35'),locale);
-  assert.ok(txt.includes('1518'+sep+'8'),locale);
-  assert.doesNotMatch(txt,locale==='en-US'?/\b0,60\b/:/\b0\.60\b/);
-  assert.ok(!txt.includes('1'+(sep===','?'.':',')+'25 · Ex'));
-  assert.doesNotMatch(txt,/^\s{2,}= /m);
+  for(const sep of ['.',',']){
+   const d=mount({norm:'87',w:'1000',fx:'25',fy:'25',loc87:'floor',decimalFormat:sep},locale);
+   const txt=d.nodes.txtPreview.textContent;
+   assert.ok(txt.includes('0'+sep+'6'),locale);
+   assert.ok(txt.includes('1'+sep+'25'),locale);
+   assert.ok(txt.includes('1'+sep+'35'),locale);
+   assert.ok(txt.includes('1518'+sep+'8'),locale);
+   assert.doesNotMatch(txt,sep==='.'?/\b0,60\b/:/\b0\.60\b/);
+  }
  }
 });
-
 
 test('FS-06-C04: NCh2369 fórmula y resultado inmediatos, sin reemplazo de valores',()=>{
   for(const p of [{loc2369:'ground',duct:'7.3.2'},{loc2369:'elevated',duct:'7.3.3',height:'6.5',zk:'3.25'}]){
@@ -321,20 +326,22 @@ test('FS-06-C04: Art87 y Art88 tienen fórmula y resultado consecutivos',()=>{
 });
 test('FS-06-C05: hasta tres decimales y sin ceros sobrantes en NCh2369',()=>{
  for(const locale of ['es-CL','en-US']){
-  for(const weight of ['1000','1000000']){
-   const d=mount({norm:'2369',w:weight},locale);
-   const txt=d.nodes.txtPreview.textContent;
-   const decimal=locale==='es-CL'?',':'.';
-   const expected={'ak/g':'0.529','Cp':'0.388','Cmin':'0.37','Cmax':'1.588','Ch':'0.388','Cv':'0.635'};
-   for(const [key,value] of Object.entries(expected)){
-    const actual=value.replace('.',decimal);
-    assert.ok(txt.includes(key+' = '+actual+'\n')||txt.includes(key+' = '+actual+'\r\n'),
-      key+' = '+actual+' no aparece para '+locale+' peso '+weight);
+  for(const decimal of ['.',',']){
+   for(const weight of ['1000','1000000']){
+    const d=mount({norm:'2369',w:weight,decimalFormat:decimal},locale);
+    const txt=d.nodes.txtPreview.textContent;
+    const expected={'ak/g':'0.529','Cp':'0.388','Cmin':'0.37','Cmax':'1.588','Ch':'0.388','Cv':'0.635'};
+    for(const [key,value] of Object.entries(expected)){
+     const actual=value.replace('.',decimal);
+     assert.ok(txt.includes(key+' = '+actual+'\n')||txt.includes(key+' = '+actual+'\r\n'),
+       key+' = '+actual+' no aparece para '+locale+' peso '+weight);
+    }
+    const ex=new Intl.NumberFormat('en-US',{
+     minimumFractionDigits:1,maximumFractionDigits:1,useGrouping:false
+    }).format(Number(weight)*.38808).replace('.',decimal);
+    assert.ok(txt.includes('Ex = '+ex+' kgf'),'Fuerza sin redondeo intermedio');
+    assert.match(txt,/Condición controlante: Cp/);
    }
-   const ex=(Number(weight)*.38808).toLocaleString(locale,
-    {minimumFractionDigits:1,maximumFractionDigits:1,useGrouping:false});
-   assert.ok(txt.includes('Ex = '+ex+' kgf'),'Fuerza sin redondeo intermedio');
-   assert.match(txt,/Condición controlante: Cp/);
   }
  }
 });
@@ -490,37 +497,66 @@ test('Asistente: no aparece en reportes CNE',()=>{
  }
 });
 
-test('Formato unificado: números mayores a un millón sin agrupación en pantalla, PDF y TXT',()=>{
- for(const [locale,decimal] of [['es-CL',','],['en-US','.'],['de-DE',',']]){
-  const W='123456789.125';
-  const d=mount({norm:'87',w:W,fx:'35',fy:'35',loc87:'ground'},locale);
-  const nf=(n,places)=>new Intl.NumberFormat(locale,{
-   minimumFractionDigits:places,maximumFractionDigits:places,useGrouping:false
-  }).format(n);
-  const input='123456789'+decimal+'125 kgf';
-  const result=nf(123456789.125*.75,1);
-  for(const content of [d.nodes.globalReport.innerHTML,d.nodes.txtPreview.textContent]){
-   assert.ok(content.includes(input),'Entrada no preservada: '+locale);
-   assert.ok(content.includes(result),'Resultado no regional: '+locale);
-   assert.doesNotMatch(content,/123[., ]456[., ]789/);
-   assert.doesNotMatch(content,/92[., ]592[., ]591/);
+test('Formato explícito: magnitudes grandes sin grupos en los tres destinos',()=>{
+ for(const locale of ['es-CL','en-US','de-DE']){
+  for(const decimal of ['.',',']){
+   const W='123456789.125';
+   const d=mount({norm:'87',w:W,fx:'35',fy:'35',loc87:'ground',decimalFormat:decimal},locale);
+   const nf=n=>new Intl.NumberFormat('en-US',{
+    minimumFractionDigits:1,maximumFractionDigits:1,useGrouping:false
+   }).format(n).replace('.',decimal);
+   const input='123456789'+decimal+'125 kgf';
+   const result=nf(123456789.125*.75);
+   for(const content of [d.nodes.globalReport.innerHTML,d.nodes.txtPreview.textContent]){
+    assert.ok(content.includes(input),'Entrada no preservada: '+locale);
+    assert.ok(content.includes(result),'Resultado no configurado: '+locale);
+    assert.doesNotMatch(content,/123[., ]456[., ]789/);
+    assert.doesNotMatch(content,/92[., ]592[., ]591/);
+   }
+   d.nodes.pdfButton.events.click();
+   assert.ok(d.saved.printedView.includes(result));
+   d.nodes.txtButton.events.click();
+   assert.ok(d.saved.payload.includes(input));
+   assert.ok(d.saved.payload.includes(result));
+   assert.doesNotMatch(d.saved.payload,/123[., ]456[., ]789/);
+   assert.equal(d.nodes.pdfButton.disabled,false);
   }
-  d.nodes.pdfButton.events.click();
-  assert.ok(d.saved.printedView.includes(result));
-  d.nodes.txtButton.events.click();
-  assert.ok(d.saved.payload.includes(input));
-  assert.ok(d.saved.payload.includes(result));
-  assert.doesNotMatch(d.saved.payload,/123[., ]456[., ]789/);
-  assert.equal(d.nodes.pdfButton.disabled,false);
  }
 });
-test('El texto numérico y las constantes locales comparten el formato regional sin grupos',()=>{
- for(const [locale,decimal] of [['es-CL',','],['en-US','.']]){
-  const d=mount({norm:'88',vertical:'rigid',w:'2000000'},locale);
-  assert.ok(d.localNumbers.some(e=>e.textContent==='0'+decimal+'5'));
-  const expected=new Intl.NumberFormat(locale,{minimumFractionDigits:1,maximumFractionDigits:1,useGrouping:false}).format(2000000*.36);
-  assert.ok(d.nodes.globalReport.innerHTML.includes(expected));
-  assert.ok(d.nodes.txtPreview.textContent.includes(expected));
-  assert.doesNotMatch(d.nodes.globalReport.innerHTML,/720[., ]000[., ]0/);
+
+test('Las constantes estáticas y resultados comparten el separador seleccionado',()=>{
+ for(const locale of ['es-CL','en-US']){
+  for(const decimal of ['.',',']){
+   const d=mount({norm:'88',vertical:'rigid',w:'2000000',decimalFormat:decimal},locale);
+   assert.ok(d.localNumbers.some(e=>e.textContent==='0'+decimal+'5'));
+   const expected=new Intl.NumberFormat('en-US',{
+    minimumFractionDigits:1,maximumFractionDigits:1,useGrouping:false
+   }).format(2000000*.36).replace('.',decimal);
+   assert.ok(d.nodes.globalReport.innerHTML.includes(expected));
+   assert.ok(d.nodes.txtPreview.textContent.includes(expected));
+   assert.doesNotMatch(d.nodes.globalReport.innerHTML,/720[., ]000[., ]0/);
+  }
  }
+});
+
+test('Cambiar separador actualiza pantalla, TXT y referencias sin alterar magnitudes',()=>{
+ const d=mount({norm:'87',w:'1000.125',fx:'25',fy:'25'},'es-CL');
+ const before=d.nodes.globalReport.innerHTML;
+ assert.ok(before.includes('1000.125 kgf'));
+ assert.ok(d.nodes.txtPreview.textContent.includes('0.6'));
+ d.set('decimalFormat',',','change');
+ const after=d.nodes.globalReport.innerHTML;
+ assert.ok(after.includes('1000,125 kgf'));
+ assert.ok(d.nodes.txtPreview.textContent.includes('0,6'));
+ assert.ok(!after.includes('1000.125 kgf'));
+ assert.equal(d.nodes.pdfButton.disabled,false);
+ d.set('decimalFormat','.','change');
+ assert.ok(d.nodes.globalReport.innerHTML.includes('1000.125 kgf'));
+ assert.equal(d.nodes.decimalFormat.value,'.');
+});
+test('El punto es el valor inicial explícito, aun con navegador es-CL',()=>{
+ assert.match(html,/<option value="\." selected>Punto \(\.\)<\/option>/);
+ const d=mount({norm:'88',vertical:'rigid',w:'12345.125'},'es-CL');
+ assert.ok(d.nodes.globalReport.innerHTML.includes('12345.125 kgf'));
+ assert.doesNotMatch(d.nodes.globalReport.innerHTML,/12345,125/);
 });

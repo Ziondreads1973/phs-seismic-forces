@@ -5,11 +5,19 @@
   else root.PHSSeismicReport=api;
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
 'use strict';
-// Formato de presentación único: configuración regional predeterminada del navegador.
- // Nunca agrupar miles; los redondeos se aplican solo al texto, no al motor.
-const formatNumber=(n,min=0,max=min)=>new Intl.NumberFormat(undefined,{
- minimumFractionDigits:min,maximumFractionDigits:max,useGrouping:false
-}).format(n);
+// Los navegadores no exponen el separador decimal personalizado de Windows/Excel.
+// Punto por defecto y coma configurable; nunca se agrupan miles ni se redondea el motor.
+let decimalSeparator='.';
+function setDecimalSeparator(value){
+ if(value!=='.'&&value!==',')throw new RangeError('Separador decimal no válido');
+ decimalSeparator=value;
+}
+const formatNumber=(n,min=0,max=min)=>{
+ const normalized=new Intl.NumberFormat('en-US',{
+  minimumFractionDigits:min,maximumFractionDigits:max,useGrouping:false
+ }).format(n);
+ return decimalSeparator==='.'?normalized:normalized.replace('.',',');
+};
 const display=(n,d=1)=>formatNumber(n,d);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const force=n=>display(n,1)+' kgf';
@@ -17,8 +25,6 @@ const caption=(r)=>r.method==='NCh2369:2025-cap7'?'NCh2369:2025 · Capítulo 7':
 const place=s=>({'ground':'Nivel basal / terreno','modular':'Sala modular con apoyo basal equivalente','elevated':'Estructura elevada','floor':'Piso superior de edificio hasta 3 pisos'})[s]||s;
 // Los valores ingresados conservan sus decimales; las magnitudes calculadas
 // nunca reciben redondeos intermedios, únicamente formato de visualización.
-const decimalSeparator=new Intl.NumberFormat(undefined,{useGrouping:false})
-  .formatToParts(1.1).find(x=>x.type==='decimal')?.value||'.';
 const factor=n=>formatNumber(n,0,12);
 function inputValue(id,rawInputs){
  const raw=String(rawInputs[id]??'').trim();
@@ -228,5 +234,5 @@ function buildReports(r,rawInputs,guide=null,route=null){
  ].join('\n');
  return {globalHtml,textReport};
 }
-return Object.freeze({buildReports,formatNumber});
+return Object.freeze({buildReports,formatNumber,setDecimalSeparator});
 });

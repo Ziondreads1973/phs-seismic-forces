@@ -48,6 +48,8 @@ function refreshReports(){
  $('txtPreview').textContent=reports.textReport;
 }
 function render(){
+ report.setDecimalSeparator($('decimalFormat').value);
+ localizeStaticNumbers();
  updateVisibility();
  const g=guide();
  $('anchorGuideStatus').textContent=g.status+'. '+g.warning+
@@ -92,6 +94,5 @@ $('anchorApply').addEventListener('click',()=>{
 document.querySelectorAll('input,select').forEach(el=>{
  el.addEventListener('input',render);el.addEventListener('change',render);
 });
-localizeStaticNumbers();
 render();
 })();

@@ -152,7 +152,7 @@ test('Art. 87: entradas inválidas borran resultados anteriores y bloquean ambos
   assert.equal(d.saved.printed,0);
 });
 
-test('Separador del PC: punto o coma automáticos, sin miles, en pantalla/PDF/TXT',()=>{
+test('Pruebas unitarias: simulación de punto y coma sin agrupación',()=>{
  for(const locale of ['es-CL','en-US','de-DE']){
   for(const decimal of ['.',',']){
    const d=mount({w:'1000000',fx:'35',fy:'35'},locale,decimal);
@@ -169,7 +169,7 @@ test('Separador del PC: punto o coma automáticos, sin miles, en pantalla/PDF/TX
  }
 });
 
-test('FS-06-C02: las entradas conservan decimales del PC sin añadir ceros',()=>{
+test('FS-06-C02: entradas conservan decimales en las simulaciones',()=>{
  for(const locale of ['es-CL','en-US']){
   for(const decimal of ['.',',']){
    const d=mount({norm:'87',w:'1000.125',fx:'29.99',fy:'30'},locale,decimal);
@@ -223,7 +223,7 @@ test('FS-06-C02: pantalla y TXT contienen el mismo valor de cada fuerza',()=>{
  }
 });
 
-test('FS-06-C02: Tabla 4 usa decimal del PC y evita ceros innecesarios',()=>{
+test('FS-06-C02: tabla estática admite formato inyectado en pruebas',()=>{
  for(const locale of ['es-CL','en-US']){
   for(const decimal of ['.',',']){
    const d=mount({norm:'88'},locale,decimal);
@@ -278,7 +278,7 @@ test('TXT Art88: desarrollo espectral y ambas hipótesis verticales',()=>{
  }
 });
 
-test('TXT aplica el separador del PC en fórmulas y resultados',()=>{
+test('TXT: compatibilidad del formateador con punto y coma simulados',()=>{
  for(const locale of ['es-CL','en-US']){
   for(const sep of ['.',',']){
    const d=mount({norm:'87',w:'1000',fx:'25',fy:'25',loc87:'floor'},locale,sep);
@@ -531,7 +531,7 @@ test('Formato explícito: magnitudes grandes sin grupos en los tres destinos',()
  }
 });
 
-test('Constantes estáticas y resultados comparten separador de Windows',()=>{
+test('Constantes estáticas y resultados comparten formato en pruebas',()=>{
  for(const locale of ['es-CL','en-US']){
   for(const decimal of ['.',',']){
    const d=mount({norm:'88',vertical:'rigid',w:'2000000'},locale,decimal);
@@ -546,7 +546,7 @@ test('Constantes estáticas y resultados comparten separador de Windows',()=>{
  }
 });
 
-test('Dos PC: misma magnitud pero decimal correspondiente a cada sistema',()=>{
+test('Formato inyectado en pruebas: mismas magnitudes, punto y coma',()=>{
  const params={norm:'87',w:'1000.125',fx:'25',fy:'25'};
  const point=mount(params,'es-CL','.');
  const comma=mount(params,'en-US',',');
@@ -559,7 +559,7 @@ test('Dos PC: misma magnitud pero decimal correspondiente a cada sistema',()=>{
  assert.doesNotMatch(html,/id="decimalFormat"/);
 });
 
-test('La compilación define el decimal sin depender del navegador',()=>{
+test('HTML fija el punto sin depender del navegador',()=>{
  assert.match(html,/PHSSeismicReport\.setDecimalSeparator\("[.,]"\);/);
  const d=mount({norm:'88',vertical:'rigid',w:'12345.125'},'es-CL',null);
  assert.ok(d.nodes.globalReport.innerHTML.includes('12345'+builtSeparator+'125 kgf'));

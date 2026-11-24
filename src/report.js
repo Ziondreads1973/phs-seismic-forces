@@ -5,7 +5,7 @@
   else root.PHSSeismicReport=api;
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
 'use strict';
-// El compilador carga el separador configurado en Windows antes de iniciar la UI.
+// Punto decimal fijo para el HTML autónomo; no se leen configuraciones regionales.
 // El motor conserva precisión completa y la presentación nunca agrupa miles.
 let decimalSeparator='.';
 function setDecimalSeparator(value){

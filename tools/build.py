@@ -3,8 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import json
-import locale
 import sys
 from pathlib import Path
 
@@ -18,31 +16,7 @@ SOURCES = {
 }
 
 
-def system_decimal_separator() -> str:
-    """Read the signed-in Windows user's actual decimal preference, not browser locale."""
-    if sys.platform == "win32":
-        try:
-            import winreg
-
-            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Control Panel\\International") as key:
-                decimal, _ = winreg.QueryValueEx(key, "sDecimal")
-        except OSError as exc:
-            raise RuntimeError(
-                "No se pudo leer el separador decimal de Windows (HKCU\\Control Panel\\International\\sDecimal)"
-            ) from exc
-    else:
-        locale.setlocale(locale.LC_NUMERIC, "")
-        decimal = locale.localeconv().get("decimal_point", ".")
-    if decimal not in (".", ","):
-        raise RuntimeError(f"Separador decimal no compatible: {decimal!r}. Se requiere punto o coma.")
-    return decimal
-
-
-def compile_html(decimal_separator: str | None = None) -> str:
-    if decimal_separator is None:
-        decimal_separator = system_decimal_separator()
-    if decimal_separator not in (".", ","):
-        raise ValueError("Separador decimal no válido")
+def compile_html() -> str:
     result = (ROOT / "src" / "template.html").read_text(encoding="utf-8")
     for name, path in SOURCES.items():
         marker = f"/*__PHS_{name}__*/"
@@ -52,10 +26,6 @@ def compile_html(decimal_separator: str | None = None) -> str:
         if "</script" in source.lower():
             raise ValueError(f"El script {path.name} contiene un cierre HTML no escapado")
         result = result.replace(marker, source)
-    decimal_marker = "/*__PHS_DECIMAL__*/"
-    if result.count(decimal_marker) != 1:
-        raise ValueError("Marcador de separador decimal faltante o repetido")
-    result = result.replace(decimal_marker, json.dumps(decimal_separator))
     return result
 
 
@@ -64,12 +34,7 @@ def main() -> int:
     parser.add_argument("--check", action="store_true",
                         help="Comprobar que dist corresponde a src, sin escribir archivos")
     args = parser.parse_args()
-    try:
-        decimal = system_decimal_separator()
-        expected = compile_html(decimal)
-    except (RuntimeError, ValueError) as exc:
-        print(f"ERROR: {exc}", file=sys.stderr)
-        return 1
+    expected = compile_html()
     if args.check:
         if not OUTPUT.is_file() or OUTPUT.read_text(encoding="utf-8") != expected:
             print("ERROR: dist está ausente o desactualizado. Ejecuta: py tools/build.py", file=sys.stderr)
@@ -78,7 +43,7 @@ def main() -> int:
         return 0
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(expected, encoding="utf-8", newline="\n")
-    print(f"HTML autónomo generado: {OUTPUT.relative_to(ROOT)} | decimal del sistema: {decimal!r}")
+    print(f"HTML autónomo generado: {OUTPUT.relative_to(ROOT)}")
     return 0
 
 

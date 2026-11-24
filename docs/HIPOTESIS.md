@@ -30,7 +30,7 @@ Se calculan **magnitudes de fuerzas sísmicas globales** por dirección para equ
 
 ## Presentación
 
-Cálculo interno con precisión completa; pantalla/PDF: entradas, factores esenciales, fuerzas; TXT: fórmulas y resultados consecutivos sin sustituciones, hasta tres decimales en coeficientes calculados, fuerzas con un decimal en kgf, punto o coma según la preferencia `sDecimal` del usuario de Windows leída al compilar, sin separador de miles en pantalla, PDF ni TXT. El HTML standalone conserva el separador del PC donde fue generado; el iniciador `Abrir PHS.cmd` lo regenera en el PC de uso. El navegador no consulta directamente los ajustes personalizados de Windows.
+Cálculo interno con precisión completa; pantalla/PDF: entradas, factores esenciales, fuerzas; TXT: fórmulas y resultados consecutivos sin sustituciones, hasta tres decimales en coeficientes calculados, fuerzas con un decimal en kgf, punto decimal fijo, sin separador de miles en pantalla, PDF ni TXT. El HTML no consulta Windows ni la configuración regional del navegador.
 
 Referencias: [Anexo Técnico CNE, artículos 87 y 122.4.iii](https://www.cne.cl/wp-content/uploads/2025/01/AT-Requisitos-Sismo.pdf); NCh2369:2025 §§5.7 y 7.2–7.3.
 

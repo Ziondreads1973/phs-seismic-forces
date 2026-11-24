@@ -3,7 +3,7 @@
 Calculadora autónoma de fuerzas sísmicas globales para equipos/elementos y demandas de anclajes. Tres rutas: **NCh2369:2025 capítulo 7**, **Anexo Técnico CNE artículo 87** y **artículo 88**.
 
 ## Ejecución
-Abrir **`dist/PHS Seismic Forces.html`** en un navegador moderno; funciona offline y no requiere instalar dependencias.
+El directorio **`dist/` se genera localmente y se excluye de Git**. Después de clonar o actualizar, ejecutar `py tools/build.py` para crear `dist/PHS Seismic Forces.html`; abrir ese HTML en un navegador moderno. La aplicación funciona offline y no necesita dependencias de ejecución.
 
 ## Compilación y validación
 Requiere Python 3 para generar el entregable y Node.js únicamente para ejecutar la suite automatizada:
@@ -16,7 +16,7 @@ node tests/smoke_dom.cjs
 Start-Process ".\\dist\\PHS Seismic Forces.html"
 ```
 
-**Fuente de verdad:** `src/motor.js` (cálculo), `src/report.js` (presentación y reportes), `src/ui.js` (interfaz), `src/template.html` (estructura visual). El compilador **reemplaza tres marcadores una sola vez** y genera el archivo listo para entregar. `--check` detecta modificaciones manuales o un `dist` desactualizado.
+**Fuente de verdad:** `src/motor.js` (cálculo), `src/anchor_assistant.js` (clasificación), `src/report.js` (presentación y reportes), `src/ui.js` (interfaz), `src/template.html` (estructura visual). El compilador **reemplaza cuatro marcadores una sola vez** y genera el archivo listo para entregar. `--check` detecta modificaciones manuales o un `dist` desactualizado.
 
 ## Alcance
 - NCh2369:2025: método simplificado del capítulo 7, sin análisis de edificio; coeficientes y fuerzas X/Y/Z para equipo y anclajes. Para apoyo basal `Zk=0`; al seleccionar «Estructura elevada» aparecen `H` y `Zk` (se admite `0<=Zk<=H`, `H>0`). La ubicación basal muestra un aviso no bloqueante sobre el procedimiento particular §5.8, fuera de alcance. Los reportes señalan explícitamente que el factor de anclajes afecta solo X/Y, no Ez.

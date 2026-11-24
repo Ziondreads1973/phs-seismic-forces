@@ -183,12 +183,8 @@ details summary{font-size:12px;font-weight:650;color:#24577f;cursor:pointer}deta
 <div class="report" id="globalReport">Sin resultados disponibles.</div>
 </section>
 <section class="card export-card"><h2>3. Exportar resultados</h2>
-<div class="field"><label for="decimalFormat">Separador decimal</label><select id="decimalFormat">
-<option value="." selected>Punto (.)</option>
-<option value=",">Coma (,)</option></select>
-<small>Sin separador de miles. El navegador no puede leer el separador personalizado de Windows.</small></div>
 <div class="button-row"><button id="pdfButton" disabled>Guardar PDF global</button><button id="txtButton" class="secondary" disabled>Descargar TXT</button></div>
-<p class="muted">El PDF imprime el resumen de pantalla en A4. El TXT desarrolla las fórmulas seguidas de sus resultados numéricos y muestra los coeficientes relevantes, sin sustituciones de valores. Los resultados, las referencias y los reportes no agrupan miles; el separador decimal corresponde a la opción seleccionada arriba.</p>
+<p class="muted">El PDF imprime el resumen de pantalla en A4. El TXT desarrolla las fórmulas seguidas de sus resultados numéricos y muestra los coeficientes relevantes, sin sustituciones de valores. Sin separador de miles. El separador decimal se establece automáticamente según Windows al abrir con «Abrir PHS.cmd».</p>
 <details><summary>Consultar contenido del TXT</summary><pre id="txtPreview">Sin resultados disponibles.</pre></details>
 </section>
 </article>
@@ -203,6 +199,7 @@ details summary{font-size:12px;font-weight:650;color:#24577f;cursor:pointer}deta
 /*__PHS_REPORT__*/
 </script>
 <script>
+PHSSeismicReport.setDecimalSeparator(/*__PHS_DECIMAL__*/);
 /*__PHS_UI__*/
 </script>
 </body></html>

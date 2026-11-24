@@ -48,7 +48,6 @@ function refreshReports(){
  $('txtPreview').textContent=reports.textReport;
 }
 function render(){
- report.setDecimalSeparator($('decimalFormat').value);
  localizeStaticNumbers();
  updateVisibility();
  const g=guide();

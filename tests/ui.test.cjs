@@ -7,9 +7,10 @@ const path=require('node:path');
 const html=fs.readFileSync(path.resolve(__dirname,'../dist/PHS Seismic Forces.html'),'utf8');
 const scripts=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(x=>x[1]);
 
-function mount(changes={},locale){
+const builtSeparator=JSON.parse(html.match(/PHSSeismicReport\.setDecimalSeparator\(("[.,]")\);/)[1]);
+function mount(changes={},locale,decimal='.') {
   const start={norm:'87',w:'1000',fx:'25',fy:'35',loc87:'ground',
-    cat:'III',zone:'2',soil:'C',equipment:'electrical-mechanical',duct:'7.3.2',decimalFormat:'.',
+    cat:'III',zone:'2',soil:'C',equipment:'electrical-mechanical',duct:'7.3.2',
     loc2369:'ground',height:'',zk:'',loc88:'ground',vertical:'',...changes};
   const nodes={},saved={files:[],printed:0,payload:null,printedView:null};
   const element=id=>nodes[id]||(nodes[id]={id,value:start[id]??'',hidden:false,disabled:false,
@@ -32,7 +33,14 @@ function mount(changes={},locale){
     saved.printed++;saved.printedView=element('globalReport').innerHTML;
   }},URL:{createObjectURL(){return'blob://test'},revokeObjectURL(){}},
     Blob:BlobCapture,setTimeout(){},console,Intl:localeIntl});
-  for(const script of scripts)vm.runInContext(script,context,{timeout:3000});
+  for(const script of scripts){
+    // Simula un HTML generado en PCs con punto/coma aunque las pruebas corran en otro equipo.
+    const loaded=decimal===null?script:script.replace(
+      /PHSSeismicReport\.setDecimalSeparator\("[.,]"\);/,
+      'PHSSeismicReport.setDecimalSeparator('+JSON.stringify(decimal)+');'
+    );
+    vm.runInContext(loaded,context,{timeout:3000});
+  }
   function set(id,value,event='input'){element(id).value=value;element(id).events[event]?.()}
   return {nodes,saved,set,localNumbers};
 }
@@ -144,12 +152,11 @@ test('Art. 87: entradas inválidas borran resultados anteriores y bloquean ambos
   assert.equal(d.saved.printed,0);
 });
 
-test('Punto predeterminado y coma elegida, independiente del navegador, sin miles en pantalla/PDF/TXT',()=>{
+test('Separador del PC: punto o coma automáticos, sin miles, en pantalla/PDF/TXT',()=>{
  for(const locale of ['es-CL','en-US','de-DE']){
   for(const decimal of ['.',',']){
-   const d=mount({w:'1000000',fx:'35',fy:'35',decimalFormat:decimal},locale);
+   const d=mount({w:'1000000',fx:'35',fy:'35'},locale,decimal);
    const output='750000'+decimal+'0';
-   assert.equal(d.nodes.decimalFormat.value,decimal);
    assert.ok(d.nodes.globalReport.innerHTML.includes(output),locale+' '+decimal);
    assert.ok(d.nodes.txtPreview.textContent.includes(output),locale+' '+decimal);
    d.nodes.pdfButton.events.click();
@@ -162,10 +169,10 @@ test('Punto predeterminado y coma elegida, independiente del navegador, sin mile
  }
 });
 
-test('FS-06-C02: entradas conservan decimales elegidos sin añadir ceros',()=>{
+test('FS-06-C02: las entradas conservan decimales del PC sin añadir ceros',()=>{
  for(const locale of ['es-CL','en-US']){
   for(const decimal of ['.',',']){
-   const d=mount({norm:'87',w:'1000.125',fx:'29.99',fy:'30',decimalFormat:decimal},locale);
+   const d=mount({norm:'87',w:'1000.125',fx:'29.99',fy:'30'},locale,decimal);
    const content=d.nodes.globalReport.innerHTML,txt=d.nodes.txtPreview.textContent;
    for(const label of ['1000'+decimal+'125 kgf','29'+decimal+'99 Hz','30 Hz']){
     assert.ok(content.includes(label),'Pantalla: '+label);
@@ -216,10 +223,10 @@ test('FS-06-C02: pantalla y TXT contienen el mismo valor de cada fuerza',()=>{
  }
 });
 
-test('FS-06-C02: Tabla 4 usa el separador elegido y evita ceros innecesarios',()=>{
+test('FS-06-C02: Tabla 4 usa decimal del PC y evita ceros innecesarios',()=>{
  for(const locale of ['es-CL','en-US']){
   for(const decimal of ['.',',']){
-   const d=mount({norm:'88',decimalFormat:decimal},locale);
+   const d=mount({norm:'88'},locale,decimal);
    const numbers=d.localNumbers.map(x=>x.textContent);
    assert.ok(numbers.includes('1'));
    assert.ok(numbers.includes('1'+decimal+'5'));
@@ -271,10 +278,10 @@ test('TXT Art88: desarrollo espectral y ambas hipótesis verticales',()=>{
  }
 });
 
-test('TXT aplica el separador seleccionado en fórmulas y resultados',()=>{
+test('TXT aplica el separador del PC en fórmulas y resultados',()=>{
  for(const locale of ['es-CL','en-US']){
   for(const sep of ['.',',']){
-   const d=mount({norm:'87',w:'1000',fx:'25',fy:'25',loc87:'floor',decimalFormat:sep},locale);
+   const d=mount({norm:'87',w:'1000',fx:'25',fy:'25',loc87:'floor'},locale,sep);
    const txt=d.nodes.txtPreview.textContent;
    assert.ok(txt.includes('0'+sep+'6'),locale);
    assert.ok(txt.includes('1'+sep+'25'),locale);
@@ -328,7 +335,7 @@ test('FS-06-C05: hasta tres decimales y sin ceros sobrantes en NCh2369',()=>{
  for(const locale of ['es-CL','en-US']){
   for(const decimal of ['.',',']){
    for(const weight of ['1000','1000000']){
-    const d=mount({norm:'2369',w:weight,decimalFormat:decimal},locale);
+    const d=mount({norm:'2369',w:weight},locale,decimal);
     const txt=d.nodes.txtPreview.textContent;
     const expected={'ak/g':'0.529','Cp':'0.388','Cmin':'0.37','Cmax':'1.588','Ch':'0.388','Cv':'0.635'};
     for(const [key,value] of Object.entries(expected)){
@@ -501,7 +508,7 @@ test('Formato explícito: magnitudes grandes sin grupos en los tres destinos',()
  for(const locale of ['es-CL','en-US','de-DE']){
   for(const decimal of ['.',',']){
    const W='123456789.125';
-   const d=mount({norm:'87',w:W,fx:'35',fy:'35',loc87:'ground',decimalFormat:decimal},locale);
+   const d=mount({norm:'87',w:W,fx:'35',fy:'35',loc87:'ground'},locale,decimal);
    const nf=n=>new Intl.NumberFormat('en-US',{
     minimumFractionDigits:1,maximumFractionDigits:1,useGrouping:false
    }).format(n).replace('.',decimal);
@@ -524,10 +531,10 @@ test('Formato explícito: magnitudes grandes sin grupos en los tres destinos',()
  }
 });
 
-test('Las constantes estáticas y resultados comparten el separador seleccionado',()=>{
+test('Constantes estáticas y resultados comparten separador de Windows',()=>{
  for(const locale of ['es-CL','en-US']){
   for(const decimal of ['.',',']){
-   const d=mount({norm:'88',vertical:'rigid',w:'2000000',decimalFormat:decimal},locale);
+   const d=mount({norm:'88',vertical:'rigid',w:'2000000'},locale,decimal);
    assert.ok(d.localNumbers.some(e=>e.textContent==='0'+decimal+'5'));
    const expected=new Intl.NumberFormat('en-US',{
     minimumFractionDigits:1,maximumFractionDigits:1,useGrouping:false
@@ -539,24 +546,22 @@ test('Las constantes estáticas y resultados comparten el separador seleccionado
  }
 });
 
-test('Cambiar separador actualiza pantalla, TXT y referencias sin alterar magnitudes',()=>{
- const d=mount({norm:'87',w:'1000.125',fx:'25',fy:'25'},'es-CL');
- const before=d.nodes.globalReport.innerHTML;
- assert.ok(before.includes('1000.125 kgf'));
- assert.ok(d.nodes.txtPreview.textContent.includes('0.6'));
- d.set('decimalFormat',',','change');
- const after=d.nodes.globalReport.innerHTML;
- assert.ok(after.includes('1000,125 kgf'));
- assert.ok(d.nodes.txtPreview.textContent.includes('0,6'));
- assert.ok(!after.includes('1000.125 kgf'));
- assert.equal(d.nodes.pdfButton.disabled,false);
- d.set('decimalFormat','.','change');
- assert.ok(d.nodes.globalReport.innerHTML.includes('1000.125 kgf'));
- assert.equal(d.nodes.decimalFormat.value,'.');
+test('Dos PC: misma magnitud pero decimal correspondiente a cada sistema',()=>{
+ const params={norm:'87',w:'1000.125',fx:'25',fy:'25'};
+ const point=mount(params,'es-CL','.');
+ const comma=mount(params,'en-US',',');
+ assert.ok(point.nodes.globalReport.innerHTML.includes('1000.125 kgf'));
+ assert.ok(comma.nodes.globalReport.innerHTML.includes('1000,125 kgf'));
+ assert.ok(point.nodes.txtPreview.textContent.includes('0.6'));
+ assert.ok(comma.nodes.txtPreview.textContent.includes('0,6'));
+ assert.equal(point.nodes.pdfButton.disabled,false);
+ assert.equal(comma.nodes.pdfButton.disabled,false);
+ assert.doesNotMatch(html,/id="decimalFormat"/);
 });
-test('El punto es el valor inicial explícito, aun con navegador es-CL',()=>{
- assert.match(html,/<option value="\." selected>Punto \(\.\)<\/option>/);
- const d=mount({norm:'88',vertical:'rigid',w:'12345.125'},'es-CL');
- assert.ok(d.nodes.globalReport.innerHTML.includes('12345.125 kgf'));
- assert.doesNotMatch(d.nodes.globalReport.innerHTML,/12345,125/);
+
+test('La compilación define el decimal sin depender del navegador',()=>{
+ assert.match(html,/PHSSeismicReport\.setDecimalSeparator\("[.,]"\);/);
+ const d=mount({norm:'88',vertical:'rigid',w:'12345.125'},'es-CL',null);
+ assert.ok(d.nodes.globalReport.innerHTML.includes('12345'+builtSeparator+'125 kgf'));
+ assert.doesNotMatch(html,/id="decimalFormat"/);
 });

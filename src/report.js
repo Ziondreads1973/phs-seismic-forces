@@ -5,8 +5,8 @@
   else root.PHSSeismicReport=api;
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
 'use strict';
-// Los navegadores no exponen el separador decimal personalizado de Windows/Excel.
-// Punto por defecto y coma configurable; nunca se agrupan miles ni se redondea el motor.
+// El compilador carga el separador configurado en Windows antes de iniciar la UI.
+// El motor conserva precisión completa y la presentación nunca agrupa miles.
 let decimalSeparator='.';
 function setDecimalSeparator(value){
  if(value!=='.'&&value!==',')throw new RangeError('Separador decimal no válido');

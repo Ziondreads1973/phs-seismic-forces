@@ -58,7 +58,7 @@ test('Contrato: PDF y TXT de entradas y fuerzas sin selectores ni JSON',()=>{
 test('Art. 87: pantalla global idéntica al contenido enviado a impresión',()=>{
   const d=mount();
   assert.equal(d.nodes.pdfButton.disabled,false);
-  const f=new Intl.NumberFormat(undefined,{minimumFractionDigits:1,maximumFractionDigits:1,useGrouping:false}).format(1012.5);
+  const f=new Intl.NumberFormat("en-US",{minimumFractionDigits:1,maximumFractionDigits:1,useGrouping:false}).format(1012.5);
   assert.ok(d.nodes.globalReport.innerHTML.includes(f));
   assert.match(d.nodes.globalReport.innerHTML,/Datos y factores de diseño/);
   assert.match(d.nodes.globalReport.innerHTML,/Fuerzas sísmicas finales/);
@@ -198,7 +198,7 @@ test('FS-06-C02: factores normativos sin ceros sobrantes, fuerzas con un decimal
  assert.match(e.nodes.txtPreview.textContent,/Sa,máx\/g/);
  assert.match(e.nodes.txtPreview.textContent,/Fb =/);
  assert.match(e.nodes.txtPreview.textContent,/Ex =/);
- const val=new Intl.NumberFormat(undefined,{minimumFractionDigits:1,maximumFractionDigits:1,useGrouping:false}).format(360);
+ const val=new Intl.NumberFormat("en-US",{minimumFractionDigits:1,maximumFractionDigits:1,useGrouping:false}).format(360);
  assert.ok(e.nodes.globalReport.innerHTML.includes(val));
  assert.ok(e.nodes.txtPreview.textContent.includes(val));
 });
@@ -258,7 +258,7 @@ test('TXT Art87: factores por eje, ubicación y resultados sin sustituciones',()
     '25 Hz','35 Hz','Cx =','Cy =','Ex =','Ey =','Ez =',
     'Ex,a =','Ey,a =','Ez,a ='])
   assert.ok(txt.includes(part),part);
- const nf=n=>new Intl.NumberFormat(undefined,{minimumFractionDigits:1,maximumFractionDigits:1,useGrouping:false}).format(n);
+ const nf=n=>new Intl.NumberFormat("en-US",{minimumFractionDigits:1,maximumFractionDigits:1,useGrouping:false}).format(n);
  for(const v of [1215,900,504,1518.75,1125])
   assert.ok(txt.includes(nf(v)),nf(v));
  assert.doesNotMatch(d.nodes.globalReport.innerHTML,/Coeficiente Cx|Kh ubicación/);
@@ -564,4 +564,19 @@ test('HTML fija el punto sin depender del navegador',()=>{
  const d=mount({norm:'88',vertical:'rigid',w:'12345.125'},'es-CL',null);
  assert.ok(d.nodes.globalReport.innerHTML.includes('12345'+builtSeparator+'125 kgf'));
  assert.doesNotMatch(html,/id="decimalFormat"/);
+});
+
+
+test('Formato fijo: navegador es-CL no altera fuerzas ni reporte de impresión',()=>{
+ const d=mount({norm:'87',w:'1000.125',fx:'25',fy:'35'},'es-CL');
+ const global=d.nodes.globalReport.innerHTML;
+ const txt=d.nodes.txtPreview.textContent;
+ assert.ok(global.includes('1000.125 kgf'));
+ assert.ok(txt.includes('1000.125 kgf'));
+ assert.ok(global.includes('1012.6'));
+ assert.doesNotMatch(global,/1000,125 kgf|1012,6/);
+ d.nodes.pdfButton.events.click();
+ assert.equal(d.saved.printedView,global);
+ d.nodes.txtButton.events.click();
+ assert.equal(d.saved.payload,txt);
 });
